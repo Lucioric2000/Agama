@@ -1,4 +1,5 @@
 const sha256 = require('js-sha256');
+const buggySha256 = require('sha256');
 const bip39 = require('bip39');
 const crypto = require('crypto');
 const bigi = require('bigi');
@@ -7,11 +8,21 @@ const bitcoin = require('bitcoinjs-lib');
 const bs58check = require('bs58check');
 
 module.exports = (shepherd) => {
+  shepherd.wifToWif = (wif, network) => {
+    network = network === 'KMD' ? 'komodo' : network.toLowerCase();
+    const key = shepherd.isZcash(network) ? new bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network), true) : new bitcoin.ECPair.fromWIF(wif, shepherd.getNetworkData(network), true);
+
+    return {
+      pub: key.getAddress(),
+      priv: key.toWIF(),
+    };
+  }
+
   shepherd.seedToWif = (seed, network, iguana) => {
     let bytes;
 
     if (process.argv.indexOf('spvold=true') > -1) {
-      bytes = shepherd.sha256(seed, { asBytes: true });
+      bytes = buggySha256(seed, { asBytes: true });
     } else {
       const hash = sha256.create().update(seed);
       bytes = hash.array();
@@ -24,7 +35,7 @@ module.exports = (shepherd) => {
     }
 
     const d = bigi.fromBuffer(bytes);
-    const keyPair = shepherd.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: shepherd.getNetworkData(network) }) : new bitcoinZcash.ECPair(d, null, { network: shepherd.getNetworkData(network) });
+    const keyPair = shepherd.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: shepherd.getNetworkData(network) }) : new bitcoin.ECPair(d, null, { network: shepherd.getNetworkData(network) });
     const keys = {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
@@ -39,93 +50,120 @@ module.exports = (shepherd) => {
   }
 
   shepherd.get('/electrum/wiftopub', (req, res, next) => {
-    let key = shepherd.isZcash(req.query.coin.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(req.query.wif, shepherd.electrumJSNetworks[req.query.coin], true) : shepherd.bitcoinJS.ECPair.fromWIF(req.query.wif, shepherd.electrumJSNetworks[req.query.coin], true);
-    keys = {
-      priv: key.toWIF(),
-      pub: key.getAddress(),
-    };
+    if (shepherd.checkToken(req.query.token)) {
+      let key = shepherd.isZcash(req.query.coin.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(req.query.wif, shepherd.electrumJSNetworks[req.query.coin], true) : bitcoin.ECPair.fromWIF(req.query.wif, shepherd.electrumJSNetworks[req.query.coin], true);
+      keys = {
+        priv: key.toWIF(),
+        pub: key.getAddress(),
+      };
 
-    const successObj = {
-      msg: 'success',
-      result: {
-        keys,
-      },
-    };
+      const successObj = {
+        msg: 'success',
+        result: {
+          keys,
+        },
+      };
 
-    res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(successObj));
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
+    }
   });
 
   shepherd.get('/electrum/seedtowif', (req, res, next) => {
-    let keys = shepherd.seedToWif(req.query.seed, req.query.network, req.query.iguana);
+    if (shepherd.checkToken(req.query.token)) {
+      let keys = shepherd.seedToWif(req.query.seed, req.query.network, req.query.iguana);
 
-    const successObj = {
-      msg: 'success',
-      result: {
-        keys,
-      },
-    };
+      const successObj = {
+        msg: 'success',
+        result: {
+          keys,
+        },
+      };
 
-    res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(successObj));
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
+    }
   });
 
   shepherd.post('/electrum/keys', (req, res, next) => {
-    let _matchingKeyPairs = 0;
-    let _totalKeys = 0;
-    let _electrumKeys = {};
-    let _seed = req.body.seed;
-    let _wifError = false;
+    if (shepherd.checkToken(req.body.token)) {
+      let _matchingKeyPairs = 0;
+      let _totalKeys = 0;
+      let _electrumKeys = {};
+      let _seed = req.body.seed;
+      let _wifError = false;
 
-    for (let key in shepherd.electrumServers) {
-      const _abbr = shepherd.electrumServers[key].abbr;
-      let isWif = false;
-      let priv;
-      let pub;
+      for (let key in shepherd.electrumServers) {
+        const _abbr = shepherd.electrumServers[key].abbr;
+        let isWif = false;
+        let priv;
+        let pub;
 
-      try {
-        bs58check.decode(_seed);
-        isWif = true;
-      } catch (e) {}
-
-      if (isWif) {
         try {
-          let key = shepherd.isZcash(_abbr.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, shepherd.getNetworkData(_abbr.toLowerCase()), true) : shepherd.bitcoinJS.ECPair.fromWIF(_seed, shepherd.getNetworkData(_abbr.toLowerCase()), true);
-          priv = key.toWIF();
-          pub = key.getAddress();
-        } catch (e) {
-          _wifError = true;
-          break;
+          bs58check.decode(_seed);
+          isWif = true;
+        } catch (e) {}
+
+        if (isWif) {
+          try {
+            let key = shepherd.isZcash(_abbr.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, shepherd.getNetworkData(_abbr.toLowerCase()), true) : bitcoin.ECPair.fromWIF(_seed, shepherd.getNetworkData(_abbr.toLowerCase()), true);
+            priv = key.toWIF();
+            pub = key.getAddress();
+          } catch (e) {
+            _wifError = true;
+            break;
+          }
+        } else {
+          let _keys = shepherd.seedToWif(_seed, shepherd.findNetworkObj(_abbr), req.body.iguana);
+          priv = _keys.priv;
+          pub = _keys.pub;
+        }
+
+        if (shepherd.electrumKeys[_abbr].pub === pub &&
+            shepherd.electrumKeys[_abbr].priv === priv) {
+          _matchingKeyPairs++;
+        }
+        _totalKeys++;
+      }
+
+      if (req.body.active) {
+        _electrumKeys = JSON.parse(JSON.stringify(shepherd.electrumKeys));
+
+        for (let key in _electrumKeys) {
+          if (!shepherd.electrumCoins[key]) {
+            delete _electrumKeys[key];
+          }
         }
       } else {
-        let _keys = shepherd.seedToWif(_seed, shepherd.findNetworkObj(_abbr), req.body.iguana);
-        priv = _keys.priv;
-        pub = _keys.pub;
+        _electrumKeys = shepherd.electrumKeys;
       }
 
-      if (shepherd.electrumKeys[_abbr].pub === pub &&
-          shepherd.electrumKeys[_abbr].priv === priv) {
-        _matchingKeyPairs++;
-      }
-      _totalKeys++;
-    }
+      const successObj = {
+        msg: _wifError ? 'error' : 'success',
+        result: _wifError ? false : (_matchingKeyPairs === _totalKeys ? _electrumKeys : false),
+      };
 
-    if (req.body.active) {
-      _electrumKeys = JSON.parse(JSON.stringify(shepherd.electrumKeys));
-
-      for (let key in _electrumKeys) {
-        if (!shepherd.electrumCoins[key]) {
-          delete _electrumKeys[key];
-        }
-      }
+      res.end(JSON.stringify(successObj));
     } else {
-      _electrumKeys = shepherd.electrumKeys;
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
     }
-
-    const successObj = {
-      msg: _wifError ? 'error' : 'success',
-      result: _wifError ? false : (_matchingKeyPairs === _totalKeys ? _electrumKeys : false),
-    };
-
-    res.end(JSON.stringify(successObj));
   });
 
   shepherd.getSpvFees = () => {
@@ -141,84 +179,45 @@ module.exports = (shepherd) => {
   };
 
   shepherd.post('/electrum/seed/bip39/match', (req, res, next) => {
-    const seed = bip39.mnemonicToSeed(req.body.seed);
-    const hdMaster = shepherd.bitcoinJS.HDNode.fromSeedBuffer(seed, shepherd.electrumJSNetworks.komodo); // seed from above
-    const matchPattern = req.body.match;
-    const _defaultAddressDepth = req.body.addressdepth;
-    const _defaultAccountCount = req.body.accounts;
-    let _addresses = [];
-    let _matchingKey;
+    if (shepherd.checkToken(req.body.token)) {
+      const seed = bip39.mnemonicToSeed(req.body.seed);
+      const hdMaster = bitcoin.HDNode.fromSeedBuffer(seed, shepherd.electrumJSNetworks.komodo); // seed from above
+      const matchPattern = req.body.match;
+      const _defaultAddressDepth = req.body.addressdepth;
+      const _defaultAccountCount = req.body.accounts;
+      let _addresses = [];
+      let _matchingKey;
 
-    for (let i = 0; i < _defaultAccountCount; i++) {
-      for (let j = 0; j < 1; j++) {
-        for (let k = 0; k < _defaultAddressDepth; k++) {
-          const _key = hdMaster.derivePath(`m/44'/141'/${i}'/${j}/${k}`);
+      for (let i = 0; i < _defaultAccountCount; i++) {
+        for (let j = 0; j < 1; j++) {
+          for (let k = 0; k < _defaultAddressDepth; k++) {
+            const _key = hdMaster.derivePath(`m/44'/141'/${i}'/${j}/${k}`);
 
-          if (_key.keyPair.getAddress() === matchPattern) {
-            _matchingKey = {
-              pub: _key.keyPair.getAddress(),
-              priv: _key.keyPair.toWIF(),
-            };
+            if (_key.keyPair.getAddress() === matchPattern) {
+              _matchingKey = {
+                pub: _key.keyPair.getAddress(),
+                priv: _key.keyPair.toWIF(),
+              };
+            }
           }
-          /*_addresses.push({
-            pub: _key.keyPair.getAddress(),
-            priv: _key.keyPair.toWIF(),
-          });*/
         }
       }
+
+      const successObj = {
+        msg: 'success',
+        result: _matchingKey ? _matchingKey : 'address is not found',
+      };
+
+      res.end(JSON.stringify(successObj));
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
     }
-
-    const successObj = {
-      msg: 'success',
-      result: _matchingKey ? _matchingKey : 'address is not found',
-    };
-
-    res.end(JSON.stringify(successObj));
   });
-
-  // spv v2
-  /*shepherd.get('/electrum/bip39/seed', (req, res, next) => {
-    const _seed = '';
-    // TODO
-    const bip39 = require('bip39'); // npm i -S bip39
-    const crypto = require('crypto');
-
-    // what you describe as 'seed'
-    const randomBytes = crypto.randomBytes(16); // 128 bits is enough
-
-    // your 12 word phrase
-    const mnemonic = bip39.entropyToMnemonic(randomBytes.toString('hex'));
-
-    // what is accurately described as the wallet seed
-    // var seed = bip39.mnemonicToSeed(mnemonic) // you'll use this in #3 below
-    const seed = bip39.mnemonicToSeed(_seed);
-
-    console.log(seed);
-
-    const successObj = {
-      msg: 'success',
-      result: {
-        servers: shepherd.electrumServers,
-      },
-    };
-
-    res.end(JSON.stringify(successObj));
-
-    console.log(shepherd.bitcoinJS.networks.komodo);
-    const hdMaster = shepherd.bitcoinJS.HDNode.fromSeedBuffer(seed, shepherd.electrumJSNetworks.komodo); // seed from above
-
-    const key1 = hdMaster.derivePath("m/44'/141'/0'/0/0");
-    const key2 = hdMaster.derivePath('m/1');
-    console.log(hdMaster);
-
-    console.log(key1.keyPair.toWIF());
-    console.log(key1.keyPair.getAddress());
-    console.log(key2.keyPair.toWIF());
-
-    const hdnode = shepherd.bitcoinJS.HDNode.fromSeedBuffer(seed, shepherd.electrumJSNetworks.komodo).deriveHardened(0).derive(0).derive(1);
-    console.log(`address: ${hdnode.getAddress()}`);
-    console.log(`priv (WIF): ${hdnode.keyPair.toWIF()}`);
-  });*/
 
   return shepherd;
 };

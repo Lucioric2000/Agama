@@ -17,7 +17,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fsnode = require('fs');
 const fs = require('fs-extra');
-const numCPUs = require('os').cpus().length;
 const Promise = require('bluebird');
 const arch = require('arch');
 
@@ -58,7 +57,6 @@ shepherd.createAgamaDirs();
 const appSessionHash = md5(Date.now().toString());
 const _spvFees = shepherd.getSpvFees();
 
-shepherd.writeLog(`app init ${appSessionHash}`);
 shepherd.writeLog(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
 shepherd.writeLog('sys info:');
 shepherd.writeLog(`totalmem_readable: ${formatBytes(os.totalmem())}`);
@@ -69,7 +67,9 @@ shepherd.writeLog(`platform: ${osPlatform}`);
 shepherd.writeLog(`os_release: ${os.release()}`);
 shepherd.writeLog(`os_type: ${os.type()}`);
 
-shepherd.log(`app init ${appSessionHash}`);
+if (process.argv.indexOf('devmode') > -1) {
+	shepherd.log(`app init ${appSessionHash}`);
+}
 shepherd.log(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
 shepherd.log('sys info:');
 shepherd.log(`totalmem_readable: ${formatBytes(os.totalmem())}`);
@@ -364,7 +364,6 @@ function createWindow(status, hideLoadingWindow) {
 		if (closeAppAfterLoading) {
 			mainWindow = null;
 			loadingWindow = null;
-			pm2Exit();
 		}
 
 		const staticMenu = Menu.buildFromTemplate([ // if static
@@ -510,7 +509,7 @@ function createWindow(status, hideLoadingWindow) {
 			}
 		}
 
-		// if window closed we kill iguana proc
+		// close app
 		mainWindow.on('closed', () => {
 			appExit();
 		});
@@ -534,18 +533,6 @@ app.on('before-quit', (event) => {
 	if (process.argv.indexOf('dexonly') > -1) {
 		shepherd.killRogueProcess('marketmaker');
 	}
-	/*if (!forceQuitApp &&
-			mainWindow === null &&
-			loadingWindow != null) { // mainWindow not intitialised and loadingWindow not dereferenced
-		// loading window is still open
-		shepherd.log('before-quit prevented');
-		shepherd.writeLog('quit app after loading is done');
-		closeAppAfterLoading = true;
-		// obsolete(?)
-		let code = `$('#loading_status_text').html('Preparing to shutdown the wallet.<br/>Please wait while all daemons are closed...')`;
-		loadingWindow.webContents.executeJavaScript(code);
-		event.preventDefault();
-	}*/
 });
 
 // Emitted when all windows have been closed and the application will quit.
@@ -570,10 +557,6 @@ app.on('quit', (event) => {
 		event.preventDefault();
 	}
 })
-
-app.on('activate', () => {
-	if (mainWindow === null) {}
-});
 
 app.commandLine.appendSwitch('ignore-certificate-errors'); // dirty hack
 
