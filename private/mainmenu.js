@@ -92,8 +92,8 @@ const template = [
     submenu: [
       {
         label: 'Reset settings',
-        click () {
-          console.log(window.require('electron').remote.getCurrentWindow().appConfig);
+        click (item, focusedWindow) {
+          focusedWindow.resetSettings();
         }
       },
     ]

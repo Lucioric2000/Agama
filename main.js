@@ -237,7 +237,7 @@ function createWindow(status, hideLoadingWindow) {
 				// initialise window
 				mainWindow = new BrowserWindow({ // dirty hack to prevent main window flash on quit
 					width: closeAppAfterLoading ? 1 : 1280,
-					height: closeAppAfterLoading ? 1 : 800,
+					height: closeAppAfterLoading ? 1 : 850,
 					icon: agamaIcon,
 					show: false,
 				});
@@ -279,6 +279,9 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.spvFees = _spvFees;
 				mainWindow.startSPV = shepherd.startSPV;
 				mainWindow.startKMDNative = shepherd.startKMDNative;
+				mainWindow.addressVersionCheck = shepherd.addressVersionCheck;
+				mainWindow.getCoinByPub = shepherd.getCoinByPub;
+				mainWindow.resetSettings = function() { shepherd.saveLocalAppConf(__defaultAppSettings) };
 				mainWindow.createSeed = {
 					triggered: false,
 					firstLoginPH: null,

@@ -13,7 +13,9 @@ module.exports = (shepherd) => {
         network === 'HUSH' ||
         network === 'hush' ||
         network === 'ZCL' ||
-        network === 'zcl') {
+        network === 'zcl' ||
+        network === 'BTCZ' ||
+        network === 'btcz') {
       return true;
     }
   };
@@ -61,6 +63,9 @@ module.exports = (shepherd) => {
         coin === 'MNZ' ||
         coin === 'BTCH' ||
         coin === 'KMD' ||
+        coin === 'BEER' ||
+        coin === 'PIZZA' ||
+        coin === 'VOTE' ||
         coin === 'KOMODO' ||
         coinUC === 'SUPERNET' ||
         coinUC === 'REVS' ||
@@ -83,6 +88,9 @@ module.exports = (shepherd) => {
         coinUC === 'WLC' ||
         coinUC === 'MNZ' ||
         coinUC === 'BTCH' ||
+        coinUC === 'BEER' ||
+        coinUC === 'PIZZA' ||
+        coinUC === 'VOTE' ||
         coinUC === 'KMD' ||
         coinUC === 'KOMODO') {
       return shepherd.electrumJSNetworks.komodo;
