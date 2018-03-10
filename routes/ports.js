@@ -28,6 +28,7 @@ const assetChainPorts = {
   'ETOMIC': '10271',
   'VOTE': '8012',
   'BTCH': '8800',
+  'OOT': '12467',
 };
 
 module.exports = assetChainPorts;
