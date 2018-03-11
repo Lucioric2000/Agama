@@ -22,7 +22,9 @@ module.exports = (shepherd) => {
 
   shepherd.isPos = (network) => {
     if (network === 'BLK' ||
-        network === 'blk') {
+        network === 'blk' ||
+        network === 'DNR' ||
+        network === 'dnr') {
       return true;
     }
   };
@@ -66,7 +68,8 @@ module.exports = (shepherd) => {
         coin === 'KMD' ||
         coin === 'BEER' ||
         coin === 'PIZZA' ||
-        coin === 'VOTE' ||
+        coin === 'VOTE2018' ||
+        coin === 'NINJA' ||
         coin === 'KOMODO' ||
         coinUC === 'SUPERNET' ||
         coinUC === 'REVS' ||
@@ -92,7 +95,8 @@ module.exports = (shepherd) => {
         coinUC === 'BTCH' ||
         coinUC === 'BEER' ||
         coinUC === 'PIZZA' ||
-        coinUC === 'VOTE' ||
+        coinUC === 'VOTE2018' ||
+        coinUC === 'NINJA' ||
         coinUC === 'KMD' ||
         coinUC === 'KOMODO') {
       return shepherd.electrumJSNetworks.komodo;
