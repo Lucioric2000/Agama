@@ -1,5 +1,16 @@
 let electrumServers = {
-  coqui: { // !estimatefee
+  oot: { // !estimatefee
+    address: 'electrum1.utrum.io',
+    port: 10088,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'OOT',
+    serverList: [
+      'electrum1.utrum.io:10088',
+      'electrum2.utrum.io:10088'
+    ],
+  },
+   coqui: { // !estimatefee
     address: 'electrum1.cipig.net',
     port: 10011,
     proto: 'tcp',
