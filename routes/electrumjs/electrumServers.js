@@ -214,12 +214,15 @@ let electrumServers = {
     ],
   },
   ninja: { // !estimatefee
-    address: 'electrum.fund.ninja',
+    address: 'electrum1.fund.ninja',
     port: 50001,
     proto: 'tcp',
     txfee: 10000,
     abbr: 'NINJA',
-    serverList: 'none',
+    serverList: [
+      'electrum1.fund.ninja:50001',
+      'electrum2.fund.ninja:50001'
+    ],
   },
   jumblr: { // !estimatefee
     address: 'electrum1.cipig.net',
