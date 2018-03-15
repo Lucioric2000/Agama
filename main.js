@@ -71,6 +71,7 @@ shepherd.writeLog(`os_type: ${os.type()}`);
 if (process.argv.indexOf('devmode') > -1) {
 	shepherd.log(`app init ${appSessionHash}`);
 }
+
 shepherd.log(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
 shepherd.log('sys info:');
 shepherd.log(`totalmem_readable: ${formatBytes(os.totalmem())}`);
@@ -101,7 +102,7 @@ guiapp.use((req, res, next) => {
 	next();
 });
 
-// preload.js
+// preload js
 const _setImmediate = setImmediate;
 const _clearImmediate = clearImmediate;
 

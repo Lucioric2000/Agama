@@ -460,7 +460,7 @@ let electrumServers = {
       '136.243.45.140:50013'
     ],
   },
-  snowgem: {
+  sng: {
     address: '45.77.254.232',
     port: 10001,
     proto: 'tcp',
