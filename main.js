@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
 const os = require('os');
+const { randomBytes } = require('crypto');
 const md5 = require('./routes/md5');
 const exec = require('child_process').exec;
 const { Menu } = require('electron');
@@ -54,7 +55,7 @@ app.setVersion(appBasicInfo.version);
 
 shepherd.createAgamaDirs();
 
-const appSessionHash = md5(Date.now().toString());
+const appSessionHash = randomBytes(32).toString('hex');
 const _spvFees = shepherd.getSpvFees();
 
 shepherd.writeLog(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
