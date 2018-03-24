@@ -1,39 +1,39 @@
 const async = require('async');
 
 module.exports = (shepherd) => {
-  shepherd.sortTransactions = (transactions) => {
+  shepherd.sortTransactions = (transactions, sortBy) => {
     return transactions.sort((b, a) => {
-      if (a.height < b.height) {
+      if (a[sortBy ? sortBy : 'height'] < b[sortBy ? sortBy : 'height']) {
         return -1;
       }
 
-      if (a.height > b.height) {
+      if (a[sortBy ? sortBy : 'height'] > b[sortBy ? sortBy : 'height']) {
         return 1;
       }
 
       return 0;
     });
   }
-  
+
   shepherd.getTransaction = (txid, network, ecl) => {
     return new shepherd.Promise((resolve, reject) => {
       if (!shepherd.electrumCache[network]) {
         shepherd.electrumCache[network] = {};
       }
       if (!shepherd.electrumCache[network].tx) {
-        shepherd.electrumCache[network]['tx'] = {};        
+        shepherd.electrumCache[network]['tx'] = {};
       }
 
       if (!shepherd.electrumCache[network].tx[txid]) {
         shepherd.log(`electrum raw input tx ${txid}`, true);
-        
+
         ecl.blockchainTransactionGet(txid)
         .then((_rawtxJSON) => {
           shepherd.electrumCache[network].tx[txid] = _rawtxJSON;
           resolve(_rawtxJSON);
         });
       } else {
-        shepherd.log(`electrum cached raw input tx ${txid}`, true);        
+        shepherd.log(`electrum cached raw input tx ${txid}`, true);
         resolve(shepherd.electrumCache[network].tx[txid]);
       }
     });
@@ -45,19 +45,19 @@ module.exports = (shepherd) => {
         shepherd.electrumCache[network] = {};
       }
       if (!shepherd.electrumCache[network].blockHeader) {
-        shepherd.electrumCache[network]['blockHeader'] = {};        
+        shepherd.electrumCache[network]['blockHeader'] = {};
       }
 
       if (!shepherd.electrumCache[network].blockHeader[height]) {
         shepherd.log(`electrum raw block ${height}`, true);
-        
+
         ecl.blockchainBlockGetHeader(height)
         .then((_rawtxJSON) => {
           shepherd.electrumCache[network].blockHeader[height] = _rawtxJSON;
           resolve(_rawtxJSON);
         });
       } else {
-        shepherd.log(`electrum cached raw block ${height}`, true);        
+        shepherd.log(`electrum cached raw block ${height}`, true);
         resolve(shepherd.electrumCache[network].blockHeader[height]);
       }
     });
@@ -66,18 +66,18 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/listtransactions', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
 
       shepherd.log('electrum listtransactions ==>', true);
 
-      if (!req.query.full) {
+      if (!req.query.full || ecl.insight) {
         ecl.connect();
         ecl.blockchainAddressGetHistory(req.query.address)
         .then((json) => {
           ecl.close();
           shepherd.log(json, true);
 
-          json = shepherd.sortTransactions(json);
+          json = shepherd.sortTransactions(json, 'timestamp');
 
           const successObj = {
             msg: 'success',
@@ -136,7 +136,7 @@ module.exports = (shepherd) => {
                           async.eachOfSeries(decodedTx.inputs, (_decodedInput, ind2, callback2) => {
                             function checkLoop() {
                               index2++;
-                              
+
                               if (index2 === decodedTx.inputs.length) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
@@ -182,7 +182,7 @@ module.exports = (shepherd) => {
 
                                 if (index === json.length) {
                                   ecl.close();
-                                  
+
                                   const successObj = {
                                     msg: 'success',
                                     result: _rawtx,
@@ -194,7 +194,7 @@ module.exports = (shepherd) => {
                                 callback();
                                 shepherd.log(`tx history main loop ${json.length} | ${index}`, true);
                               }
-                              callback2();                              
+                              callback2();
                             }
 
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
@@ -229,15 +229,15 @@ module.exports = (shepherd) => {
 
                           if (index === json.length) {
                             ecl.close();
-                            
+
                             const successObj = {
                               msg: 'success',
                               result: _rawtx,
                             };
-          
+
                             res.end(JSON.stringify(successObj));
                           } else {
-                            callback();                          
+                            callback();
                           }
                         }
                       });
@@ -257,12 +257,12 @@ module.exports = (shepherd) => {
 
                       if (index === json.length) {
                         ecl.close();
-                        
+
                         const successObj = {
                           msg: 'success',
                           result: _rawtx,
                         };
-      
+
                         res.end(JSON.stringify(successObj));
                       } else {
                         callback();

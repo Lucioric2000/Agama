@@ -92,7 +92,7 @@ module.exports = (shepherd) => {
           });
         });
       } else {
-        console.log(`btcfees, use cache`);
+        shepherd.log('btcfees, use cache', true);
 
         const successObj = {
           msg: 'success',

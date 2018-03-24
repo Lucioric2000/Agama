@@ -548,6 +548,15 @@ let electrumServers = {
       's2.qtum.info:50001'
     ],
   },
+  aby: {
+    address: 'http://explorer.artbyte.me',
+    port: 'none',
+    proto: 'insight',
+    insightRawApi: false,
+    txfee: 100000,
+    abbr: 'ABY',
+    serverList: 'none',
+  },
 };
 
 electrumServers.crw = electrumServers.crown;

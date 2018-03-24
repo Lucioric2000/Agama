@@ -24,7 +24,7 @@
   "author": "SuperNET Team",
   "license": "MIT",
   "devDependencies": {
-    "electron": "1.8.3"
+    "electron": "1.8.4"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
@@ -40,7 +40,7 @@
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",
     "coinselect": "github:bitcoinjs/coinselect",
-    "electron": "1.8.3",
+    "electron": "1.8.4",
     "express": "^4.14.0",
     "fix-path": "^2.1.0",
     "fs-extra": "^4.0.2",

@@ -4,7 +4,7 @@ module.exports = (shepherd) => {
   shepherd.listunspent = (ecl, address, network, full, verify) => {
     let _atLeastOneDecodeTxFailed = false;
 
-    if (full) {
+    if (full && !ecl.insight) {
       return new shepherd.Promise((resolve, reject) => {
         ecl.connect();
         ecl.blockchainAddressListunspent(address)
@@ -161,7 +161,7 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/listunspent', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
 
       if (req.query.full &&
           req.query.full === 'true') {

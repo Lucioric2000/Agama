@@ -31,11 +31,13 @@ module.exports = (shepherd) => {
     }
   };
 
-  shepherd.electrumJSTxDecoder = (rawtx, networkName, network) => {
+  shepherd.electrumJSTxDecoder = (rawtx, networkName, network, insight) => {
     if (shepherd.isZcash(networkName)) {
       return txDecoder.zcash(rawtx, network);
     } else if (shepherd.isPos(networkName)) {
       return txDecoder.pos(rawtx, network);
+    } else if (insight) {
+      console.log('insight decoder');
     } else {
       return txDecoder.default(rawtx, network);
     }
