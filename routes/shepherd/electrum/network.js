@@ -17,7 +17,19 @@ module.exports = (shepherd) => {
         network === 'ZCL' ||
         network === 'zcl' ||
         network === 'BTCZ' ||
-        network === 'btcz') {
+        network === 'btcz' ||
+        network === 'VOT' ||
+        network === 'vot' ||
+        network === 'BTCP' ||
+        network === 'btcp' ||
+        network === 'XZC' ||
+        network === 'xzc' ||
+        network === 'ZEN' ||
+        network === 'zen' ||
+        network === 'SYS' ||
+        network === 'sys' ||
+        network === 'SMART' ||
+        network === 'smart') {
       return true;
     }
   };
@@ -26,7 +38,9 @@ module.exports = (shepherd) => {
     if (network === 'BLK' ||
         network === 'blk' ||
         network === 'DNR' ||
-        network === 'dnr') {
+        network === 'dnr' ||
+        network === 'XWC' ||
+        network === 'xwc') {
       return true;
     }
   };

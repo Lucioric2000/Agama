@@ -16,6 +16,34 @@ module.exports = (shepherd) => {
       shepherd.insightJSCoreActiveCoin = electrumServer;
     }
 
+    const apiRoutes = (type, address) => {
+      if (shepherd.insightJSCoreActiveCoin.nonStdApi) {
+        switch (type) {
+          case 'transactions':
+            return shepherd.insightJSCoreActiveCoin.nonStdApi.transactions.replace('{address}', address);
+            break;
+          case 'utxo':
+            return shepherd.insightJSCoreActiveCoin.nonStdApi.transactions.replace('{utxo}', address);
+            break;
+          case 'push':
+            return shepherd.insightJSCoreActiveCoin.nonStdApi.push;
+            break;
+        }
+      } else {
+        switch (type) {
+          case 'transactions':
+            return `txs/?address=${address}`;
+            break;
+          case 'utxo':
+            return `addr/${address}/utxo`;
+            break;
+          case 'push':
+            return 'tx/send';
+            break;
+        }
+      }
+    };
+
     return {
       insight: true,
       connect: () => {
@@ -29,11 +57,11 @@ module.exports = (shepherd) => {
 
         return new shepherd.Promise((resolve, reject) => {
           let options = {
-            url: `${shepherd.insightJSCoreActiveCoin.address}/api/addr/${address}/utxo`,
+            url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`,
             method: 'GET',
           };
 
-          console.log(`${shepherd.insightJSCoreActiveCoin.address}/api/addr/${address}/utxo`);
+          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`);
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour
@@ -71,11 +99,11 @@ module.exports = (shepherd) => {
 
         return new shepherd.Promise((resolve, reject) => {
           let options = {
-            url: `${shepherd.insightJSCoreActiveCoin.address}/api/addr/${address}/utxo`,
+            url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`,
             method: 'GET',
           };
 
-          console.log(`${shepherd.insightJSCoreActiveCoin.address}/api/addr/${address}/utxo`);
+          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`);
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour
@@ -89,6 +117,10 @@ module.exports = (shepherd) => {
 
                 if (_parsedBody) {
                   let _utxos = [];
+
+                  if (_parsedBody.utxo) {
+                    _parsedBody = _parsedBody.utxo;
+                  }
 
                   for (let i = 0; i < _parsedBody.length; i++) {
                     _utxos.push({
@@ -120,25 +152,26 @@ module.exports = (shepherd) => {
 
         return new shepherd.Promise((resolve, reject) => {
           let options = {
-            url: `${shepherd.insightJSCoreActiveCoin.address}/api/txs/?address=${address}`,
+            url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('transactions', address)}`,
             method: 'GET',
           };
 
-          console.log(`${shepherd.insightJSCoreActiveCoin.address}/api/txs/?address=${address}`);
+          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('transactions', address)}`);
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour
           request(options, (error, response, body) => {
+              console.log(body);
             if (response &&
                 response.statusCode &&
                 response.statusCode === 200) {
               try {
                 const _parsedBody = JSON.parse(body);
-                console.log(_parsedBody.txs);
+                console.log(_parsedBody.txs || _parsedBody.transactions);
 
                 if (_parsedBody &&
-                    _parsedBody.txs) {
-                  const _txs = _parsedBody.txs;
+                    (_parsedBody.txs || _parsedBody.transactions)) {
+                  const _txs = _parsedBody.txs || _parsedBody.transactions;
                   let txs = [];
 
                   for (let i = 0; i < _txs.length; i++) {
