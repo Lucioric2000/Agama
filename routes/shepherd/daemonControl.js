@@ -58,12 +58,12 @@ module.exports = (shepherd) => {
         }
         break;
       case 'coind':
-        DaemonConfPath = _platform === 'win32' ? shepherd.path.normalize(`${shepherd.coindRootDir}/${coind.toLowerCase()}`) : `${shepherd.coindRootDir}/${coind.toLowerCase()}`;
+        DaemonConfPath = _platform === 'win32' ? path.normalize(`${shepherd.coindRootDir}/${coind.toLowerCase()}`) : `${shepherd.coindRootDir}/${coind.toLowerCase()}`;
         break;
       default:
         DaemonConfPath = `${shepherd.komodoDir}/${flock}`;
         if (_platform === 'win32') {
-          DaemonConfPath = shepherd.path.normalize(DaemonConfPath);
+          DaemonConfPath = path.normalize(DaemonConfPath);
         }
     }
 
@@ -230,7 +230,11 @@ module.exports = (shepherd) => {
                 let spawnErr = fs.openSync(_daemonLogName, 'a');
 
                 spawn(shepherd.komododBin, _arg, {
-                  stdio: ['ignore', spawnOut, spawnErr],
+                  stdio: [
+                    'ignore',
+                    spawnOut,
+                    spawnErr
+                  ],
                   detached: true,
                 }).unref();
               } else {
@@ -439,7 +443,7 @@ module.exports = (shepherd) => {
             fs.unlink(coindDebugLogLocation);
           }
         });
-       } catch(e) {
+       } catch (e) {
          shepherd.log(`coind ${coind} debug.log access err: ${e}`);
          shepherd.writeLog(`coind ${coind} debug.log access err: ${e}`);
        }
@@ -475,7 +479,7 @@ module.exports = (shepherd) => {
             shepherd.writeLog(`port ${_port} (${coind}) is already in use`);
           }
         });
-      } catch(e) {
+      } catch (e) {
         shepherd.log(`failed to start ${coind} err: ${e}`);
         shepherd.writeLog(`failed to start ${coind} err: ${e}`);
       }
@@ -609,7 +613,7 @@ module.exports = (shepherd) => {
                 shepherd.log('rpcuser: OK');
                 shepherd.writeLog('rpcuser: OK');
               } else {
-                const randomstring = shepherd.md5((Math.random() * Math.random() * 999).toString());
+                const randomstring = md5((Math.random() * Math.random() * 999).toString());
 
                 shepherd.log('rpcuser: NOT FOUND');
                 shepherd.writeLog('rpcuser: NOT FOUND');

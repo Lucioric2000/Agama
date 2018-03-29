@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 module.exports = (shepherd) => {
   shepherd.get('/electrum/getblockinfo', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
@@ -21,7 +23,7 @@ module.exports = (shepherd) => {
   });
 
   shepherd.electrumGetBlockInfo = (height, network) => {
-    return new shepherd.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
 
       ecl.connect();
@@ -58,7 +60,7 @@ module.exports = (shepherd) => {
   });
 
   shepherd.electrumGetCurrentBlock = (network) => {
-    return new shepherd.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
 
       ecl.connect();

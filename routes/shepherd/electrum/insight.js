@@ -1,4 +1,5 @@
 const request = require('request');
+const Promise = require('bluebird');
 
 // abstraction layer to communicate with insight explorers
 
@@ -55,7 +56,7 @@ module.exports = (shepherd) => {
       blockchainAddressGetBalance: (address) => {
         shepherd.log('insight blockchainAddressGetBalance', true);
 
-        return new shepherd.Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           let options = {
             url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`,
             method: 'GET',
@@ -97,7 +98,7 @@ module.exports = (shepherd) => {
       blockchainAddressListunspent: (address) => {
         shepherd.log('insight blockchainAddressListunspent', true);
 
-        return new shepherd.Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           let options = {
             url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`,
             method: 'GET',

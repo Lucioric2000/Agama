@@ -1,11 +1,14 @@
 // TODO: watchonly spendable switch
 
+const Promise = require('bluebird');
+
 module.exports = (shepherd) => {
   shepherd.listunspent = (ecl, address, network, full, verify) => {
     let _atLeastOneDecodeTxFailed = false;
 
-    if (full && !ecl.insight) {
-      return new shepherd.Promise((resolve, reject) => {
+    if (full &&
+        !ecl.insight) {
+      return new Promise((resolve, reject) => {
         ecl.connect();
         ecl.blockchainAddressListunspent(address)
         .then((_utxoJSON) => {
@@ -29,12 +32,12 @@ module.exports = (shepherd) => {
                   ecl.close();
                   resolve('no valid utxo');
                 } else {
-                  shepherd.Promise.all(_utxo.map((_utxoItem, index) => {
-                    return new shepherd.Promise((resolve, reject) => {
+                  Promise.all(_utxo.map((_utxoItem, index) => {
+                    return new Promise((resolve, reject) => {
                       shepherd.getTransaction(_utxoItem['tx_hash'], network, ecl)
                       .then((_rawtxJSON) => {
                         shepherd.log('electrum gettransaction ==>', true);
-                        shepherd.log(index + ' | ' + (_rawtxJSON.length - 1), true);
+                        shepherd.log(`${index} | ${(_rawtxJSON.length - 1)}`, true);
                         shepherd.log(_rawtxJSON, true);
 
                         // decode tx
@@ -72,7 +75,11 @@ module.exports = (shepherd) => {
 
                             // merkle root verification against another electrum server
                             if (verify) {
-                              shepherd.verifyMerkleByCoin(shepherd.findCoinName(network), _utxoItem['tx_hash'], _utxoItem.height)
+                              shepherd.verifyMerkleByCoin(
+                                shepherd.findCoinName(network),
+                                _utxoItem['tx_hash'],
+                                _utxoItem.height
+                              )
                               .then((verifyMerkleRes) => {
                                 if (verifyMerkleRes &&
                                     verifyMerkleRes === shepherd.CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
@@ -99,7 +106,11 @@ module.exports = (shepherd) => {
 
                             // merkle root verification against another electrum server
                             if (verify) {
-                              shepherd.verifyMerkleByCoin(shepherd.findCoinName(network), _utxoItem['tx_hash'], _utxoItem.height)
+                              shepherd.verifyMerkleByCoin(
+                                shepherd.findCoinName(network),
+                                _utxoItem['tx_hash'],
+                                _utxoItem.height
+                              )
                               .then((verifyMerkleRes) => {
                                 if (verifyMerkleRes &&
                                     verifyMerkleRes === shepherd.CONNECTION_ERROR_OR_INCOMPLETE_DATA) {
@@ -141,7 +152,7 @@ module.exports = (shepherd) => {
         });
       });
     } else {
-      return new shepherd.Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         ecl.connect();
         ecl.blockchainAddressListunspent(address)
         .then((json) => {

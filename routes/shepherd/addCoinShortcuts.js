@@ -1,4 +1,7 @@
 const electrumServers = require('../electrumjs/electrumServers');
+const request = require('request');
+
+// TODO: refactor
 
 module.exports = (shepherd) => {
   shepherd.startSPV = (coin) => {
@@ -44,7 +47,7 @@ module.exports = (shepherd) => {
         }),
       };
 
-      shepherd.request(options, (error, response, body) => {
+      request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
             response.statusCode === 200) {
@@ -78,7 +81,7 @@ module.exports = (shepherd) => {
         }),
       };
 
-      shepherd.request(options, (error, response, body) => {
+      request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
             response.statusCode === 200) {
@@ -112,7 +115,7 @@ module.exports = (shepherd) => {
         }),
       };
 
-      shepherd.request(options, (error, response, body) => {
+      request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
             response.statusCode === 200) {
@@ -146,7 +149,7 @@ module.exports = (shepherd) => {
         }),
       };
 
-      shepherd.request(options, (error, response, body) => {
+      request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
             response.statusCode === 200) {
@@ -180,7 +183,7 @@ module.exports = (shepherd) => {
         }),
       };
 
-      shepherd.request(options, (error, response, body) => {
+      request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
             response.statusCode === 200) {
@@ -231,7 +234,7 @@ module.exports = (shepherd) => {
             }),
           };
 
-          shepherd.request(options, (error, response, body) => {
+          request(options, (error, response, body) => {
             if (response &&
                 response.statusCode &&
                 response.statusCode === 200) {

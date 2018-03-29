@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+const request = require('request');
 
 module.exports = (shepherd) => {
   /*
@@ -24,7 +25,7 @@ module.exports = (shepherd) => {
         _promiseStack = [
           'getinfo',
           'listtransactions',
-          'getbalance',
+          'getbalance'
         ];
       } else {
         _returnObj = {
@@ -272,7 +273,7 @@ module.exports = (shepherd) => {
             timeout: 120000,
           };
 
-          shepherd.request(options, (error, response, body) => {
+          request(options, (error, response, body) => {
             if (response &&
                 response.statusCode &&
                 response.statusCode === 200) {

@@ -18,7 +18,7 @@ module.exports = (shepherd) => {
       fs.readdir(rootLocation, (err, items) => {
         for (let i = 0; i < items.length; i++) {
           if (items[i].substr(0, 3) === 'gen') {
-            console.log(items[i]);
+            shepherd.log(`remove items[i]`);
             fs.unlinkSync(rootLocation + items[i]);
           }
         }

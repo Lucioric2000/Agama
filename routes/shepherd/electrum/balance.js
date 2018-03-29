@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 module.exports = (shepherd) => {
   shepherd.get('/electrum/getbalance', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
@@ -35,8 +37,8 @@ module.exports = (shepherd) => {
                     _utxo.length) {
                   let interestTotal = 0;
 
-                  shepherd.Promise.all(_utxo.map((_utxoItem, index) => {
-                    return new shepherd.Promise((resolve, reject) => {
+                  Promise.all(_utxo.map((_utxoItem, index) => {
+                    return new Promise((resolve, reject) => {
                       shepherd.getTransaction(_utxoItem['tx_hash'], network, ecl)
                       .then((_rawtxJSON) => {
                         shepherd.log('electrum gettransaction ==>', true);

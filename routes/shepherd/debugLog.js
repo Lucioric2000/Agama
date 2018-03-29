@@ -1,3 +1,7 @@
+const path = require('path');
+const _fs = require('graceful-fs');
+const Promise = require('bluebird');
+
 module.exports = (shepherd) => {
   /*
    *  type: POST
@@ -20,7 +24,7 @@ module.exports = (shepherd) => {
 
       if (shepherd.os.platform() === 'win32') {
         shepherd.komodoDir = shepherd.appConfig.dataDir.length ? shepherd.appConfig.dataDir : `${process.env.APPDATA}/Komodo`;
-        shepherd.komodoDir = shepherd.path.normalize(shepherd.komodoDir);
+        shepherd.komodoDir = path.normalize(shepherd.komodoDir);
       }
 
       if (_herd === 'komodo') {
@@ -93,18 +97,18 @@ module.exports = (shepherd) => {
   });
 
   shepherd.readDebugLog = (fileLocation, lastNLines) => {
-    return new shepherd.Promise(
+    return new Promise(
       (resolve, reject) => {
         if (lastNLines) {
           try {
-            shepherd._fs.access(fileLocation, shepherd.fs.constants.R_OK, (err) => {
+            _fs.access(fileLocation, shepherd.fs.constants.R_OK, (err) => {
               if (err) {
                 shepherd.log(`error reading ${fileLocation}`);
                 shepherd.writeLog(`error reading ${fileLocation}`);
                 reject(`readDebugLog error: ${err}`);
               } else {
                 shepherd.log(`reading ${fileLocation}`);
-                shepherd._fs.readFile(fileLocation, 'utf-8', (err, data) => {
+                _fs.readFile(fileLocation, 'utf-8', (err, data) => {
                   if (err) {
                     shepherd.writeLog(`readDebugLog err: ${err}`);
                     shepherd.log(`readDebugLog err: ${err}`);
