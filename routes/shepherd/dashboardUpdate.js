@@ -59,7 +59,7 @@ module.exports = (shepherd) => {
             _bitcoinRPC(
               coin,
               _type === 'public' ? 'getaddressesbyaccount' : 'z_listaddresses',
-              ['']
+              _type === 'public' ? [''] : null
             )
             .then((_json) => {
               if (_json === 'Work queue depth exceeded' ||
@@ -87,10 +87,13 @@ module.exports = (shepherd) => {
                   const filteredArray = json.filter(res => res.address === allAddrArray[a]).map(res => res.amount);
 
                   let isNewAddr = true;
+
                   for (let x = 0; x < result.length && isNewAddr; x++) {
-                    for (let y = 0; y < result[x].length && isNewAddr; y++) {
-                      if (allAddrArray[a] === result[x][y]) {
-                        isNewAddr = false;
+                    if (result[x]) {
+                      for (let y = 0; y < result[x].length && isNewAddr; y++) {
+                        if (allAddrArray[a] === result[x][y]) {
+                          isNewAddr = false;
+                        }
                       }
                     }
                   }

@@ -115,8 +115,8 @@ module.exports = (shepherd) => {
             }
 
             exec(`"${_coindCliBin}" ${_arg}`, (error, stdout, stderr) => {
-              //shepherd.log(`stdout: ${stdout}`);
-              //shepherd.log(`stderr: ${stderr}`);
+              // shepherd.log(`stdout: ${stdout}`);
+              // shepherd.log(`stderr: ${stderr}`);
 
               if (error !== null) {
                 shepherd.log(`exec error: ${error}`);
