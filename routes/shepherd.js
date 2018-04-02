@@ -103,6 +103,8 @@ shepherd = require('./shepherd/electrum/createtx-multi.js')(shepherd);
 shepherd = require('./shepherd/electrum/interest.js')(shepherd);
 shepherd = require('./shepherd/electrum/listunspent.js')(shepherd);
 shepherd = require('./shepherd/electrum/estimate.js')(shepherd);
+shepherd = require('./shepherd/electrum/btcFees.js')(shepherd);
+shepherd = require('./shepherd/electrum/insight.js')(shepherd);
 
 // dex
 shepherd = require('./shepherd/dex/coind.js')(shepherd);

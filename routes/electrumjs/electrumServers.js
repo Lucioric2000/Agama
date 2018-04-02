@@ -214,12 +214,15 @@ let electrumServers = {
     ],
   },
   ninja: { // !estimatefee
-    address: 'electrum.fund.ninja',
+    address: 'electrum1.fund.ninja',
     port: 50001,
     proto: 'tcp',
     txfee: 10000,
     abbr: 'NINJA',
-    serverList: 'none',
+    serverList: [
+      'electrum1.fund.ninja:50001',
+      'electrum2.fund.ninja:50001'
+    ],
   },
   jumblr: { // !estimatefee
     address: 'electrum1.cipig.net',
@@ -457,6 +460,17 @@ let electrumServers = {
       '136.243.45.140:50013'
     ],
   },
+  sng: { // ssl 50002
+    address: 'electrumsvr.snowgem.org',
+    port: 50001,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'SNG',
+    serverList: [
+      'electrumsvr.snowgem.org:50001',
+      'electrumsvr.snowgem.org:50001'
+    ],
+  },
   xmy: {
     address: 'cetus.cryptap.us',
     port: 50004,
@@ -533,6 +547,39 @@ let electrumServers = {
       's1.qtum.info:50001',
       's2.qtum.info:50001'
     ],
+  },
+  // insight
+  aby: {
+    address: 'http://explorer.artbyte.me/api/',
+    proto: 'insight',
+    insightRawApi: false,
+    txfee: 100000,
+    abbr: 'ABY',
+    serverList: 'none',
+  },
+  mac: { // cloudfare captcha :(
+    address: 'https://explorer.machinecoin.org/api/',
+    proto: 'insight',
+    insightRawApi: false,
+    txfee: 100000,
+    abbr: 'MAC',
+    serverList: 'none',
+  },
+  vot: {
+    address: 'http://explorer.votecoin.site/insight-api-zcash/',
+    proto: 'insight',
+    insightRawApi: false,
+    txfee: 10000,
+    abbr: 'VOT',
+    serverList: 'none',
+  },
+  bdl: {
+    address: 'https://explorer.bitdeal.co.in/api/',
+    proto: 'insight',
+    insightRawApi: false,
+    txfee: 10000,
+    abbr: 'BDL',
+    serverList: 'none',
   },
 };
 

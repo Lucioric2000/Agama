@@ -21,6 +21,7 @@ module.exports = (shepherd) => {
   shepherd.seedToWif = (seed, network, iguana) => {
     let bytes;
 
+    // legacy seed edge case
     if (process.argv.indexOf('spvold=true') > -1) {
       bytes = buggySha256(seed, { asBytes: true });
     } else {
@@ -142,7 +143,7 @@ module.exports = (shepherd) => {
       } else {
         return 'Unable to find matching coin version';
       }
-    } catch(e) {
+    } catch (e) {
       return 'Invalid pub address';
     }
   };
@@ -153,12 +154,13 @@ module.exports = (shepherd) => {
     try {
       const _b58check = shepherd.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
 
-      if (_b58check.version === _network.pubKeyHash) {
+      if (_b58check.version === _network.pubKeyHash ||
+          (address[0] === 'b' && shepherd.getNetworkData(network.toLowerCase()).pubKeyHash === 60)) { // kmd multisig edge case
         return true;
       } else {
         return false;
       }
-    } catch(e) {
+    } catch (e) {
       return 'Invalid pub address';
     }
   };

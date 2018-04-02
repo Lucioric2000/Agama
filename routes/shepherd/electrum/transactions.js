@@ -1,63 +1,64 @@
 const async = require('async');
+const Promise = require('bluebird');
 
 module.exports = (shepherd) => {
-  shepherd.sortTransactions = (transactions) => {
+  shepherd.sortTransactions = (transactions, sortBy) => {
     return transactions.sort((b, a) => {
-      if (a.height < b.height) {
+      if (a[sortBy ? sortBy : 'height'] < b[sortBy ? sortBy : 'height']) {
         return -1;
       }
 
-      if (a.height > b.height) {
+      if (a[sortBy ? sortBy : 'height'] > b[sortBy ? sortBy : 'height']) {
         return 1;
       }
 
       return 0;
     });
   }
-  
+
   shepherd.getTransaction = (txid, network, ecl) => {
-    return new shepherd.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (!shepherd.electrumCache[network]) {
         shepherd.electrumCache[network] = {};
       }
       if (!shepherd.electrumCache[network].tx) {
-        shepherd.electrumCache[network]['tx'] = {};        
+        shepherd.electrumCache[network]['tx'] = {};
       }
 
       if (!shepherd.electrumCache[network].tx[txid]) {
         shepherd.log(`electrum raw input tx ${txid}`, true);
-        
+
         ecl.blockchainTransactionGet(txid)
         .then((_rawtxJSON) => {
           shepherd.electrumCache[network].tx[txid] = _rawtxJSON;
           resolve(_rawtxJSON);
         });
       } else {
-        shepherd.log(`electrum cached raw input tx ${txid}`, true);        
+        shepherd.log(`electrum cached raw input tx ${txid}`, true);
         resolve(shepherd.electrumCache[network].tx[txid]);
       }
     });
   }
 
   shepherd.getBlockHeader = (height, network, ecl) => {
-    return new shepherd.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (!shepherd.electrumCache[network]) {
         shepherd.electrumCache[network] = {};
       }
       if (!shepherd.electrumCache[network].blockHeader) {
-        shepherd.electrumCache[network]['blockHeader'] = {};        
+        shepherd.electrumCache[network]['blockHeader'] = {};
       }
 
       if (!shepherd.electrumCache[network].blockHeader[height]) {
         shepherd.log(`electrum raw block ${height}`, true);
-        
+
         ecl.blockchainBlockGetHeader(height)
         .then((_rawtxJSON) => {
           shepherd.electrumCache[network].blockHeader[height] = _rawtxJSON;
           resolve(_rawtxJSON);
         });
       } else {
-        shepherd.log(`electrum cached raw block ${height}`, true);        
+        shepherd.log(`electrum cached raw block ${height}`, true);
         resolve(shepherd.electrumCache[network].blockHeader[height]);
       }
     });
@@ -66,18 +67,21 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/listtransactions', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const _address = req.query.address;
+      const _maxlength = req.query.maxlength;
 
       shepherd.log('electrum listtransactions ==>', true);
 
-      if (!req.query.full) {
+      if (!req.query.full ||
+          ecl.insight) {
         ecl.connect();
-        ecl.blockchainAddressGetHistory(req.query.address)
+        ecl.blockchainAddressGetHistory(_address)
         .then((json) => {
           ecl.close();
           shepherd.log(json, true);
 
-          json = shepherd.sortTransactions(json);
+          json = shepherd.sortTransactions(json, 'timestamp');
 
           const successObj = {
             msg: 'success',
@@ -89,14 +93,14 @@ module.exports = (shepherd) => {
       } else {
         // !expensive call!
         // TODO: limit e.g. 1-10, 10-20 etc
-        const MAX_TX = req.query.maxlength || 10;
+        const MAX_TX = _maxlength || 10;
         ecl.connect();
 
         ecl.blockchainNumblocksSubscribe()
         .then((currentHeight) => {
           if (currentHeight &&
               Number(currentHeight) > 0) {
-            ecl.blockchainAddressGetHistory(req.query.address)
+            ecl.blockchainAddressGetHistory(_address)
             .then((json) => {
               if (json &&
                   json.length) {
@@ -108,6 +112,7 @@ module.exports = (shepherd) => {
                 shepherd.log(json.length, true);
                 let index = 0;
 
+                // callback hell, use await?
                 async.eachOfSeries(json, (transaction, ind, callback) => {
                   shepherd.getBlockHeader(transaction.height, network, ecl)
                   .then((blockInfo) => {
@@ -130,13 +135,14 @@ module.exports = (shepherd) => {
                         // shepherd.log(decodedTx.outputs, true);
 
                         let index2 = 0;
+
                         if (decodedTx &&
                             decodedTx.inputs &&
                             decodedTx.inputs.length) {
                           async.eachOfSeries(decodedTx.inputs, (_decodedInput, ind2, callback2) => {
-                            function checkLoop() {
+                            const checkLoop = () => {
                               index2++;
-                              
+
                               if (index2 === decodedTx.inputs.length) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
@@ -149,7 +155,7 @@ module.exports = (shepherd) => {
                                   confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                                 };
 
-                                const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, req.query.address, network);
+                                const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
 
                                 if (formattedTx.type) {
                                   formattedTx.height = transaction.height;
@@ -182,7 +188,7 @@ module.exports = (shepherd) => {
 
                                 if (index === json.length) {
                                   ecl.close();
-                                  
+
                                   const successObj = {
                                     msg: 'success',
                                     result: _rawtx,
@@ -194,7 +200,7 @@ module.exports = (shepherd) => {
                                 callback();
                                 shepherd.log(`tx history main loop ${json.length} | ${index}`, true);
                               }
-                              callback2();                              
+                              callback2();
                             }
 
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
@@ -223,21 +229,21 @@ module.exports = (shepherd) => {
                             confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                           };
 
-                          const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, req.query.address, network);
+                          const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
                           _rawtx.push(formattedTx);
                           index++;
 
                           if (index === json.length) {
                             ecl.close();
-                            
+
                             const successObj = {
                               msg: 'success',
                               result: _rawtx,
                             };
-          
+
                             res.end(JSON.stringify(successObj));
                           } else {
-                            callback();                          
+                            callback();
                           }
                         }
                       });
@@ -251,18 +257,18 @@ module.exports = (shepherd) => {
                         timestamp: 'cant get block info',
                         confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                       };
-                      const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, req.query.address, network);
+                      const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
                       _rawtx.push(formattedTx);
                       index++;
 
                       if (index === json.length) {
                         ecl.close();
-                        
+
                         const successObj = {
                           msg: 'success',
                           result: _rawtx,
                         };
-      
+
                         res.end(JSON.stringify(successObj));
                       } else {
                         callback();

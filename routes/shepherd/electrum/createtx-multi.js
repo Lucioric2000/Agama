@@ -1,10 +1,14 @@
+const bitcoinJS = require('bitcoinjs-lib');
 const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
+const coinSelect = require('coinselect');
 
 // not prod ready, only for voting!
 // needs a fix
 
+// TODO: spread fee across targets
+//       current implementation subtracts fee from the fist target out
 module.exports = (shepherd) => {
   shepherd.post('/electrum/createrawtx-multiout', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
@@ -92,7 +96,7 @@ module.exports = (shepherd) => {
           // default coin selection algo blackjack with fallback to accumulative
           // make a first run, calc approx tx fee
           // if ins and outs are empty reduce max spend by txfee
-          const firstRun = shepherd.coinSelect(utxoListFormatted, targets, btcFee ? btcFee : 0);
+          const firstRun = coinSelect(utxoListFormatted, targets, btcFee ? btcFee : 0);
           let inputs = firstRun.inputs;
           let outputs = firstRun.outputs;
 
@@ -115,7 +119,7 @@ module.exports = (shepherd) => {
             shepherd.log('coinselect adjusted targets =>', true);
             shepherd.log(targets, true);
 
-            const secondRun = shepherd.coinSelect(utxoListFormatted, targets, 0);
+            const secondRun = coinSelect(utxoListFormatted, targets, 0);
             inputs = secondRun.inputs;
             outputs = secondRun.outputs;
             fee = fee ? fee : secondRun.fee;
@@ -131,9 +135,12 @@ module.exports = (shepherd) => {
           let _change = 0;
 
           if (outputs &&
-              outputs.length > 1) {
+              outputs.length > 1 &&
+              outputs.length > targets.length) {
             _change = outputs[outputs.length - 1].value - fee;
           }
+
+          shepherd.log(`change before adjustments ${_change}`, true);
 
           if (!btcFee &&
               _change === 0) {
@@ -145,6 +152,9 @@ module.exports = (shepherd) => {
 
           shepherd.log('init targets', true);
           shepherd.log(initTargets, true);
+
+          shepherd.log('coinselect targets', true);
+          shepherd.log(targets, true);
 
           if (initTargets[0].value < targets[0].value) {
             targets[0].value = initTargets[0].value;
@@ -238,12 +248,11 @@ module.exports = (shepherd) => {
               res.end(JSON.stringify(successObj));
             } else {
               let vinSum = 0;
+              let voutSum = 0;
 
               for (let i = 0; i < inputs.length; i++) {
                 vinSum += inputs[i].value;
               }
-
-              let voutSum = 0;
 
               for (let i = 0; i < outputs.length; i++) {
                 voutSum += outputs[i].value;
@@ -272,7 +281,7 @@ module.exports = (shepherd) => {
 
               outputAddress = outputs;
 
-              if (outputAddress.length > 1) {
+              if (!outputAddress[outputAddress.length - 1].address) {
                 outputAddress.pop();
               }
 
@@ -420,7 +429,7 @@ module.exports = (shepherd) => {
 
   // single sig
   shepherd.buildSignedTxMulti = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn) => {
-    let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : shepherd.bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
+    let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
     let tx;
 
     if (shepherd.isZcash(network)) {
@@ -428,7 +437,7 @@ module.exports = (shepherd) => {
     } else if (shepherd.isPos(network)) {
       tx = new bitcoinPos.TransactionBuilder(shepherd.getNetworkData(network));
     } else {
-      tx = new shepherd.bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
+      tx = new bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
     }
 
     shepherd.log('buildSignedTx', true);
@@ -459,10 +468,11 @@ module.exports = (shepherd) => {
     if (opreturn &&
         opreturn.length) {
       for (let i = 0; i < opreturn.length; i++) {
-        shepherd.log(`opreturn ${i} ${opreturn[i]}`);
         const data = Buffer.from(opreturn[i], 'utf8');
-        const dataScript = shepherd.bitcoinJS.script.nullData.output.encode(data);
+        const dataScript = bitcoinJS.script.nullData.output.encode(data);
         tx.addOutput(dataScript, 1000);
+
+        shepherd.log(`opreturn ${i} ${opreturn[i]}`);
       }
     }
 

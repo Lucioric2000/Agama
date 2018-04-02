@@ -1,6 +1,8 @@
+const bitcoinJS = require('bitcoinjs-lib');
 const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
+const coinSelect = require('coinselect');
 
 module.exports = (shepherd) => {
   // unsigned tx
@@ -9,11 +11,11 @@ module.exports = (shepherd) => {
 
     // TODO: finish unsigned for zcash, btc forks and pos coins
     if (network === 'btg') {
-      shepherd.log('enable btg', true);
       tx = new bitcoinJSForks.TransactionBuilder(shepherd.getNetworkData(network));
       tx.enableBitcoinGold(true);
+      shepherd.log('enable btg', true);
     } else {
-      tx = new shepherd.bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
+      tx = new bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
     }
 
     shepherd.log('buildSignedTx', true);
@@ -55,7 +57,7 @@ module.exports = (shepherd) => {
 
   // single sig
   shepherd.buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn) => {
-    let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : shepherd.bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
+    let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
     let tx;
 
     if (shepherd.isZcash(network)) {
@@ -63,7 +65,7 @@ module.exports = (shepherd) => {
     } else if (shepherd.isPos(network)) {
       tx = new bitcoinPos.TransactionBuilder(shepherd.getNetworkData(network));
     } else {
-      tx = new shepherd.bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
+      tx = new bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
     }
 
     shepherd.log('buildSignedTx', true);
@@ -90,10 +92,10 @@ module.exports = (shepherd) => {
     }
 
     if (opreturn) {
-      console.log(`opreturn ${opreturn}`);
       const data = Buffer.from(opreturn, 'utf8');
       const dataScript = shepherd.bitcoinJS.script.nullData.output.encode(data);
       tx.addOutput(dataScript, 1000);
+      console.log(`opreturn ${opreturn}`);
     }
 
     if (network === 'komodo' ||
@@ -279,7 +281,7 @@ module.exports = (shepherd) => {
           // default coin selection algo blackjack with fallback to accumulative
           // make a first run, calc approx tx fee
           // if ins and outs are empty reduce max spend by txfee
-          const firstRun = shepherd.coinSelect(utxoListFormatted, targets, btcFee ? btcFee : 0);
+          const firstRun = coinSelect(utxoListFormatted, targets, btcFee ? btcFee : 0);
           let inputs = firstRun.inputs;
           let outputs = firstRun.outputs;
 
@@ -302,7 +304,7 @@ module.exports = (shepherd) => {
             shepherd.log('coinselect adjusted targets =>', true);
             shepherd.log(targets, true);
 
-            const secondRun = shepherd.coinSelect(utxoListFormatted, targets, 0);
+            const secondRun = coinSelect(utxoListFormatted, targets, 0);
             inputs = secondRun.inputs;
             outputs = secondRun.outputs;
             fee = fee ? fee : secondRun.fee;
