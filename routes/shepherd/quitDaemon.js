@@ -23,6 +23,7 @@ module.exports = (shepherd) => {
 
         const execCliStop = () => {
           let _arg = [];
+
           if (chain &&
               !shepherd.nativeCoindList[key.toLowerCase()] && key !== 'CHIPS') {
             _arg.push(`-ac_name=${chain}`);

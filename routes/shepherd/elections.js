@@ -1,5 +1,6 @@
 const bs58check = require('bs58check');
 const bitcoin = require('bitcoinjs-lib');
+const Promise = require('bluebird');
 
 module.exports = (shepherd) => {
   shepherd.elections = {};
@@ -111,11 +112,11 @@ module.exports = (shepherd) => {
   shepherd.electionsDecodeTx = (decodedTx, ecl, network, _network, transaction, blockInfo, address) => {
     let txInputs = [];
 
-    return new shepherd.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (decodedTx &&
           decodedTx.inputs) {
-        shepherd.Promise.all(decodedTx.inputs.map((_decodedInput, index) => {
-          return new shepherd.Promise((_resolve, _reject) => {
+        Promise.all(decodedTx.inputs.map((_decodedInput, index) => {
+          return new Promise((_resolve, _reject) => {
             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
               ecl.blockchainTransactionGet(_decodedInput.txid)
               .then((rawInput) => {
@@ -186,8 +187,8 @@ module.exports = (shepherd) => {
 
           shepherd.log(json.length, true);
 
-          shepherd.Promise.all(json.map((transaction, index) => {
-            return new shepherd.Promise((resolve, reject) => {
+          Promise.all(json.map((transaction, index) => {
+            return new Promise((resolve, reject) => {
               ecl.blockchainBlockGetHeader(transaction.height)
               .then((blockInfo) => {
                 if (blockInfo &&
@@ -256,7 +257,8 @@ module.exports = (shepherd) => {
 
                         if (type === 'candidate') {
                           if (_region === 'ne2k18-na-1-eu-2-ae-3-sh-4') {
-                            if (decodedTx.outputs[i].scriptPubKey.addresses[0] === _address && decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') === -1) {
+                            if (decodedTx.outputs[i].scriptPubKey.addresses[0] === _address &&
+                                decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') === -1) {
                               const _regionsLookup = [
                                 'ne2k18-na',
                                 'ne2k18-eu',
@@ -264,7 +266,15 @@ module.exports = (shepherd) => {
                                 'ne2k18-sh'
                               ];
 
-                              shepherd.electionsDecodeTx(decodedTx, ecl, network, _network, transaction, blockInfo, _address)
+                              shepherd.electionsDecodeTx(
+                                decodedTx,
+                                ecl,
+                                network,
+                                _network,
+                                transaction,
+                                blockInfo,
+                                _address
+                              )
                               .then((res) => {
                                 shepherd.log(`i received ${decodedTx.outputs[i].value} from ${res.outputAddresses[0]} out ${i} region ${_regionsLookup[i]}`);
                                 _rawtx.push({
@@ -277,7 +287,15 @@ module.exports = (shepherd) => {
                               });
                             }
                           } else {
-                            shepherd.electionsDecodeTx(decodedTx, ecl, network, _network, transaction, blockInfo, _address)
+                            shepherd.electionsDecodeTx(
+                              decodedTx,
+                              ecl,
+                              network,
+                              _network,
+                              transaction,
+                              blockInfo,
+                              _address
+                            )
                             .then((res) => {
                               if (decodedTx.outputs[i].scriptPubKey.addresses[0] === _address) {
                                 _candidate.amount = decodedTx.outputs[i].value;
@@ -298,7 +316,15 @@ module.exports = (shepherd) => {
                       }
                     } else {
                       shepherd.log('elections regular tx', true);
-                      shepherd.electionsDecodeTx(decodedTx, ecl, network, _network, transaction, blockInfo, _address)
+                      shepherd.electionsDecodeTx(
+                        decodedTx,
+                        ecl,
+                        network,
+                        _network,
+                        transaction,
+                        blockInfo,
+                        _address
+                      )
                       .then((_regularTx) => {
                         if (_regularTx[0] &&
                             _regularTx[1]) {
@@ -311,7 +337,8 @@ module.exports = (shepherd) => {
                             hash: transaction['tx_hash'],
                           });
                         } else {
-                          if ((type === 'voter' && _regularTx.type !== 'received') && (type === 'candidate' && _regularTx.type !== 'sent')) {
+                          if ((type === 'voter' && _regularTx.type !== 'received') &&
+                              (type === 'candidate' && _regularTx.type !== 'sent')) {
                             _rawtx.push({
                               address: _regularTx.address || 'self',
                               timestamp: _regularTx.timestamp,

@@ -1,3 +1,4 @@
+const bitcoinJS = require('bitcoinjs-lib');
 const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
@@ -14,7 +15,7 @@ module.exports = (shepherd) => {
       const outputAddress = req.body.payload.outputAddress;
       const changeAddress = req.body.payload.changeAddress;
 
-      let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : shepherd.bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
+      let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
       let tx;
 
       if (shepherd.isZcash(network)) {
@@ -22,7 +23,7 @@ module.exports = (shepherd) => {
       } else if (shepherd.isPos(network)) {
         tx = new bitcoinPos.TransactionBuilder(shepherd.getNetworkData(network));
       } else {
-        tx = new shepherd.bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
+        tx = new bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
       }
 
       shepherd.log('buildSignedTx', true);

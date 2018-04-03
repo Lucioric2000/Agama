@@ -1,3 +1,5 @@
+const fs = require('fs-extra');
+
 module.exports = (shepherd) => {
   /*
    *  type: GET
@@ -5,8 +7,8 @@ module.exports = (shepherd) => {
    */
   shepherd.get('/coinslist', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      if (shepherd.fs.existsSync(`${shepherd.agamaDir}/shepherd/coinslist.json`)) {
-        shepherd.fs.readFile(`${shepherd.agamaDir}/shepherd/coinslist.json`, 'utf8', (err, data) => {
+      if (fs.existsSync(`${shepherd.agamaDir}/shepherd/coinslist.json`)) {
+        fs.readFile(`${shepherd.agamaDir}/shepherd/coinslist.json`, 'utf8', (err, data) => {
           if (err) {
             const errorObj = {
               msg: 'error',
@@ -57,7 +59,7 @@ module.exports = (shepherd) => {
 
         res.end(JSON.stringify(errorObj));
       } else {
-        shepherd.fs.writeFile(`${shepherd.agamaDir}/shepherd/coinslist.json`, JSON.stringify(_payload), (err) => {
+        fs.writeFile(`${shepherd.agamaDir}/shepherd/coinslist.json`, JSON.stringify(_payload), (err) => {
           if (err) {
             const errorObj = {
               msg: 'error',

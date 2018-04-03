@@ -17,7 +17,19 @@ module.exports = (shepherd) => {
         network === 'ZCL' ||
         network === 'zcl' ||
         network === 'BTCZ' ||
-        network === 'btcz') {
+        network === 'btcz' ||
+        network === 'VOT' ||
+        network === 'vot' ||
+        network === 'BTCP' ||
+        network === 'btcp' ||
+        network === 'XZC' ||
+        network === 'xzc' ||
+        network === 'ZEN' ||
+        network === 'zen' ||
+        network === 'SYS' ||
+        network === 'sys' ||
+        network === 'SMART' ||
+        network === 'smart') {
       return true;
     }
   };
@@ -26,16 +38,20 @@ module.exports = (shepherd) => {
     if (network === 'BLK' ||
         network === 'blk' ||
         network === 'DNR' ||
-        network === 'dnr') {
+        network === 'dnr' ||
+        network === 'XWC' ||
+        network === 'xwc') {
       return true;
     }
   };
 
-  shepherd.electrumJSTxDecoder = (rawtx, networkName, network) => {
+  shepherd.electrumJSTxDecoder = (rawtx, networkName, network, insight) => {
     if (shepherd.isZcash(networkName)) {
       return txDecoder.zcash(rawtx, network);
     } else if (shepherd.isPos(networkName)) {
       return txDecoder.pos(rawtx, network);
+    } else if (insight) {
+      console.log('insight decoder');
     } else {
       return txDecoder.default(rawtx, network);
     }

@@ -1,8 +1,10 @@
+const Promise = require('bluebird');
+
 module.exports = (shepherd) => {
   shepherd.get('/electrum/getbalance', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
 
       shepherd.log('electrum getbalance =>', true);
 
@@ -14,7 +16,7 @@ module.exports = (shepherd) => {
             json.hasOwnProperty('unconfirmed')) {
           if (network === 'komodo') {
             ecl.blockchainAddressListunspent(req.query.address)
-            .then((utxoList) => {              
+            .then((utxoList) => {
               if (utxoList &&
                   utxoList.length) {
                 // filter out < 10 KMD amounts
@@ -35,8 +37,8 @@ module.exports = (shepherd) => {
                     _utxo.length) {
                   let interestTotal = 0;
 
-                  shepherd.Promise.all(_utxo.map((_utxoItem, index) => {
-                    return new shepherd.Promise((resolve, reject) => {
+                  Promise.all(_utxo.map((_utxoItem, index) => {
+                    return new Promise((resolve, reject) => {
                       shepherd.getTransaction(_utxoItem['tx_hash'], network, ecl)
                       .then((_rawtxJSON) => {
                         shepherd.log('electrum gettransaction ==>', true);
@@ -45,7 +47,7 @@ module.exports = (shepherd) => {
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
-                        const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                        const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network, shepherd.electrumServers[network].proto === 'insight');
 
                         if (decodedTx &&
                             decodedTx.format &&
@@ -81,7 +83,7 @@ module.exports = (shepherd) => {
                   });
                 } else {
                   ecl.close();
-                  
+
                   const successObj = {
                     msg: 'success',
                     result: {
@@ -100,7 +102,7 @@ module.exports = (shepherd) => {
                 }
               } else {
                 ecl.close();
-                
+
                 const successObj = {
                   msg: 'success',
                   result: {
@@ -137,7 +139,7 @@ module.exports = (shepherd) => {
           }
         } else {
           ecl.close();
-          
+
           const successObj = {
             msg: 'error',
             result: shepherd.CONNECTION_ERROR_OR_INCOMPLETE_DATA,
