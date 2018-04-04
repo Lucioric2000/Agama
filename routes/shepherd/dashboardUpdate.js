@@ -152,7 +152,7 @@ module.exports = (shepherd) => {
                       amount: sum,
                       spendable: spendableSum,
                       canspend,
-                      type: a === 0 ? 'public': 'private',
+                      type: a === 0 ? 'public' : 'private',
                     };
                   }
                 }
