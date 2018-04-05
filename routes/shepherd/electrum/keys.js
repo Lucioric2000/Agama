@@ -155,7 +155,7 @@ module.exports = (shepherd) => {
       const _b58check = shepherd.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
 
       if (_b58check.version === _network.pubKeyHash ||
-          (address[0] === 'b' && shepherd.getNetworkData(network.toLowerCase()).pubKeyHash === 60)) { // kmd multisig edge case
+          _b58check.version === _network.scriptHash) {
         return true;
       } else {
         return false;
@@ -164,6 +164,15 @@ module.exports = (shepherd) => {
       return 'Invalid pub address';
     }
   };
+
+  shepherd.get('/electrum/keys/validateaddress', (req, res, next) => {
+    const successObj = {
+      msg: 'success',
+      result: shepherd.addressVersionCheck(req.query.network, req.query.address),
+    };
+
+    res.end(JSON.stringify(successObj));
+  });
 
   shepherd.post('/electrum/keys', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
