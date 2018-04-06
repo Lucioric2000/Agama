@@ -71,7 +71,7 @@ const appConfig = {
     experimentalFeatures: {
       display: true,
       initDisplay: true,
-      displayName: 'Enable experimental features',
+      displayName: 'Enable advanced features',
       type: 'boolean',
     },
     dataDir: {

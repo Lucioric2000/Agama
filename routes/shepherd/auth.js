@@ -1,3 +1,5 @@
+const passwdStrength = require('passwd-strength');
+
 module.exports = (shepherd) => {
   /*
    *  type: GET
@@ -41,6 +43,11 @@ module.exports = (shepherd) => {
         process.argv.indexOf('devmode') > -1) {
       return true;
     }
+  };
+
+  shepherd.checkStringEntropy = (str) => {
+    // https://tools.ietf.org/html/rfc4086#page-35
+    return passwdStrength(str) < 29 ? false : true;
   };
 
   return shepherd;
