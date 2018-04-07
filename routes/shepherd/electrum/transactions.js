@@ -1,6 +1,8 @@
 const async = require('async');
 const Promise = require('bluebird');
 
+const MAX_VOUT_LENGTH = 10;
+
 module.exports = (shepherd) => {
   shepherd.sortTransactions = (transactions, sortBy) => {
     return transactions.sort((b, a) => {
@@ -143,7 +145,7 @@ module.exports = (shepherd) => {
                             const checkLoop = () => {
                               index2++;
 
-                              if (index2 === decodedTx.inputs.length) {
+                              if (index2 === decodedTx.inputs.length || index2 === MAX_VOUT_LENGTH) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
                                   network: decodedTx.network,
@@ -199,8 +201,9 @@ module.exports = (shepherd) => {
 
                                 callback();
                                 shepherd.log(`tx history main loop ${json.length} | ${index}`, true);
+                              } else {
+                                callback2();
                               }
-                              callback2();
                             }
 
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {

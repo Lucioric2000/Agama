@@ -1,7 +1,7 @@
 {
   "name": "agama-app",
   "productName": "Agama",
-  "version": "0.2.30",
+  "version": "0.2.32",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "async": "^2.6.0",
     "bigi": "^1.4.2",
     "bip39": "^2.4.0",
-    "bitcoinforksjs-lib": "git://github.com/bitcoinjs/bitcoinjs-lib#opt-in-bitcoincash-sighash",
+    "bitcoinforksjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib#opt-in-bitcoincash-sighash",
     "bitcoinjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib",
     "bitcoinjs-lib-zcash": "git://github.com/pbca26/bitcoinjs-lib#zcash",
     "bitcoinjs-lib-pos": "git://github.com/KomodoPlatform/bitcoinjs-lib-pos",
@@ -48,6 +48,7 @@
     "js-sha256": "^0.7.1",
     "marketmaker": "git://github.com/pbca26/marketmaker",
     "nodejs-aes256": "^1.0.1",
+    "passwd-strength": "https://github.com/pbca26/passwd-strength",
     "portscanner": "^2.1.1",
     "ps-node": "^0.1.5",
     "remote-file-size": "^3.0.3",
