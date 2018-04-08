@@ -14,12 +14,21 @@ module.exports = (shepherd) => {
         if (Object.keys(shepherd.electrumCoins).length > 1 &&
             shepherd.electrumCoins.auth) {
           _status = true;
-        } else if (Object.keys(shepherd.electrumCoins).length === 1 && !shepherd.electrumCoins.auth) {
+        } else if (
+          Object.keys(shepherd.electrumCoins).length === 1 &&
+          !shepherd.electrumCoins.auth
+        ) {
           _status = true;
         }
-      } else if (Object.keys(shepherd.electrumCoins).length > 1 && shepherd.electrumCoins.auth) {
+      } else if (
+        Object.keys(shepherd.electrumCoins).length > 1 &&
+        shepherd.electrumCoins.auth
+      ) {
         _status = true;
-      } else if (Object.keys(shepherd.electrumCoins).length === 1 && !Object.keys(shepherd.coindInstanceRegistry).length) {
+      } else if (
+        Object.keys(shepherd.electrumCoins).length === 1 &&
+        !Object.keys(shepherd.coindInstanceRegistry).length
+      ) {
         _status = true;
       }
 

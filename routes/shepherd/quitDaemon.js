@@ -31,7 +31,10 @@ module.exports = (shepherd) => {
             if (shepherd.appConfig.dataDir.length) {
               _arg.push(`-datadir=${shepherd.appConfig.dataDir + (key !== 'komodod' ? '/' + key : '')}`);
             }
-          } else if (key === 'komodod' && shepherd.appConfig.dataDir.length) {
+          } else if (
+            key === 'komodod' &&
+            shepherd.appConfig.dataDir.length
+          ) {
             _arg.push(`-datadir=${shepherd.appConfig.dataDir}`);
           }
 

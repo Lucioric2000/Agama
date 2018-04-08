@@ -5,12 +5,12 @@ const Promise = require('bluebird');
 module.exports = (shepherd) => {
   shepherd.elections = {};
 
-  shepherd.hex2str = (hexx) => {
-    const hex = hexx.toString(); // force conversion
+  shepherd.hex2str = (hex) => {
+    const _hex = hex.toString(); // force conversion
     let str = '';
 
-    for (let i = 0; i < hex.length; i += 2) {
-      str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    for (let i = 0; i < _hex.length; i += 2) {
+      str += String.fromCharCode(parseInt(_hex.substr(i, 2), 16));
     }
 
     return str;
@@ -167,7 +167,11 @@ module.exports = (shepherd) => {
   shepherd.get('/elections/listtransactions', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
       const type = req.query.type;
       const _address = req.query.address;
 
@@ -299,7 +303,10 @@ module.exports = (shepherd) => {
                             .then((res) => {
                               if (decodedTx.outputs[i].scriptPubKey.addresses[0] === _address) {
                                 _candidate.amount = decodedTx.outputs[i].value;
-                              } else if (decodedTx.outputs[i].scriptPubKey.addresses[0] !== _address && decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') === -1) {
+                              } else if (
+                                decodedTx.outputs[i].scriptPubKey.addresses[0] !== _address &&
+                                decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') === -1
+                              ) {
                                 _candidate.address = decodedTx.outputs[i].scriptPubKey.addresses[0];
                                 _candidate.region = _region;
                                 _candidate.timestamp = blockInfo.timestamp;

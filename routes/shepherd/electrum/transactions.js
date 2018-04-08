@@ -1,7 +1,7 @@
 const async = require('async');
 const Promise = require('bluebird');
 
-const MAX_VOUT_LENGTH = 10;
+const MAX_VIN_LENGTH = 150; // parse up to MAX_VIN_LENGTH vins
 
 module.exports = (shepherd) => {
   shepherd.sortTransactions = (transactions, sortBy) => {
@@ -145,7 +145,8 @@ module.exports = (shepherd) => {
                             const checkLoop = () => {
                               index2++;
 
-                              if (index2 === decodedTx.inputs.length || index2 === MAX_VOUT_LENGTH) {
+                              if (index2 === decodedTx.inputs.length ||
+                                  index2 === MAX_VIN_LENGTH) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
                                   network: decodedTx.network,
@@ -167,6 +168,8 @@ module.exports = (shepherd) => {
                                   formattedTx.inputs = decodedTx.inputs;
                                   formattedTx.outputs = decodedTx.outputs;
                                   formattedTx.locktime = decodedTx.format.locktime;
+                                  formattedTx.vinLen = decodedTx.inputs.length;
+                                  formattedTx.vinMaxLen = MAX_VIN_LENGTH;
                                   _rawtx.push(formattedTx);
                                 } else {
                                   formattedTx[0].height = transaction.height;
@@ -176,6 +179,8 @@ module.exports = (shepherd) => {
                                   formattedTx[0].inputs = decodedTx.inputs;
                                   formattedTx[0].outputs = decodedTx.outputs;
                                   formattedTx[0].locktime = decodedTx.format.locktime;
+                                  formattedTx[0].vinLen = decodedTx.inputs.length;
+                                  formattedTx[0].vinMaxLen = MAX_VIN_LENGTH;
                                   formattedTx[1].height = transaction.height;
                                   formattedTx[1].blocktime = blockInfo.timestamp;
                                   formattedTx[1].timereceived = blockInfo.timereceived;
@@ -183,6 +188,8 @@ module.exports = (shepherd) => {
                                   formattedTx[1].inputs = decodedTx.inputs;
                                   formattedTx[1].outputs = decodedTx.outputs;
                                   formattedTx[1].locktime = decodedTx.format.locktime;
+                                  formattedTx[1].vinLen = decodedTx.inputs.length;
+                                  formattedTx[1].vinMaxLen = MAX_VIN_LENGTH;
                                   _rawtx.push(formattedTx[0]);
                                   _rawtx.push(formattedTx[1]);
                                 }
@@ -313,7 +320,11 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/gettransaction', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
 
       shepherd.log('electrum gettransaction =>', true);
 
@@ -551,7 +562,11 @@ module.exports = (shepherd) => {
 
         res.end(JSON.stringify(successObj));
       } else {
-        const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[req.query.network].port, shepherd.electrumServers[req.query.network].address, shepherd.electrumServers[req.query.network].proto); // tcp or tls
+        const ecl = new shepherd.electrumJSCore(
+          shepherd.electrumServers[req.query.network].port,
+          shepherd.electrumServers[req.query.network].address,
+          shepherd.electrumServers[req.query.network].proto
+        ); // tcp or tls
 
         shepherd.log(decodedTx.inputs[0]);
         shepherd.log(decodedTx.inputs[0].txid);

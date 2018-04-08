@@ -15,7 +15,7 @@ module.exports = (shepherd) => {
       max = Math.floor(max);
 
       return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
-    }
+    };
     let randomServer;
 
     // pick a random server to communicate with
@@ -43,7 +43,7 @@ module.exports = (shepherd) => {
             port: randomServer ? randomServer.port : shepherd.electrumServers[key].port,
           },
           serverList: shepherd.electrumServers[key].serverList ? shepherd.electrumServers[key].serverList : 'none',
-          txfee: 'calculated' /*shepherd.electrumServers[key].txfee*/,
+          txfee: key === 'btc' ? 'calculated' : shepherd.electrumServers[key].txfee,
         };
 
         shepherd.log(`default ${coin} electrum server ${shepherd.electrumServers[key].address + ':' + shepherd.electrumServers[key].port}`, true);

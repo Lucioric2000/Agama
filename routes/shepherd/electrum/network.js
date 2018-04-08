@@ -178,7 +178,7 @@ module.exports = (shepherd) => {
       };
 
       for (let key in shepherd.electrumServers) {
-        if (shepherd.electrumServers[key].abbr === req.query.coin) { // a bit risky
+        if (shepherd.electrumServers[key].abbr === req.query.coin) {
           shepherd.electrumServers[key].address = req.query.address;
           shepherd.electrumServers[key].port = req.query.port;
           break;

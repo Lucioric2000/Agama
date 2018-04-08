@@ -8,17 +8,10 @@ module.exports = (shepherd) => {
       console.log(msg);
     }
 
-    if (!isSpvOut) {
-      shepherd.appRuntimeLog.push({
-        time: Date.now(),
-        msg: msg,
-      });
-    } else {
-      shepherd.appRuntimeSPVLog.push({
-        time: Date.now(),
-        msg: msg,
-      });
-    }
+    shepherd[!isSpvOut ? 'appRuntimeLog' : 'appRuntimeSPVLog'].push({
+      time: Date.now(),
+      msg: msg,
+    });
   }
 
   shepherd.writeLog = (data) => {
@@ -73,16 +66,17 @@ module.exports = (shepherd) => {
   shepherd.post('/guilog', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
       const logLocation = `${shepherd.agamaDir}/shepherd`;
+      const timestamp = req.body.timestamp;
 
       if (!shepherd.guiLog[shepherd.appSessionHash]) {
         shepherd.guiLog[shepherd.appSessionHash] = {};
       }
 
-      if (shepherd.guiLog[shepherd.appSessionHash][req.body.timestamp]) {
-        shepherd.guiLog[shepherd.appSessionHash][req.body.timestamp].status = req.body.status;
-        shepherd.guiLog[shepherd.appSessionHash][req.body.timestamp].response = req.body.response;
+      if (shepherd.guiLog[shepherd.appSessionHash][timestamp]) {
+        shepherd.guiLog[shepherd.appSessionHash][timestamp].status = req.body.status;
+        shepherd.guiLog[shepherd.appSessionHash][timestamp].response = req.body.response;
       } else {
-        shepherd.guiLog[shepherd.appSessionHash][req.body.timestamp] = {
+        shepherd.guiLog[shepherd.appSessionHash][timestamp] = {
           function: req.body.function,
           type: req.body.type,
           url: req.body.url,

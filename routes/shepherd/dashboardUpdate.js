@@ -277,13 +277,7 @@ module.exports = (shepherd) => {
           };
 
           request(options, (error, response, body) => {
-            if (response &&
-                response.statusCode &&
-                response.statusCode === 200) {
-              resolve(body);
-            } else {
-              resolve(body);
-            }
+            resolve(body);            
           });
         });
       }
