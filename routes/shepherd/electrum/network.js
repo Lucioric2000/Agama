@@ -72,6 +72,7 @@ module.exports = (shepherd) => {
         coin === 'COQUI' ||
         coin === 'OOT' ||
         coin === 'HODL' ||
+	coin === 'EQL' ||
         coin === 'SHARK' ||
         coin === 'MSHARK' ||
         coin === 'BOTS' ||
@@ -89,6 +90,7 @@ module.exports = (shepherd) => {
         coin === 'VOTE2018' ||
         coin === 'NINJA' ||
         coin === 'KOMODO' ||
+        coin === 'BNTN' ||
         coinUC === 'SUPERNET' ||
         coinUC === 'REVS' ||
         coinUC === 'SUPERNET' ||
@@ -99,6 +101,7 @@ module.exports = (shepherd) => {
         coinUC === 'CRYPTO' ||
         coinUC === 'COQUI' ||
         coinUC === 'OOT' ||
+	coinUC === 'EQL' ||
         coinUC === 'HODL' ||
         coinUC === 'SHARK' ||
         coinUC === 'MSHARK' ||
@@ -116,7 +119,8 @@ module.exports = (shepherd) => {
         coinUC === 'VOTE2018' ||
         coinUC === 'NINJA' ||
         coinUC === 'KMD' ||
-        coinUC === 'KOMODO') {
+        coinUC === 'KOMODO' ||
+        coinUC === 'BNTN') {
       return shepherd.electrumJSNetworks.komodo;
     } else {
       return shepherd.electrumJSNetworks[network];
@@ -176,7 +180,7 @@ module.exports = (shepherd) => {
       };
 
       for (let key in shepherd.electrumServers) {
-        if (shepherd.electrumServers[key].abbr === req.query.coin) { // a bit risky
+        if (shepherd.electrumServers[key].abbr === req.query.coin) {
           shepherd.electrumServers[key].address = req.query.address;
           shepherd.electrumServers[key].port = req.query.port;
           break;

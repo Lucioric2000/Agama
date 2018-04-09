@@ -39,7 +39,11 @@ module.exports = (shepherd) => {
                 break;
               }
             } else {
-              keys = shepherd.seedToWif(_seed, shepherd.findNetworkObj(_abbr), req.body.iguana);
+              keys = shepherd.seedToWif(
+                _seed,
+                shepherd.findNetworkObj(_abbr),
+                req.body.iguana
+              );
             }
 
             shepherd.electrumKeys[_abbr] = {

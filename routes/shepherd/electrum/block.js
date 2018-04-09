@@ -24,7 +24,11 @@ module.exports = (shepherd) => {
 
   shepherd.electrumGetBlockInfo = (height, network) => {
     return new Promise((resolve, reject) => {
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
 
       ecl.connect();
       ecl.blockchainBlockGetHeader(height)
@@ -61,7 +65,11 @@ module.exports = (shepherd) => {
 
   shepherd.electrumGetCurrentBlock = (network) => {
     return new Promise((resolve, reject) => {
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
 
       ecl.connect();
       ecl.blockchainNumblocksSubscribe()

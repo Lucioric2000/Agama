@@ -1,4 +1,26 @@
 let electrumServers = {
+  bntn: { // !estimatefee
+    address: 'electrum1.cipig.net',
+    port: 10026,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'BNTN',
+    serverList: [
+      'electrum1.cipig.net:10026',
+      'electrum2.cipig.net:10026'
+    ],
+  },
+  eql: { // !estimatefee
+    address:'159.65.91.235',
+    port: 10801,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'EQL',
+    serverList: [
+      '159.65.91.235:10801',
+      '167.99.204.42:10801'
+    ],
+  },
   oot: { // !estimatefee
     address: 'electrum1.utrum.io',
     port: 10088,
@@ -83,8 +105,8 @@ let electrumServers = {
     txfee: 10000,
     abbr: 'DNR',
     serverList: [
-      '173.254.244.119:50001',
-      '173.254.244.122:50001'
+      '144.202.95.223:50001',
+      '45.77.137.111:50001'
     ],
   },
   hodl: { // !estimatefee

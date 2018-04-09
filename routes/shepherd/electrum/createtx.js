@@ -78,14 +78,22 @@ module.exports = (shepherd) => {
     }
 
     if (shepherd.isPos(network)) {
-      tx.addOutput(sendTo, Number(spendValue), shepherd.getNetworkData(network));
+      tx.addOutput(
+        sendTo,
+        Number(spendValue),
+        shepherd.getNetworkData(network)
+      );
     } else {
       tx.addOutput(sendTo, Number(spendValue));
     }
 
     if (changeValue > 0) {
       if (shepherd.isPos(network)) {
-        tx.addOutput(changeAddress, Number(changeValue), shepherd.getNetworkData(network));
+        tx.addOutput(
+          changeAddress,
+          Number(changeValue),
+          shepherd.getNetworkData(network)
+        );
       } else {
         tx.addOutput(changeAddress, Number(changeValue));
       }
@@ -114,7 +122,11 @@ module.exports = (shepherd) => {
 
     for (let i = 0; i < utxo.length; i++) {
       if (shepherd.isPos(network)) {
-        tx.sign(shepherd.getNetworkData(network), i, key);
+        tx.sign(
+          shepherd.getNetworkData(network),
+          i,
+          key
+        );
       } else {
         tx.sign(i, key);
       }
@@ -144,7 +156,12 @@ module.exports = (shepherd) => {
     shepherd.log(`buildSignedTx${network.toUpperCase()}`, true);
 
     for (let i = 0; i < utxo.length; i++) {
-      tx.addInput(utxo[i].txid, utxo[i].vout, bitcoinJSForks.Transaction.DEFAULT_SEQUENCE, spk);
+      tx.addInput(
+        utxo[i].txid,
+        utxo[i].vout,
+        bitcoinJSForks.Transaction.DEFAULT_SEQUENCE,
+        spk
+      );
     }
 
     tx.addOutput(sendTo, Number(spendValue));
@@ -171,7 +188,13 @@ module.exports = (shepherd) => {
     const hashType = bitcoinJSForks.Transaction.SIGHASH_ALL | bitcoinJSForks.Transaction.SIGHASH_BITCOINCASHBIP143;
 
     for (let i = 0; i < utxo.length; i++) {
-      tx.sign(i, keyPair, null, hashType, utxo[i].value);
+      tx.sign(
+        i,
+        keyPair,
+        null,
+        hashType,
+        utxo[i].value
+      );
     }
 
     const rawtx = tx.build().toHex();
@@ -200,7 +223,11 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       // TODO: unconf output(s) error message
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
       const outputAddress = req.query.address;
       const changeAddress = req.query.change;
       const push = req.query.push;
@@ -225,7 +252,13 @@ module.exports = (shepherd) => {
       shepherd.log('electrum createrawtx =>', true);
 
       ecl.connect();
-      shepherd.listunspent(ecl, changeAddress, network, true, req.query.verify === 'true' ? true : null)
+      shepherd.listunspent(
+        ecl,
+        changeAddress,
+        network,
+        true,
+        req.query.verify === 'true' ? true : null
+      )
       .then((utxoList) => {
         ecl.close();
 
@@ -281,7 +314,11 @@ module.exports = (shepherd) => {
           // default coin selection algo blackjack with fallback to accumulative
           // make a first run, calc approx tx fee
           // if ins and outs are empty reduce max spend by txfee
-          const firstRun = coinSelect(utxoListFormatted, targets, btcFee ? btcFee : 0);
+          const firstRun = coinSelect(
+            utxoListFormatted,
+            targets,
+            btcFee ? btcFee : 0
+          );
           let inputs = firstRun.inputs;
           let outputs = firstRun.outputs;
 
@@ -304,7 +341,11 @@ module.exports = (shepherd) => {
             shepherd.log('coinselect adjusted targets =>', true);
             shepherd.log(targets, true);
 
-            const secondRun = coinSelect(utxoListFormatted, targets, 0);
+            const secondRun = coinSelect(
+              utxoListFormatted,
+              targets,
+              0
+            );
             inputs = secondRun.inputs;
             outputs = secondRun.outputs;
             fee = fee ? fee : secondRun.fee;
@@ -493,7 +534,11 @@ module.exports = (shepherd) => {
 
                 res.end(JSON.stringify(successObj));
               } else {
-                const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+                const ecl = new shepherd.electrumJSCore(
+                  shepherd.electrumServers[network].port,
+                  shepherd.electrumServers[network].address,
+                  shepherd.electrumServers[network].proto
+                ); // tcp or tls
 
                 ecl.connect();
                 ecl.blockchainTransactionBroadcast(_rawtx)
@@ -591,7 +636,11 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       const rawtx = req.body.rawtx;
       const _network = req.body.network;
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[_network].port, shepherd.electrumServers[_network].address, shepherd.electrumServers[_network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[_network].port,
+        shepherd.electrumServers[_network].address,
+        shepherd.electrumServers[_network].proto
+      ); // tcp or tls
 
       ecl.connect();
       ecl.blockchainTransactionBroadcast(rawtx)

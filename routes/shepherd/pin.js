@@ -1,5 +1,9 @@
 const fs = require('fs-extra');
 const aes256 = require('nodejs-aes256');
+const passwdStrength = require('passwd-strength');
+const bitcoin = require('bitcoinjs-lib');
+const sha256 = require('js-sha256');
+const bigi = require('bigi');
 
 module.exports = (shepherd) => {
   /*
@@ -9,36 +13,51 @@ module.exports = (shepherd) => {
   shepherd.post('/encryptkey', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
       if (req.body.key &&
-          req.body.string &&
-          req.body.pubkey) {
-        const encryptedString = aes256.encrypt(req.body.key, req.body.string);
-
-        // test pin security
-        // - at least 1 char in upper case
-        // - at least 1 digit
-        // - at least one special character
-        // - min length 8
-
+          req.body.string) {
         const _pin = req.body.key;
-        const _pinTest = _pin.match('^(?=.*[A-Z])(?=.*[^<>{}\"/|;:.,~!?@#$%^=&*\\]\\\\()\\[_+]*$)(?=.*[0-9])(?=.*[a-z]).{8}$');
+        const hash = sha256.create().update(req.body.string);
+        let bytes = hash.array();
+        bytes[0] &= 248;
+        bytes[31] &= 127;
+        bytes[31] |= 64;
 
-        fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${req.body.pubkey}.pin`, encryptedString, (err) => {
-          if (err) {
-            shepherd.log('error writing pin file');
-          }
+        const d = bigi.fromBuffer(bytes);
+        const keyPair = new bitcoin.ECPair(d, null, { network: shepherd.getNetworkData('btc') });
+        const keys = {
+          pub: keyPair.getAddress(),
+          priv: keyPair.toWIF(),
+        };
+        const pubkey = keyPair.getAddress();
+
+        if (passwdStrength(_pin) < 29) {
+          shepherd.log('seed storage weak pin!');
 
           const returnObj = {
-            msg: 'success',
-            result: encryptedString,
+            msg: 'error',
+            result: false,
           };
 
           res.end(JSON.stringify(returnObj));
-        });
+        } else {
+          const encryptedString = aes256.encrypt(req.body.key, req.body.string);
+
+          fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
+            if (err) {
+              shepherd.log('error writing pin file');
+            }
+
+            const returnObj = {
+              msg: 'success',
+              result: pubkey,
+            };
+
+            res.end(JSON.stringify(returnObj));
+          });
+        }
       } else {
         const _paramsList = [
           'key',
-          'string',
-          'pubkey'
+          'string'
         ];
         let errorObj = {
           msg: 'error',

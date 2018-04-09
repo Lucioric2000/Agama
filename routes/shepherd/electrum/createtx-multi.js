@@ -15,16 +15,20 @@ module.exports = (shepherd) => {
       // TODO: 1) unconf output(s) error message
       // 2) check targets integrity
       const network = req.body.network || shepherd.findNetworkObj(req.body.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
       const initTargets = JSON.parse(JSON.stringify(req.body.targets));
-      let targets = req.body.targets;
       const changeAddress = req.body.change;
       const push = req.body.push;
       const opreturn = req.body.opreturn;
       const btcFee = req.body.btcfee ? Number(req.body.btcfee) : null;
       let fee = shepherd.electrumServers[network].txfee;
       let wif = req.body.wif;
-
+      let targets = req.body.targets;
+      
       if (req.body.gui) {
         wif = shepherd.electrumKeys[req.body.coin].priv;
       }
@@ -40,7 +44,13 @@ module.exports = (shepherd) => {
       shepherd.log('electrum createrawtx =>', true);
 
       ecl.connect();
-      shepherd.listunspent(ecl, changeAddress, network, true, req.body.verify === 'true' ? true : null)
+      shepherd.listunspent(
+        ecl,
+        changeAddress,
+        network,
+        true,
+        req.body.verify === 'true' ? true : null
+      )
       .then((utxoList) => {
         ecl.close();
 
@@ -96,7 +106,11 @@ module.exports = (shepherd) => {
           // default coin selection algo blackjack with fallback to accumulative
           // make a first run, calc approx tx fee
           // if ins and outs are empty reduce max spend by txfee
-          const firstRun = coinSelect(utxoListFormatted, targets, btcFee ? btcFee : 0);
+          const firstRun = coinSelect(
+            utxoListFormatted,
+            targets,
+            btcFee ? btcFee : 0
+          );
           let inputs = firstRun.inputs;
           let outputs = firstRun.outputs;
 
@@ -119,7 +133,11 @@ module.exports = (shepherd) => {
             shepherd.log('coinselect adjusted targets =>', true);
             shepherd.log(targets, true);
 
-            const secondRun = coinSelect(utxoListFormatted, targets, 0);
+            const secondRun = coinSelect(
+              utxoListFormatted,
+              targets,
+              0
+            );
             inputs = secondRun.inputs;
             outputs = secondRun.outputs;
             fee = fee ? fee : secondRun.fee;
@@ -333,7 +351,11 @@ module.exports = (shepherd) => {
 
                 res.end(JSON.stringify(successObj));
               } else {
-                const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+                const ecl = new shepherd.electrumJSCore(
+                  shepherd.electrumServers[network].port,
+                  shepherd.electrumServers[network].address,
+                  shepherd.electrumServers[network].proto
+                ); // tcp or tls
 
                 ecl.connect();
                 ecl.blockchainTransactionBroadcast(_rawtx)
@@ -451,7 +473,11 @@ module.exports = (shepherd) => {
 
     for (let i = 0; i < sendTo.length; i++) {
       if (shepherd.isPos(network)) {
-        tx.addOutput(sendTo[i].address, Number(sendTo[i].value), shepherd.getNetworkData(network));
+        tx.addOutput(
+          sendTo[i].address,
+          Number(sendTo[i].value),
+          shepherd.getNetworkData(network)
+        );
       } else {
         tx.addOutput(sendTo[i].address, Number(sendTo[i].value));
       }
@@ -459,7 +485,11 @@ module.exports = (shepherd) => {
 
     if (changeValue > 0) {
       if (shepherd.isPos(network)) {
-        tx.addOutput(changeAddress, Number(changeValue), shepherd.getNetworkData(network));
+        tx.addOutput(
+          changeAddress,
+          Number(changeValue),
+          shepherd.getNetworkData(network)
+        );
       } else {
         tx.addOutput(changeAddress, Number(changeValue));
       }
@@ -492,7 +522,11 @@ module.exports = (shepherd) => {
 
     for (let i = 0; i < utxo.length; i++) {
       if (shepherd.isPos(network)) {
-        tx.sign(shepherd.getNetworkData(network), i, key);
+        tx.sign(
+          shepherd.getNetworkData(network),
+          i,
+          key
+        );
       } else {
         tx.sign(i, key);
       }

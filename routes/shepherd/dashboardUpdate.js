@@ -152,7 +152,7 @@ module.exports = (shepherd) => {
                       amount: sum,
                       spendable: spendableSum,
                       canspend,
-                      type: a === 0 ? 'public': 'private',
+                      type: a === 0 ? 'public' : 'private',
                     };
                   }
                 }
@@ -277,13 +277,7 @@ module.exports = (shepherd) => {
           };
 
           request(options, (error, response, body) => {
-            if (response &&
-                response.statusCode &&
-                response.statusCode === 200) {
-              resolve(body);
-            } else {
-              resolve(body);
-            }
+            resolve(body);            
           });
         });
       }
