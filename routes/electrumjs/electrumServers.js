@@ -15,7 +15,7 @@ let electrumServers = {
     port: 10801,
     proto: 'tcp',
     txfee: 10000,
-    abbr: 'OOT',
+    abbr: 'EQL',
     serverList: [
       '159.65.91.235:10801',
       '167.99.204.42:10801'
