@@ -31,6 +31,7 @@ const assetChainPorts = {
   'NINJA': '8427',
   'BTCH': '8800',
   'BNTN': '14358',
+  'EQL': '10306',
 };
 
 module.exports = assetChainPorts;

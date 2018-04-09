@@ -10,6 +10,17 @@ let electrumServers = {
       'electrum2.cipig.net:10026'
     ],
   },
+  eql: { // !estimatefee
+    address:'159.65.91.235',
+    port: 10801,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'EQL',
+    serverList: [
+      '159.65.91.235:10801',
+      '167.99.204.42:10801'
+    ],
+  },
   oot: { // !estimatefee
     address: 'electrum1.utrum.io',
     port: 10088,
