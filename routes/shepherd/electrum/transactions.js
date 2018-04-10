@@ -131,12 +131,24 @@ module.exports = (shepherd) => {
                         const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
 
                         let txInputs = [];
+                        let opreturn = false;
+
                         shepherd.log(`decodedtx network ${network}`, true);
 
                         shepherd.log('decodedtx =>', true);
                         // shepherd.log(decodedTx.outputs, true);
 
                         let index2 = 0;
+
+                        if (decodedTx &&
+                            decodedTx.outputs &&
+                            decodedTx.outputs.length) {
+                          for (let i = 0; i < decodedTx.outputs.length; i++) {
+                            if (decodedTx.outputs[i].scriptPubKey.type === 'nulldata') {
+                              opreturn = shepherd.hex2str(decodedTx.outputs[i].scriptPubKey.hex);
+                            }
+                          }
+                        }
 
                         if (decodedTx &&
                             decodedTx.inputs &&
@@ -170,6 +182,7 @@ module.exports = (shepherd) => {
                                   formattedTx.locktime = decodedTx.format.locktime;
                                   formattedTx.vinLen = decodedTx.inputs.length;
                                   formattedTx.vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx.opreturn = opreturn;
                                   _rawtx.push(formattedTx);
                                 } else {
                                   formattedTx[0].height = transaction.height;
@@ -181,6 +194,7 @@ module.exports = (shepherd) => {
                                   formattedTx[0].locktime = decodedTx.format.locktime;
                                   formattedTx[0].vinLen = decodedTx.inputs.length;
                                   formattedTx[0].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[0].opreturn = opreturn[0];
                                   formattedTx[1].height = transaction.height;
                                   formattedTx[1].blocktime = blockInfo.timestamp;
                                   formattedTx[1].timereceived = blockInfo.timereceived;
@@ -190,6 +204,7 @@ module.exports = (shepherd) => {
                                   formattedTx[1].locktime = decodedTx.format.locktime;
                                   formattedTx[1].vinLen = decodedTx.inputs.length;
                                   formattedTx[1].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[1].opreturn = opreturn[1];
                                   _rawtx.push(formattedTx[0]);
                                   _rawtx.push(formattedTx[1]);
                                 }
@@ -237,6 +252,7 @@ module.exports = (shepherd) => {
                             height: transaction.height,
                             timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
                             confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                            opreturn,
                           };
 
                           const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
