@@ -146,7 +146,7 @@ module.exports = (shepherd) => {
   });
 
   shepherd.get('/getpinlist', (req, res, next) => {
-    if (shepherd.checkToken(req.body.token)) {
+    if (shepherd.checkToken(req.query.token)) {
       if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin`)) {
         fs.readdir(`${shepherd.agamaDir}/shepherd/pin`, (err, items) => {
           let _pins = [];
