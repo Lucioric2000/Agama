@@ -291,6 +291,7 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.nnVoteChain = 'VOTE2018';
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
+				mainWindow.randomBytes = randomBytes;
 
 			  /*for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
