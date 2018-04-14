@@ -40,6 +40,7 @@ module.exports = (shepherd) => {
     const keys = {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
+      pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
     };
 
     /*shepherd.log(`seed: ${seed}`, true);
@@ -57,28 +58,6 @@ module.exports = (shepherd) => {
         priv: key.toWIF(),
         pub: key.getAddress(),
       };
-
-      const successObj = {
-        msg: 'success',
-        result: {
-          keys,
-        },
-      };
-
-      res.end(JSON.stringify(successObj));
-    } else {
-      const errorObj = {
-        msg: 'error',
-        result: 'unauthorized access',
-      };
-
-      res.end(JSON.stringify(errorObj));
-    }
-  });
-
-  shepherd.post('/electrum/seedtowif', (req, res, next) => {
-    if (shepherd.checkToken(req.body.token)) {
-      let keys = shepherd.seedToWif(req.body.seed, req.body.network.toLowerCase(), req.body.iguana);
 
       const successObj = {
         msg: 'success',
