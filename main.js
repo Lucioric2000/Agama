@@ -20,6 +20,7 @@ const fsnode = require('fs');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
 const arch = require('arch');
+const bip39 = require('bip39');
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -292,7 +293,7 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.nnVoteChain = 'VOTE2018';
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
-				mainWindow.randomBytes = randomBytes;
+				mainWindow.bip39 = bip39;
 
 			  /*for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
