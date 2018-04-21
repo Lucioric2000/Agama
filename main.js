@@ -20,10 +20,13 @@ const fsnode = require('fs');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
 const arch = require('arch');
+const bip39 = require('bip39');
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
 }
+
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
 // GUI APP settings and starting gui on address http://120.0.0.1:17777
 let shepherd = require('./routes/shepherd');
@@ -124,8 +127,7 @@ process.once('loaded', () => {
 });
 
 // silent errors
-if (!appConfig.debug ||
-		!appConfig.dev) {
+if (!appConfig.dev) {
 	process.on('uncaughtException', (err) => {
 	  shepherd.log(`${(new Date).toUTCString()} uncaughtException: ${err.message}`);
 	  shepherd.log(err.stack);
@@ -185,7 +187,7 @@ function createAppCloseWindow() {
 
 	appCloseWindow.setResizable(false);
 
-	appCloseWindow.loadURL(`http://${appConfig.host}:${appConfig.agamaPort}/gui/startup/app-closing.html`);
+	appCloseWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort}/gui/startup/app-closing.html` : `file://${__dirname}/gui/startup/app-closing.html`);
 
   appCloseWindow.webContents.on('did-finish-load', () => {
     setTimeout(() => {
@@ -232,7 +234,7 @@ function createWindow(status, hideLoadingWindow) {
 					shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
 					shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
 					// start sockets.io
-					io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : `http://127.0.0.1:${appConfig.agamaPort}`); // set origin
+					io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
 				});
 
 				// initialise window
@@ -246,7 +248,7 @@ function createWindow(status, hideLoadingWindow) {
 				if (appConfig.dev) {
 					mainWindow.loadURL('http://127.0.0.1:3000');
 				} else {
-					mainWindow.loadURL(`http://${appConfig.host}:${appConfig.agamaPort}/gui/EasyDEX-GUI/react/build`);
+					mainWindow.loadURL(`file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
 				}
 
 				shepherd.setIO(io); // pass sockets object to shepherd router
@@ -291,7 +293,7 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.nnVoteChain = 'VOTE2018';
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
-				mainWindow.randomBytes = randomBytes;
+				mainWindow.bip39 = bip39;
 
 			  /*for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
@@ -316,7 +318,7 @@ function createWindow(status, hideLoadingWindow) {
 					shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`);
 					shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`);
 				});
-				mainWindow.loadURL(`http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html`);
+				mainWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html` : `file://${__dirname}/gui/startup/agama-instance-error.html`);
 				shepherd.log('another agama app is already running');
 			}
 
