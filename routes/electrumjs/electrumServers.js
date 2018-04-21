@@ -346,14 +346,14 @@ let electrumServers = {
     ],
   },
   dgb: {
-    address: '173.212.225.176',
-    port: 50022,
+    address: 'electrum1.cipig.net',
+    port: 10059,
     proto: 'tcp',
     txfee: 100000,
     abbr: 'DGB',
     serverList: [
-      '173.212.225.176:50022',
-      '136.243.45.140:50022'
+      'electrum1.cipig.net:10059',
+      'electrum2.cipig.net:10059'
     ],
   },
   dash: {
@@ -384,6 +384,8 @@ let electrumServers = {
     proto: 'tcp',
     abbr: 'BTC',
     serverList: [
+      'electrum1.cipig.net:10000',
+      'electrum2.cipig.net:10000',
       'mooo.not.fyi:50011',
       'e-x.not.fyi:50001',
       'vps.hsmiths.com:50001',
@@ -461,14 +463,14 @@ let electrumServers = {
     ],
   },
   zec: {
-    address: '173.212.225.176',
-    port: 50032,
+    address: 'electrum1.cipig.net',
+    port: 10058,
     proto: 'tcp',
     txfee: 10000,
     abbr: 'ZEC',
     serverList: [
-      '173.212.225.176:50032',
-      '136.243.45.140:50032'
+      'electrum1.cipig.net:10058',
+      'electrum2.cipig.net:10058'
     ],
   },
   hush: {
