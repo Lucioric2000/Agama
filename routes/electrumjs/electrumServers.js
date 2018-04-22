@@ -595,6 +595,17 @@ let electrumServers = {
       'electrum2.cipig.net:10062'
     ],
   },
+  bcbc: {
+    address: 'bsmn0.cleanblockchain.io',
+    port: 50001,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'BCBC',
+    serverList: [
+      'bsmn0.cleanblockchain.io:50001',
+      'bsmn1.cleanblockchain.io:50001'
+    ],
+  },
   zen: {
     txfee: 10000,
     abbr: 'ZEN',
