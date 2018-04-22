@@ -166,16 +166,16 @@ module.exports = (shepherd) => {
                                   inputs: txInputs,
                                   outputs: decodedTx.outputs,
                                   height: transaction.height,
-                                  timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
-                                  confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                                  timestamp: Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
+                                  confirmations: Number(transaction.height) === 0 || Number(transaction.height) === -1 ? 0 : currentHeight - transaction.height,
                                 };
 
                                 const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
 
                                 if (formattedTx.type) {
                                   formattedTx.height = transaction.height;
-                                  formattedTx.blocktime = blockInfo.timestamp;
-                                  formattedTx.timereceived = blockInfo.timereceived;
+                                  formattedTx.blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
+                                  formattedTx.timereceived = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timereceived;
                                   formattedTx.hex = _rawtxJSON;
                                   formattedTx.inputs = decodedTx.inputs;
                                   formattedTx.outputs = decodedTx.outputs;
@@ -186,8 +186,8 @@ module.exports = (shepherd) => {
                                   _rawtx.push(formattedTx);
                                 } else {
                                   formattedTx[0].height = transaction.height;
-                                  formattedTx[0].blocktime = blockInfo.timestamp;
-                                  formattedTx[0].timereceived = blockInfo.timereceived;
+                                  formattedTx[0].blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
+                                  formattedTx[0].timereceived = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timereceived;
                                   formattedTx[0].hex = _rawtxJSON;
                                   formattedTx[0].inputs = decodedTx.inputs;
                                   formattedTx[0].outputs = decodedTx.outputs;
@@ -196,8 +196,8 @@ module.exports = (shepherd) => {
                                   formattedTx[0].vinMaxLen = MAX_VIN_LENGTH;
                                   formattedTx[0].opreturn = opreturn[0];
                                   formattedTx[1].height = transaction.height;
-                                  formattedTx[1].blocktime = blockInfo.timestamp;
-                                  formattedTx[1].timereceived = blockInfo.timereceived;
+                                  formattedTx[1].blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
+                                  formattedTx[1].timereceived = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timereceived;
                                   formattedTx[1].hex = _rawtxJSON;
                                   formattedTx[1].inputs = decodedTx.inputs;
                                   formattedTx[1].outputs = decodedTx.outputs;
