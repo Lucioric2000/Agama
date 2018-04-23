@@ -42,6 +42,17 @@ let electrumServers = {
       'electrum1.cipig.net:10011',
       'electrum2.cipig.net:10011'
     ],
+},
+   glxt: { // !estimatefee
+    address: 'electrum1.glx.co',
+    port: 60012,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'GLXT',
+    serverList: [
+      'electrum1.glx.co:60012',
+      'electrum2.glx.co:60012'
+    ],
   },
   revs: { // !estimatefee
     address: 'electrum1.cipig.net',
