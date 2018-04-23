@@ -290,17 +290,16 @@ function createWindow(status, hideLoadingWindow) {
 					firstLoginPH: null,
 					secondaryLoginPH: null,
 				};
-				mainWindow.nnVoteChain = 'VOTE2018';
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
 				mainWindow.bip39 = bip39;
 
-			  /*for (let i = 0; i < process.argv.length; i++) {
+			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
-			      console.log(`notary node elections chain ${process.argv[i].replace('nvote=', '')}`);
-			      mainWindow.nnVoteChain = process.argv[i].replace('nvote=', '');
+			      console.log(`enable notary node elections ui`);
+			      mainWindow.nnVoteChain = 'VOTE2018';
 			    }
-			  }*/
+			  }
 			} else {
 				mainWindow = new BrowserWindow({
 					width: 500,
