@@ -1,7 +1,7 @@
 {
   "name": "agama-app",
   "productName": "Agama",
-  "version": "0.2.34",
+  "version": "0.2.35",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -36,6 +36,7 @@
     "bitcoinjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib",
     "bitcoinjs-lib-pos": "git://github.com/KomodoPlatform/bitcoinjs-lib-pos",
     "bitcoinjs-lib-zcash": "git://github.com/pbca26/bitcoinjs-lib#zcash",
+    "tx-decoder": "git://github.com/pbca26/tx-decoder",
     "bluebird": "^3.4.7",
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",

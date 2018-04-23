@@ -244,6 +244,10 @@ module.exports = (shepherd) => {
                             }
                           });
                         } else {
+                          /*if (_network.isZcash) {
+
+                          } else {*/
+
                           const _parsedTx = {
                             network: decodedTx.network,
                             format: 'cant parse',
