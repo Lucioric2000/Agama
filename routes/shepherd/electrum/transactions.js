@@ -3,6 +3,8 @@ const Promise = require('bluebird');
 
 const MAX_VIN_LENGTH = 150; // parse up to MAX_VIN_LENGTH vins
 
+// TODO: add z -> pub, pub -> z flag for zcash forks
+
 module.exports = (shepherd) => {
   shepherd.sortTransactions = (transactions, sortBy) => {
     return transactions.sort((b, a) => {
@@ -244,10 +246,6 @@ module.exports = (shepherd) => {
                             }
                           });
                         } else {
-                          /*if (_network.isZcash) {
-
-                          } else {*/
-
                           const _parsedTx = {
                             network: decodedTx.network,
                             format: 'cant parse',

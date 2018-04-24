@@ -255,8 +255,8 @@ function createWindow(status, hideLoadingWindow) {
 				shepherd.setVar('appBasicInfo', appBasicInfo);
 				shepherd.setVar('appSessionHash', appSessionHash);
 
-				// load our index.html (i.e. easyDEX GUI)
-				shepherd.writeLog('show edex gui');
+				// load our index.html (i.e. Agama GUI)
+				shepherd.writeLog('show agama gui');
 				mainWindow.appConfig = appConfig;
 				mainWindow.appConfigSchema = shepherd.appConfigSchema;
 				mainWindow.arch = arch();
