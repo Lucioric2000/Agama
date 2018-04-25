@@ -1,4 +1,15 @@
 let electrumServers = {
+  kv: { // !estimatefee
+    address: 'electrum1.cipig.net',
+    port: 10016,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'KV',
+    serverList: [
+      'electrum1.cipig.net:10016',
+      'electrum2.cipig.net:10016'
+    ],
+  },
   bntn: { // !estimatefee
     address: 'electrum1.cipig.net',
     port: 10026,
