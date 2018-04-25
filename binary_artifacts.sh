@@ -28,7 +28,7 @@ mkdir assets/bin/osx
 echo Moving komodo bins to assets/bin/osx
 wget https://supernetorg.bintray.com/binaries/kmd_osx_bins.zip
 checksum=`shasum -a 256 kmd_osx_bins.zip | awk '{ print $1 }'`
-if [ "$checksum" = "c16419c4eb292ad620cbc97aab0cf5e7e4236ad501d6b576cd82d0ba9a347981" ]; then
+if [ "$checksum" = "c01a3d1ebfffa2d66fd8eadcc783524a5918f92c52da31dfeea61725a2c2427c" ]; then
     echo "Checksum is correct."
     unzip kmd_osx_bins.zip
     cp -rvf kmd_osx_bins/* assets/bin/osx/.
