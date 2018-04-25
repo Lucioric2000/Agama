@@ -37,6 +37,7 @@ shepherd.rpcConf = {};
 shepherd.appRuntimeLog = [];
 shepherd.appRuntimeSPVLog = [];
 shepherd.lockDownAddCoin = false;
+shepherd.isWatchOnly = false;
 
 // dex cache
 shepherd.mmupass = null;

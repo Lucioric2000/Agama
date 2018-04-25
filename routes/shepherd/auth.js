@@ -59,5 +59,9 @@ module.exports = (shepherd) => {
     return passwdStrength(str) < 29 ? false : true;
   };
 
+  shepherd.isWatchOnly = () => {
+    return shepherd.isWatchOnly;
+  };
+
   return shepherd;
 };

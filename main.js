@@ -293,6 +293,7 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
 				mainWindow.bip39 = bip39;
+				mainWindow.isWatchOnly = shepherd.isWatchOnly;
 
 			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
