@@ -27,7 +27,7 @@ mv assets/artifacts.supernet.org/latest/osx assets/bin/osx
 echo Moving legacy libs to assets/bin
 wget https://supernetorg.bintray.com/misc/libs_legacy_osx.zip
 checksum=`shasum -a 256 libs_legacy_osx.zip | awk '{ print $1 }'`
-if [ "$checksum" = "e9474aa243694a2d4c87fccc443e4b16a9a5172a24da76af9e5ecddd006649bb" ]; then
+if [ "$checksum" = "c01a3d1ebfffa2d66fd8eadcc783524a5918f92c52da31dfeea61725a2c2427c" ]; then
     echo "Checksum is correct."
     unzip libs_legacy_osx.zip
     cp -rvf libs_legacy_osx/* assets/bin/osx/.
