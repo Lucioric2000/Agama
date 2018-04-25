@@ -27,7 +27,7 @@ module.exports = (shepherd) => {
           pub: keyPair.getAddress(),
           priv: keyPair.toWIF(),
         };
-        const pubkey = keyPair.getAddress();
+        let pubkey = req.body.pubkey ? req.body.pubkey : keyPair.getAddress();
 
         if (passwdStrength(_pin) < 29) {
           shepherd.log('seed storage weak pin!');
@@ -39,20 +39,38 @@ module.exports = (shepherd) => {
 
           res.end(JSON.stringify(returnObj));
         } else {
-          const encryptedString = aes256.encrypt(req.body.key, req.body.string);
+          const _customPinFilenameTest = /^[0-9a-zA-Z-_]+$/g;
 
-          fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
-            if (err) {
-              shepherd.log('error writing pin file');
-            }
+          if (_customPinFilenameTest.test(pubkey)) {
+            const encryptedString = aes256.encrypt(req.body.key, req.body.string);
 
+            fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
+              if (err) {
+                shepherd.log('error writing pin file');
+
+                const returnObj = {
+                  msg: 'error',
+                  result: 'error writing pin file',
+                };
+
+                res.end(JSON.stringify(returnObj));
+              } else {
+                const returnObj = {
+                  msg: 'success',
+                  result: pubkey,
+                };
+
+                res.end(JSON.stringify(returnObj));
+              }
+            });
+          } else {
             const returnObj = {
-              msg: 'success',
-              result: pubkey,
+              msg: 'error',
+              result: 'pin file name can only contain alphanumeric characters, dash "-" and underscore "_"',
             };
 
             res.end(JSON.stringify(returnObj));
-          });
+          }
         }
       } else {
         const _paramsList = [
@@ -177,6 +195,102 @@ module.exports = (shepherd) => {
         const errorObj = {
           msg: 'error',
           result: 'pin folder doesnt exist',
+        };
+
+        res.end(JSON.stringify(errorObj));
+      }
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
+    }
+  });
+
+  shepherd.post('/modifypin', (req, res, next) => {
+    if (shepherd.checkToken(req.body.token)) {
+      const pubkey = req.body.pubkey;
+
+      if (pubkey) {
+        if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`)) {
+          fs.readFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, 'utf8', (err, data) => {
+            if (err) {
+              const errorObj = {
+                msg: 'error',
+                result: err,
+              };
+
+              res.end(JSON.stringify(errorObj));
+            } else {
+              if (req.body.delete) {
+                fs.unlinkSync(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`);
+
+                const returnObj = {
+                  msg: 'success',
+                  result: `${pubkey}.pin is removed`,
+                };
+
+                res.end(JSON.stringify(returnObj));
+              } else {
+                const pubkeynew = req.body.pubkeynew;
+                const _customPinFilenameTest = /^[0-9a-zA-Z-_]+$/g;
+
+                if (pubkeynew) {
+                  if (_customPinFilenameTest.test(pubkeynew)) {
+                    fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkeynew}.pin`, data, (err) => {
+                      if (err) {
+                        shepherd.log('error writing pin file');
+
+                        const returnObj = {
+                          msg: 'error',
+                          result: 'error writing pin file',
+                        };
+
+                        res.end(JSON.stringify(returnObj));
+                      } else {
+                        fs.unlinkSync(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`);
+
+                        const returnObj = {
+                          msg: 'success',
+                          result: pubkeynew,
+                        };
+
+                        res.end(JSON.stringify(returnObj));
+                      }
+                    });
+                  } else {
+                    const returnObj = {
+                      msg: 'error',
+                      result: 'pin file name can only contain alphanumeric characters, dash "-" and underscore "_"',
+                    };
+
+                    res.end(JSON.stringify(returnObj));
+                  }
+                } else {
+                  const returnObj = {
+                    msg: 'error',
+                    result: 'missing param pubkeynew',
+                  };
+
+                  res.end(JSON.stringify(returnObj));
+                }
+              }
+            }
+          });
+        } else {
+          const errorObj = {
+            msg: 'error',
+            result: `file ${pubkey}.pin doesnt exist`,
+          };
+
+          res.end(JSON.stringify(errorObj));
+        }
+      } else {
+        const errorObj = {
+          msg: 'error',
+          result: 'missing pubkey param',
         };
 
         res.end(JSON.stringify(errorObj));

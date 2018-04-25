@@ -255,8 +255,8 @@ function createWindow(status, hideLoadingWindow) {
 				shepherd.setVar('appBasicInfo', appBasicInfo);
 				shepherd.setVar('appSessionHash', appSessionHash);
 
-				// load our index.html (i.e. easyDEX GUI)
-				shepherd.writeLog('show edex gui');
+				// load our index.html (i.e. Agama GUI)
+				shepherd.writeLog('show agama gui');
 				mainWindow.appConfig = appConfig;
 				mainWindow.appConfigSchema = shepherd.appConfigSchema;
 				mainWindow.arch = arch();
@@ -290,17 +290,16 @@ function createWindow(status, hideLoadingWindow) {
 					firstLoginPH: null,
 					secondaryLoginPH: null,
 				};
-				mainWindow.nnVoteChain = 'VOTE2018';
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
 				mainWindow.bip39 = bip39;
 
-			  /*for (let i = 0; i < process.argv.length; i++) {
+			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
-			      console.log(`notary node elections chain ${process.argv[i].replace('nvote=', '')}`);
-			      mainWindow.nnVoteChain = process.argv[i].replace('nvote=', '');
+			      console.log(`enable notary node elections ui`);
+			      mainWindow.nnVoteChain = 'VOTE2018';
 			    }
-			  }*/
+			  }
 			} else {
 				mainWindow = new BrowserWindow({
 					width: 500,
