@@ -58,8 +58,13 @@ module.exports = (shepherd) => {
   };
 
   shepherd.getNetworkData = (network) => {
-    const coin = shepherd.findNetworkObj(network) || shepherd.findNetworkObj(network.toUpperCase()) || shepherd.findNetworkObj(network.toLowerCase());
+    let coin = shepherd.findNetworkObj(network) || shepherd.findNetworkObj(network.toUpperCase()) || shepherd.findNetworkObj(network.toLowerCase());
     const coinUC = coin ? coin.toUpperCase() : null;
+
+    if (!coin &&
+        !coinUC) {
+      coin = network.toUpperCase();
+    }
 
     if (coin === 'SUPERNET' ||
         coin === 'REVS' ||
@@ -70,10 +75,10 @@ module.exports = (shepherd) => {
         coin === 'BET' ||
         coin === 'CRYPTO' ||
         coin === 'COQUI' ||
-	coin === 'GLXT' ||
+        coin === 'GLXT' ||
         coin === 'OOT' ||
         coin === 'HODL' ||
-	coin === 'EQL' ||
+        coin === 'EQL' ||
         coin === 'SHARK' ||
         coin === 'MSHARK' ||
         coin === 'BOTS' ||
@@ -101,9 +106,9 @@ module.exports = (shepherd) => {
         coinUC === 'BET' ||
         coinUC === 'CRYPTO' ||
         coinUC === 'COQUI' ||
-	coinUC === 'GLXT' ||
+        coinUC === 'GLXT' ||
         coinUC === 'OOT' ||
-	coinUC === 'EQL' ||
+        coinUC === 'EQL' ||
         coinUC === 'HODL' ||
         coinUC === 'SHARK' ||
         coinUC === 'MSHARK' ||
@@ -182,7 +187,7 @@ module.exports = (shepherd) => {
       };
 
       for (let key in shepherd.electrumServers) {
-        if (shepherd.electrumServers[key].abbr === req.query.coin) { // a bit risky
+        if (shepherd.electrumServers[key].abbr === req.query.coin) {
           shepherd.electrumServers[key].address = req.query.address;
           shepherd.electrumServers[key].port = req.query.port;
           break;

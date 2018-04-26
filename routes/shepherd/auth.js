@@ -14,12 +14,21 @@ module.exports = (shepherd) => {
         if (Object.keys(shepherd.electrumCoins).length > 1 &&
             shepherd.electrumCoins.auth) {
           _status = true;
-        } else if (Object.keys(shepherd.electrumCoins).length === 1 && !shepherd.electrumCoins.auth) {
+        } else if (
+          Object.keys(shepherd.electrumCoins).length === 1 &&
+          !shepherd.electrumCoins.auth
+        ) {
           _status = true;
         }
-      } else if (Object.keys(shepherd.electrumCoins).length > 1 && shepherd.electrumCoins.auth) {
+      } else if (
+        Object.keys(shepherd.electrumCoins).length > 1 &&
+        shepherd.electrumCoins.auth
+      ) {
         _status = true;
-      } else if (Object.keys(shepherd.electrumCoins).length === 1 && !Object.keys(shepherd.coindInstanceRegistry).length) {
+      } else if (
+        Object.keys(shepherd.electrumCoins).length === 1 &&
+        !Object.keys(shepherd.coindInstanceRegistry).length
+      ) {
         _status = true;
       }
 
@@ -48,6 +57,33 @@ module.exports = (shepherd) => {
   shepherd.checkStringEntropy = (str) => {
     // https://tools.ietf.org/html/rfc4086#page-35
     return passwdStrength(str) < 29 ? false : true;
+  };
+
+  shepherd.isWatchOnly = () => {
+    return shepherd.isWatchOnly;
+  };
+
+  shepherd.setPubkey = (seed, coin) => {
+    const {
+      pub,
+      pubHex,
+    } = shepherd.seedToWif(seed, 'komodo', true);
+
+    shepherd.staking[coin] = {
+      pub,
+      pubHex,
+    };
+
+    shepherd.log(`pub key for ${coin} is set`);
+    shepherd.log(shepherd.staking[coin]);
+  };
+
+  shepherd.getPubkeys = () => {
+    return shepherd.staking;
+  };
+
+  shepherd.removePubkey = (coin) => {
+    delete shepherd.staking[coin];
   };
 
   return shepherd;

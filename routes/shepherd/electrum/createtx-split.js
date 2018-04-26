@@ -35,7 +35,11 @@ module.exports = (shepherd) => {
 
       for (let i = 0; i < targets.length; i++) {
         if (shepherd.isPos(network)) {
-          tx.addOutput(outputAddress, Number(targets[i]), shepherd.getNetworkData(network));
+          tx.addOutput(
+            outputAddress,
+            Number(targets[i]),
+            shepherd.getNetworkData(network)
+          );
         } else {
           tx.addOutput(outputAddress, Number(targets[i]));
         }
@@ -43,7 +47,11 @@ module.exports = (shepherd) => {
 
       if (Number(change) > 0) {
         if (shepherd.isPos(network)) {
-          tx.addOutput(changeAddress, Number(change), shepherd.getNetworkData(network));
+          tx.addOutput(
+            changeAddress,
+            Number(change),
+            shepherd.getNetworkData(network)
+          );
         } else {
           shepherd.log(`change ${change}`, true);
           tx.addOutput(changeAddress, Number(change));
@@ -59,7 +67,11 @@ module.exports = (shepherd) => {
 
       for (let i = 0; i < utxo.length; i++) {
         if (shepherd.isPos(network)) {
-          tx.sign(shepherd.getNetworkData(network), i, key);
+          tx.sign(
+            shepherd.getNetworkData(network),
+            i,
+            key
+          );
         } else {
           tx.sign(i, key);
         }

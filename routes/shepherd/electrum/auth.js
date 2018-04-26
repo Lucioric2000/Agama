@@ -14,14 +14,17 @@ module.exports = (shepherd) => {
           let keys;
           let isWif = false;
 
-          if (req.body.seed.match('^[a-zA-Z0-9]{34}$') &&
+          if (_seed.match('^[a-zA-Z0-9]{34}$') &&
               shepherd.appConfig.experimentalFeatures) {
             shepherd.log('watchonly pub addr');
             shepherd.electrumKeys[_abbr] = {
-              priv: req.body.seed,
-              pub: req.body.seed,
+              priv: _seed,
+              pub: _seed,
             };
+            shepherd.isWatchOnly = true;
           } else {
+            shepherd.isWatchOnly = false;
+
             try {
               bs58check.decode(_seed);
               isWif = true;
@@ -39,7 +42,11 @@ module.exports = (shepherd) => {
                 break;
               }
             } else {
-              keys = shepherd.seedToWif(_seed, shepherd.findNetworkObj(_abbr), req.body.iguana);
+              keys = shepherd.seedToWif(
+                _seed,
+                shepherd.findNetworkObj(_abbr),
+                req.body.iguana,
+              );
             }
 
             shepherd.electrumKeys[_abbr] = {

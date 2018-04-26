@@ -47,7 +47,12 @@ module.exports = (shepherd) => {
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
-                        const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network, shepherd.electrumServers[network].proto === 'insight');
+                        const decodedTx = shepherd.electrumJSTxDecoder(
+                          _rawtxJSON,
+                          network,
+                          _network,
+                          shepherd.electrumServers[network].proto === 'insight'
+                        );
 
                         if (decodedTx &&
                             decodedTx.format &&

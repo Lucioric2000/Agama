@@ -1,7 +1,9 @@
 const async = require('async');
 const Promise = require('bluebird');
 
-const MAX_VOUT_LENGTH = 10;
+const MAX_VIN_LENGTH = 150; // parse up to MAX_VIN_LENGTH vins
+
+// TODO: add z -> pub, pub -> z flag for zcash forks
 
 module.exports = (shepherd) => {
   shepherd.sortTransactions = (transactions, sortBy) => {
@@ -131,6 +133,8 @@ module.exports = (shepherd) => {
                         const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
 
                         let txInputs = [];
+                        let opreturn = false;
+
                         shepherd.log(`decodedtx network ${network}`, true);
 
                         shepherd.log('decodedtx =>', true);
@@ -139,13 +143,24 @@ module.exports = (shepherd) => {
                         let index2 = 0;
 
                         if (decodedTx &&
+                            decodedTx.outputs &&
+                            decodedTx.outputs.length) {
+                          for (let i = 0; i < decodedTx.outputs.length; i++) {
+                            if (decodedTx.outputs[i].scriptPubKey.type === 'nulldata') {
+                              opreturn = shepherd.hex2str(decodedTx.outputs[i].scriptPubKey.hex);
+                            }
+                          }
+                        }
+
+                        if (decodedTx &&
                             decodedTx.inputs &&
                             decodedTx.inputs.length) {
                           async.eachOfSeries(decodedTx.inputs, (_decodedInput, ind2, callback2) => {
                             const checkLoop = () => {
                               index2++;
 
-                              if (index2 === decodedTx.inputs.length || index2 === MAX_VOUT_LENGTH) {
+                              if (index2 === decodedTx.inputs.length ||
+                                  index2 === MAX_VIN_LENGTH) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
                                   network: decodedTx.network,
@@ -153,36 +168,45 @@ module.exports = (shepherd) => {
                                   inputs: txInputs,
                                   outputs: decodedTx.outputs,
                                   height: transaction.height,
-                                  timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
-                                  confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                                  timestamp: Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
+                                  confirmations: Number(transaction.height) === 0 || Number(transaction.height) === -1 ? 0 : currentHeight - transaction.height,
                                 };
 
                                 const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
 
                                 if (formattedTx.type) {
                                   formattedTx.height = transaction.height;
-                                  formattedTx.blocktime = blockInfo.timestamp;
-                                  formattedTx.timereceived = blockInfo.timereceived;
+                                  formattedTx.blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
+                                  formattedTx.timereceived = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timereceived;
                                   formattedTx.hex = _rawtxJSON;
                                   formattedTx.inputs = decodedTx.inputs;
                                   formattedTx.outputs = decodedTx.outputs;
                                   formattedTx.locktime = decodedTx.format.locktime;
+                                  formattedTx.vinLen = decodedTx.inputs.length;
+                                  formattedTx.vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx.opreturn = opreturn;
                                   _rawtx.push(formattedTx);
                                 } else {
                                   formattedTx[0].height = transaction.height;
-                                  formattedTx[0].blocktime = blockInfo.timestamp;
-                                  formattedTx[0].timereceived = blockInfo.timereceived;
+                                  formattedTx[0].blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
+                                  formattedTx[0].timereceived = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timereceived;
                                   formattedTx[0].hex = _rawtxJSON;
                                   formattedTx[0].inputs = decodedTx.inputs;
                                   formattedTx[0].outputs = decodedTx.outputs;
                                   formattedTx[0].locktime = decodedTx.format.locktime;
+                                  formattedTx[0].vinLen = decodedTx.inputs.length;
+                                  formattedTx[0].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[0].opreturn = opreturn[0];
                                   formattedTx[1].height = transaction.height;
-                                  formattedTx[1].blocktime = blockInfo.timestamp;
-                                  formattedTx[1].timereceived = blockInfo.timereceived;
+                                  formattedTx[1].blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
+                                  formattedTx[1].timereceived = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timereceived;
                                   formattedTx[1].hex = _rawtxJSON;
                                   formattedTx[1].inputs = decodedTx.inputs;
                                   formattedTx[1].outputs = decodedTx.outputs;
                                   formattedTx[1].locktime = decodedTx.format.locktime;
+                                  formattedTx[1].vinLen = decodedTx.inputs.length;
+                                  formattedTx[1].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[1].opreturn = opreturn[1];
                                   _rawtx.push(formattedTx[0]);
                                   _rawtx.push(formattedTx[1]);
                                 }
@@ -230,6 +254,7 @@ module.exports = (shepherd) => {
                             height: transaction.height,
                             timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
                             confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
+                            opreturn,
                           };
 
                           const formattedTx = shepherd.parseTransactionAddresses(_parsedTx, _address, network);
@@ -313,7 +338,11 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/gettransaction', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(
+        shepherd.electrumServers[network].port,
+        shepherd.electrumServers[network].address,
+        shepherd.electrumServers[network].proto
+      ); // tcp or tls
 
       shepherd.log('electrum gettransaction =>', true);
 
@@ -551,7 +580,11 @@ module.exports = (shepherd) => {
 
         res.end(JSON.stringify(successObj));
       } else {
-        const ecl = new shepherd.electrumJSCore(shepherd.electrumServers[req.query.network].port, shepherd.electrumServers[req.query.network].address, shepherd.electrumServers[req.query.network].proto); // tcp or tls
+        const ecl = new shepherd.electrumJSCore(
+          shepherd.electrumServers[req.query.network].port,
+          shepherd.electrumServers[req.query.network].address,
+          shepherd.electrumServers[req.query.network].proto
+        ); // tcp or tls
 
         shepherd.log(decodedTx.inputs[0]);
         shepherd.log(decodedTx.inputs[0].txid);

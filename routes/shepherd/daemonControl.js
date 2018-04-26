@@ -187,12 +187,14 @@ module.exports = (shepherd) => {
               change: '-pubkey=',
               datadir: '-datadir=',
               rescan: '-rescan',
+              gen: '-gen',
             };
             let _customParam = '';
 
             if (data.ac_custom_param === 'silent' ||
                 data.ac_custom_param === 'reindex' ||
-                data.ac_custom_param === 'rescan') {
+                data.ac_custom_param === 'rescan' ||
+                data.ac_custom_param === 'gen') {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}`;
             } else if (data.ac_custom_param === 'change' && data.ac_custom_param_value) {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}${data.ac_custom_param_value}`;
@@ -359,14 +361,14 @@ module.exports = (shepherd) => {
 
             shepherd.log(`daemon param ${data.ac_custom_param}`);
 
-            shepherd.coindInstanceRegistry['CHIPS'] = true;
+            shepherd.coindInstanceRegistry.CHIPS = true;
             let _arg = `${_customParam}`;
             _arg = _arg.trim().split(' ');
 
             if (_arg &&
                 _arg.length > 1) {
               execFile(`${shepherd.chipsBin}`, _arg, {
-                maxBuffer: 1024 * 1000000 // 1000 mb
+                maxBuffer: 1024 * 1000000, // 1000 mb
               }, (error, stdout, stderr) => {
                 shepherd.writeLog(`stdout: ${stdout}`);
                 shepherd.writeLog(`stderr: ${stderr}`);
@@ -464,7 +466,7 @@ module.exports = (shepherd) => {
             let _arg = `${data.ac_options.join(' ')}`;
             _arg = _arg.trim().split(' ');
             execFile(`${coindBin}`, _arg, {
-              maxBuffer: 1024 * 1000000 // 1000 mb
+              maxBuffer: 1024 * 1000000, // 1000 mb
             }, (error, stdout, stderr) => {
               shepherd.writeLog(`stdout: ${stdout}`);
               shepherd.writeLog(`stderr: ${stderr}`);
@@ -651,7 +653,6 @@ module.exports = (shepherd) => {
                     shepherd.writeLog(`append daemon conf err: ${err}`);
                     shepherd.log(`append daemon conf err: ${err}`);
                   }
-                  // throw err;
                   shepherd.log('rpcpassword: ADDED');
                   shepherd.writeLog('rpcpassword: ADDED');
                 });
@@ -678,7 +679,6 @@ module.exports = (shepherd) => {
                       shepherd.writeLog(`append daemon conf err: ${err}`);
                       shepherd.log(`append daemon conf err: ${err}`);
                     }
-                    // throw err;
                     shepherd.log('rpcport: ADDED');
                     shepherd.writeLog('rpcport: ADDED');
                   });
@@ -754,7 +754,6 @@ module.exports = (shepherd) => {
                       shepherd.writeLog(`append daemon conf err: ${err}`);
                       shepherd.log(`append daemon conf err: ${err}`);
                     }
-                    // throw err;
                     shepherd.log('addnode: ADDED');
                     shepherd.writeLog('addnode: ADDED');
                   });
