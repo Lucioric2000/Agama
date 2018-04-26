@@ -39,6 +39,8 @@ shepherd.appRuntimeSPVLog = [];
 shepherd.lockDownAddCoin = false;
 shepherd.isWatchOnly = false;
 
+shepherd.staking = {};
+
 // dex cache
 shepherd.mmupass = null;
 shepherd.mmRatesInterval = null;
@@ -61,7 +63,6 @@ shepherd.electrumCoins = {
   auth: false,
 };
 shepherd.electrumKeys = {};
-
 shepherd.electrumCache = {};
 
 shepherd.electrumJSCore = require('./electrumjs/electrumjs.core.js');

@@ -75,10 +75,10 @@ module.exports = (shepherd) => {
         coin === 'BET' ||
         coin === 'CRYPTO' ||
         coin === 'COQUI' ||
-	coin === 'GLXT' ||
+        coin === 'GLXT' ||
         coin === 'OOT' ||
         coin === 'HODL' ||
-      	coin === 'EQL' ||
+        coin === 'EQL' ||
         coin === 'SHARK' ||
         coin === 'MSHARK' ||
         coin === 'BOTS' ||
@@ -106,9 +106,9 @@ module.exports = (shepherd) => {
         coinUC === 'BET' ||
         coinUC === 'CRYPTO' ||
         coinUC === 'COQUI' ||
-	coinUC === 'GLXT' ||
+        coinUC === 'GLXT' ||
         coinUC === 'OOT' ||
-      	coinUC === 'EQL' ||
+        coinUC === 'EQL' ||
         coinUC === 'HODL' ||
         coinUC === 'SHARK' ||
         coinUC === 'MSHARK' ||

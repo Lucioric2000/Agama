@@ -63,5 +63,28 @@ module.exports = (shepherd) => {
     return shepherd.isWatchOnly;
   };
 
+  shepherd.setPubkey = (seed, coin) => {
+    const {
+      pub,
+      pubHex,
+    } = shepherd.seedToWif(seed, 'komodo', true);
+
+    shepherd.staking[coin] = {
+      pub,
+      pubHex,
+    };
+
+    shepherd.log(`pub key for ${coin} is set`);
+    shepherd.log(shepherd.staking[coin]);
+  };
+
+  shepherd.getPubkeys = () => {
+    return shepherd.staking;
+  };
+
+  shepherd.removePubkey = (coin) => {
+    delete shepherd.staking[coin];
+  };
+
   return shepherd;
 };

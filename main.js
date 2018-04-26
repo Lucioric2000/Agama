@@ -294,6 +294,8 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.pinAccess = false;
 				mainWindow.bip39 = bip39;
 				mainWindow.isWatchOnly = shepherd.isWatchOnly;
+				mainWindow.setPubkey = shepherd.setPubkey;
+				mainWindow.getPubkeys = shepherd.getPubkeys;
 
 			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
