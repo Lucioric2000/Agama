@@ -53,6 +53,18 @@ let electrumServers = {
       'electrum1.cipig.net:10011',
       'electrum2.cipig.net:10011'
     ],
+  },
+   chain: { // !estimatefee
+    address: 'electrum1.chainmakers.co',
+    port: 55417,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'CHAIN',
+    serverList: [
+      'electrum1.chainmakers.co:55417',
+      'electrum2.chainmakers.co:55417'
+    ],
+
 },
    glxt: { // !estimatefee
     address: 'electrum1.glx.co',
