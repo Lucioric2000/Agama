@@ -56,7 +56,7 @@ module.exports = (shepherd) => {
 
                             if (Number(_utxoItem.value) * 0.00000001 >= 10 &&
                                 decodedTx.format.locktime > 0) {
-                              interest = shepherd.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value);
+                              interest = shepherd.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
                             }
 
                             let _resolveObj = {

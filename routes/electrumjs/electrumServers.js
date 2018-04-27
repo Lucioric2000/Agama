@@ -43,7 +43,7 @@ let electrumServers = {
       'electrum2.utrum.io:10088'
     ],
   },
-   coqui: { // !estimatefee
+  coqui: { // !estimatefee
     address: 'electrum1.cipig.net',
     port: 10011,
     proto: 'tcp',
@@ -53,8 +53,8 @@ let electrumServers = {
       'electrum1.cipig.net:10011',
       'electrum2.cipig.net:10011'
     ],
-},
-   glxt: { // !estimatefee
+  },
+  glxt: { // !estimatefee
     address: 'electrum1.glx.co',
     port: 60012,
     proto: 'tcp',

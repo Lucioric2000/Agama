@@ -1,7 +1,7 @@
 'use strict'
-var bitcoin = require('bitcoinjs-lib');
+const bitcoin = require('bitcoinjs-lib');
 
-var networks = exports;
+let networks = exports;
 Object.keys(bitcoin.networks).forEach((key) => {
   networks[key] = bitcoin.networks[key];
 });
