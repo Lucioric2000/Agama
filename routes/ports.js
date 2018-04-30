@@ -21,6 +21,7 @@ const assetChainPorts = {
   'BOTS': '11964',
   'MGW': '12386',
   'COQUI': '14276',
+  'CHAIN': '15587',
   'GLXT': '15723',
   'MVP': '11676',
   'KV': '8299',

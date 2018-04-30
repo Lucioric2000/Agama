@@ -299,7 +299,7 @@ function createWindow(status, hideLoadingWindow) {
 
 			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
-			      console.log(`enable notary node elections ui`);
+			      console.log('enable notary node elections ui');
 			      mainWindow.nnVoteChain = 'VOTE2018';
 			    }
 			  }
