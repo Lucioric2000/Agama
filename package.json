@@ -50,6 +50,7 @@
     "js-sha256": "^0.7.1",
     "lz-string": "^1.4.4",
     "marketmaker": "git://github.com/pbca26/marketmaker",
+    "nodejs-aes256": "^1.0.1",
     "passwd-strength": "git+https://github.com/pbca26/passwd-strength.git",
     "portscanner": "^2.1.1",
     "ps-node": "^0.1.5",

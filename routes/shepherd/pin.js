@@ -1,9 +1,16 @@
 const fs = require('fs-extra');
-const {encrypt, decrypt} = require('./../encryption');
 const passwdStrength = require('passwd-strength');
 const bitcoin = require('bitcoinjs-lib');
 const sha256 = require('js-sha256');
 const bigi = require('bigi');
+const aes256 = require('nodejs-aes256');
+const iocane = require('iocane');
+const session = iocane.createSession()
+  .use('cbc')
+  .setDerivationRounds(300000);
+
+const encrypt = session.encrypt.bind(session);
+const decrypt = session.decrypt.bind(session);
 
 module.exports = (shepherd) => {
   /*
@@ -12,10 +19,12 @@ module.exports = (shepherd) => {
    */
   shepherd.post('/encryptkey', async (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
-      if (req.body.key &&
-          req.body.string) {
-        const _pin = req.body.key;
-        const hash = sha256.create().update(req.body.string);
+      const _pin = req.body.key;
+      const _str = req.body.string;
+
+      if (_pin &&
+          _str) {
+        const hash = sha256.create().update(_str);
         let bytes = hash.array();
         bytes[0] &= 248;
         bytes[31] &= 127;
@@ -27,7 +36,7 @@ module.exports = (shepherd) => {
           pub: keyPair.getAddress(),
           priv: keyPair.toWIF(),
         };
-        let pubkey = req.body.pubkey ? req.body.pubkey : keyPair.getAddress();
+        const pubkey = req.body.pubkey ? req.body.pubkey : keyPair.getAddress();
 
         if (passwdStrength(_pin) < 29) {
           shepherd.log('seed storage weak pin!');
@@ -42,26 +51,27 @@ module.exports = (shepherd) => {
           const _customPinFilenameTest = /^[0-9a-zA-Z-_]+$/g;
 
           if (_customPinFilenameTest.test(pubkey)) {
-            const encryptedString = await encrypt(req.body.string, req.body.key);
+            encrypt(req.body.string, _pin)
+            .then((encryptedString) => {
+              fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
+                if (err) {
+                  shepherd.log('error writing pin file');
 
-            fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
-              if (err) {
-                shepherd.log('error writing pin file');
+                  const returnObj = {
+                    msg: 'error',
+                    result: 'error writing pin file',
+                  };
 
-                const returnObj = {
-                  msg: 'error',
-                  result: 'error writing pin file',
-                };
+                  res.end(JSON.stringify(returnObj));
+                } else {
+                  const returnObj = {
+                    msg: 'success',
+                    result: pubkey,
+                  };
 
-                res.end(JSON.stringify(returnObj));
-              } else {
-                const returnObj = {
-                  msg: 'success',
-                  result: pubkey,
-                };
-
-                res.end(JSON.stringify(returnObj));
-              }
+                  res.end(JSON.stringify(returnObj));
+                }
+              });
             });
           } else {
             const returnObj = {
@@ -104,10 +114,13 @@ module.exports = (shepherd) => {
 
   shepherd.post('/decryptkey', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
-      if (req.body.key &&
-          req.body.pubkey) {
-        if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin/${req.body.pubkey}.pin`)) {
-          fs.readFile(`${shepherd.agamaDir}/shepherd/pin/${req.body.pubkey}.pin`, 'utf8', async (err, data) => {
+      const _pubkey = req.body.pubkey;
+      const _key = req.body.key;
+
+      if (_key &&
+          _pubkey) {
+        if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin/${_pubkey}.pin`)) {
+          fs.readFile(`${shepherd.agamaDir}/shepherd/pin/${_pubkey}.pin`, 'utf8', async(err, data) => {
             if (err) {
               const errorObj = {
                 msg: 'error',
@@ -116,22 +129,51 @@ module.exports = (shepherd) => {
 
               res.end(JSON.stringify(errorObj));
             } else {
-
+              const decryptedKey = aes256.decrypt(_key, data);
+              const _regexTest = decryptedKey.match(/^[0-9a-zA-Z ]+$/g);
               let returnObj;
-              try {
-                const decryptedKey = await decrypt(data, req.body.key);
-                returnObj = {
-                  msg: 'success',
-                  result: decryptedKey,
-                };
-              } catch (error) {
-                returnObj = {
-                  msg: 'error',
-                  result: 'wrong key',
-                };
-              }
 
-              res.end(JSON.stringify(returnObj));
+              if (_regexTest) { // re-encrypt with a new method
+                encrypt(decryptedKey, _key)
+                .then((encryptedString) => {
+                  shepherd.log(`seed encrypt old method detected for file ${_pubkey}`);
+
+                  fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${_pubkey}.pin`, encryptedString, (err) => {
+                    if (err) {
+                      shepherd.log(`error re-encrypt pin file ${_pubkey}`);
+                    } else {
+                      returnObj = {
+                        msg: 'success',
+                        result: decryptedKey,
+                      };
+
+                      res.end(JSON.stringify(returnObj));
+                    }
+                  });
+                });
+              } else {
+                decrypt(data, _key)
+                .then((decryptedKey) => {
+                  shepherd.log(`pin ${_pubkey} decrypted`);
+
+                  returnObj = {
+                    msg: 'success',
+                    result: decryptedKey,
+                  };
+
+                  res.end(JSON.stringify(returnObj));
+                })
+                .catch((err) => {
+                  shepherd.log(`pin ${_pubkey} decrypt err ${err}`);
+
+                  returnObj = {
+                    msg: 'error',
+                    result: 'wrong key',
+                  };
+
+                  res.end(JSON.stringify(returnObj));
+                });
+              }
             }
           });
         } else {
