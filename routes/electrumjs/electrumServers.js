@@ -475,13 +475,13 @@ let electrumServers = {
   },
   argentum: { // !estimatefee
     address: 'electrum1.cipig.net',
-    port: 10069,
+    port: 10068,
     proto: 'tcp',
     txfee: 50000,
     abbr: 'ARG',
     serverList: [
-      'electrum1.cipig.net:10069',
-      'electrum2.cipig.net:10069'
+      'electrum1.cipig.net:10068',
+      'electrum2.cipig.net:10068'
     ],
   },
   chips: { // !estimatefee
