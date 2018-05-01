@@ -11,7 +11,6 @@ shepherd._fs = require('graceful-fs');
 shepherd.md5 = require('./md5.js');
 shepherd.request = require('request');
 shepherd.portscanner = require('portscanner');
-shepherd.aes256 = require('nodejs-aes256');
 shepherd.AdmZip = require('adm-zip');
 shepherd.remoteFileSize = require('remote-file-size');
 shepherd.Promise = require('bluebird');
@@ -37,6 +36,9 @@ shepherd.rpcConf = {};
 shepherd.appRuntimeLog = [];
 shepherd.appRuntimeSPVLog = [];
 shepherd.lockDownAddCoin = false;
+shepherd.isWatchOnly = false;
+
+shepherd.staking = {};
 
 // dex cache
 shepherd.mmupass = null;
@@ -60,7 +62,6 @@ shepherd.electrumCoins = {
   auth: false,
 };
 shepherd.electrumKeys = {};
-
 shepherd.electrumCache = {};
 
 shepherd.electrumJSCore = require('./electrumjs/electrumjs.core.js');

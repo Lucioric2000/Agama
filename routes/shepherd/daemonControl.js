@@ -187,12 +187,14 @@ module.exports = (shepherd) => {
               change: '-pubkey=',
               datadir: '-datadir=',
               rescan: '-rescan',
+              gen: '-gen',
             };
             let _customParam = '';
 
             if (data.ac_custom_param === 'silent' ||
                 data.ac_custom_param === 'reindex' ||
-                data.ac_custom_param === 'rescan') {
+                data.ac_custom_param === 'rescan' ||
+                data.ac_custom_param === 'gen') {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}`;
             } else if (data.ac_custom_param === 'change' && data.ac_custom_param_value) {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}${data.ac_custom_param_value}`;

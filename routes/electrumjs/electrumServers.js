@@ -1,4 +1,15 @@
 let electrumServers = {
+  kv: { // !estimatefee
+    address: 'electrum1.cipig.net',
+    port: 10016,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'KV',
+    serverList: [
+      'electrum1.cipig.net:10016',
+      'electrum2.cipig.net:10016'
+    ],
+  },
   bntn: { // !estimatefee
     address: 'electrum1.cipig.net',
     port: 10026,
@@ -32,7 +43,7 @@ let electrumServers = {
       'electrum2.utrum.io:10088'
     ],
   },
-   coqui: { // !estimatefee
+  coqui: { // !estimatefee
     address: 'electrum1.cipig.net',
     port: 10011,
     proto: 'tcp',
@@ -42,8 +53,19 @@ let electrumServers = {
       'electrum1.cipig.net:10011',
       'electrum2.cipig.net:10011'
     ],
-},
-   glxt: { // !estimatefee
+  },
+  chain: { // !estimatefee
+    address: 'electrum1.chainmakers.co',
+    port: 55417,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'CHAIN',
+    serverList: [
+      'electrum1.chainmakers.co:55417',
+      'electrum2.chainmakers.co:55417'
+    ],
+  },
+  glxt: { // !estimatefee
     address: 'electrum1.glx.co',
     port: 60012,
     proto: 'tcp',

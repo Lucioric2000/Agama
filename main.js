@@ -293,10 +293,13 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
 				mainWindow.pinAccess = false;
 				mainWindow.bip39 = bip39;
+				mainWindow.isWatchOnly = shepherd.isWatchOnly;
+				mainWindow.setPubkey = shepherd.setPubkey;
+				mainWindow.getPubkeys = shepherd.getPubkeys;
 
 			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
-			      console.log(`enable notary node elections ui`);
+			      console.log('enable notary node elections ui');
 			      mainWindow.nnVoteChain = 'VOTE2018';
 			    }
 			  }

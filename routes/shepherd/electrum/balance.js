@@ -57,7 +57,7 @@ module.exports = (shepherd) => {
                         if (decodedTx &&
                             decodedTx.format &&
                             decodedTx.format.locktime > 0) {
-                          interestTotal += shepherd.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value);
+                          interestTotal += shepherd.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
                         }
 
                         shepherd.log('decoded tx =>', true);
