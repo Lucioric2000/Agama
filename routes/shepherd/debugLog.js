@@ -69,7 +69,7 @@ module.exports = (shepherd) => {
 
   shepherd.get('/coind/stdout', (req, res) => {
     if (shepherd.checkToken(req.query.token)) {
-      const _daemonName = req.query.chain !== 'komodod' ? req.query.chain : 'komodod';
+      const _daemonName = req.query.chain !== 'komodod' && req.query.chain.toLowerCase() !== 'kmd' ? req.query.chain : 'komodod';
       const _daemonLogName = `${shepherd.agamaDir}/${_daemonName}.log`;
 
       shepherd.readDebugLog(_daemonLogName, 'all')

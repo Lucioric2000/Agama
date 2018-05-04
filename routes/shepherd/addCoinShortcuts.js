@@ -43,6 +43,11 @@ module.exports = (shepherd) => {
         seedNode: '78.47.196.146',
         supply: 20998641,
       },
+      BNTN: {
+        name: 'BNTN',
+        seedNode: '94.130.169.205',
+        supply: 500000000,
+      },
     };
     const httpRequest = () => {
       const options = {
@@ -81,7 +86,8 @@ module.exports = (shepherd) => {
       selection === 'REVS' ||
       selection === 'JUMRLR' ||
       selection === 'MNZ' ||
-      selection === 'BTCH'
+      selection === 'BTCH' ||
+      selection === 'BNTN'
     ) {
       herdData = {
         'ac_name': acHerdData[selection].name,
