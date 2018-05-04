@@ -1,8 +1,6 @@
 const async = require('async');
 const Promise = require('bluebird');
 
-const MAX_VIN_LENGTH = 150; // parse up to MAX_VIN_LENGTH vins
-
 // TODO: add z -> pub, pub -> z flag for zcash forks
 
 module.exports = (shepherd) => {
@@ -160,7 +158,7 @@ module.exports = (shepherd) => {
                               index2++;
 
                               if (index2 === decodedTx.inputs.length ||
-                                  index2 === MAX_VIN_LENGTH) {
+                                  index2 === shepherd.appConfig.spv.maxVinParseLimit) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
                                   network: decodedTx.network,
@@ -183,7 +181,7 @@ module.exports = (shepherd) => {
                                   formattedTx.outputs = decodedTx.outputs;
                                   formattedTx.locktime = decodedTx.format.locktime;
                                   formattedTx.vinLen = decodedTx.inputs.length;
-                                  formattedTx.vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx.vinMaxLen = shepherd.appConfig.spv.maxVinParseLimit;
                                   formattedTx.opreturn = opreturn;
                                   _rawtx.push(formattedTx);
                                 } else {
@@ -195,7 +193,7 @@ module.exports = (shepherd) => {
                                   formattedTx[0].outputs = decodedTx.outputs;
                                   formattedTx[0].locktime = decodedTx.format.locktime;
                                   formattedTx[0].vinLen = decodedTx.inputs.length;
-                                  formattedTx[0].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[0].vinMaxLen = shepherd.appConfig.spv.maxVinParseLimit;
                                   formattedTx[0].opreturn = opreturn[0];
                                   formattedTx[1].height = transaction.height;
                                   formattedTx[1].blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
@@ -205,7 +203,7 @@ module.exports = (shepherd) => {
                                   formattedTx[1].outputs = decodedTx.outputs;
                                   formattedTx[1].locktime = decodedTx.format.locktime;
                                   formattedTx[1].vinLen = decodedTx.inputs.length;
-                                  formattedTx[1].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[1].vinMaxLen = shepherd.appConfig.spv.maxVinParseLimit;
                                   formattedTx[1].opreturn = opreturn[1];
                                   _rawtx.push(formattedTx[0]);
                                   _rawtx.push(formattedTx[1]);

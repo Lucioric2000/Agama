@@ -20,6 +20,9 @@ const appConfig = {
     lang: 'EN',
     rpc2cli: false,
     fiatRates: false,
+    spv: {
+      maxVinParseLimit: 120,
+    },
   },
   schema: {
     host: {
@@ -128,6 +131,16 @@ const appConfig = {
       displayName: 'Fetch fiat rates',
       info: 'Get coin fiat rates from atomicexplorer.com',
       type: 'boolean',
+    },
+    spv: {
+      display: true,
+      displayName: 'Lite mode',
+      maxVinParseLimit: {
+        display: true,
+        displayName: 'Max tx inputs parse limit',
+        info: 'Maximum inputs to parse per transaction.<br/>Change to lower values if you have the app freeze constantly or to retrieve transaction history faster but with degraded accuracy.<br/>Change to higher values to get maximum transaction history accuracy.',
+        type: 'number',
+      },
     },
   },
 };
