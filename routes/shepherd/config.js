@@ -2,6 +2,8 @@ const fs = require('fs-extra');
 const _fs = require('graceful-fs');
 const fsnode = require('fs');
 const Promise = require('bluebird');
+const defaultConf = require('../appConfig.js').config
+const deepmerge = require('./deepmerge.js');
 
 module.exports = (shepherd) => {
   shepherd.loadLocalConfig = () => {
@@ -17,8 +19,21 @@ module.exports = (shepherd) => {
         let result = {};
 
         for (let i in obj1) {
-          if (!obj2.hasOwnProperty(i)) {
-            result[i] = obj1[i];
+          if (typeof obj1[i] !== 'object') {
+            if (!obj2.hasOwnProperty(i)) {
+              result[i] = obj1[i];
+            }
+          } else {
+            for (let j in obj1[i]) {
+              if (!obj2[i].hasOwnProperty(j)) {
+                if (!result[i]) {
+                  result[i] = {};
+                }
+
+                console.log(`settings multi-level diff ${i} -> ${j}`);
+                result[i][j] = obj1[i][j];
+              }
+            }
           }
         }
 
@@ -26,10 +41,17 @@ module.exports = (shepherd) => {
       };
 
       if (localAppConfig) {
-        const compareConfigs = compareJSON(shepherd.appConfig, JSON.parse(localAppConfig));
+        const compareConfigs = compareJSON(defaultConf, JSON.parse(localAppConfig));
 
         if (Object.keys(compareConfigs).length) {
-          const newConfig = Object.assign(JSON.parse(localAppConfig), compareConfigs);
+          const newConfig = deepmerge(defaultConf, JSON.parse(localAppConfig));
+
+          shepherd.log('appconf');
+          shepherd.log(JSON.stringify(defaultConf));
+          shepherd.log('local');
+          shepherd.log(JSON.stringify(localAppConfig));
+          shepherd.log('new conf');
+          shepherd.log(JSON.stringify(newConfig));
 
           shepherd.log('config diff is found, updating local config');
           shepherd.log('config diff:');
