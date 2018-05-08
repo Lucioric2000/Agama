@@ -202,5 +202,23 @@ module.exports = (shepherd) => {
     }
   });
 
+  shepherd.testLocation = function(path) {
+    return new Promise(function(resolve, reject) {
+      fs.lstat(path, (err, stats) => {
+        if (err) {
+          shepherd.log(`error testing path ${path}`);
+          resolve(-1);
+        } else {
+          if (stats.isDirectory()) {
+            resolve(true);
+          } else {
+            shepherd.log(`error testing path ${path} not a folder`);
+            resolve(false);
+          }
+        }
+      });
+    });
+  }
+
   return shepherd;
 };
