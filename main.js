@@ -355,6 +355,11 @@ function createWindow(status, hideLoadingWindow) {
 			// mainWindow.webContents.openDevTools()
 
 			function appExit() {
+				if (shepherd.appConfig.spv &&
+						shepherd.appConfig.spv.cache) {
+					shepherd.saveLocalSPVCache();
+				}
+
 				const CloseDaemons = () => {
 					return new Promise((resolve, reject) => {
 						shepherd.log('Closing Main Window...');

@@ -106,6 +106,7 @@ shepherd = require('./shepherd/electrum/listunspent.js')(shepherd);
 shepherd = require('./shepherd/electrum/estimate.js')(shepherd);
 shepherd = require('./shepherd/electrum/btcFees.js')(shepherd);
 shepherd = require('./shepherd/electrum/insight.js')(shepherd);
+shepherd = require('./shepherd/electrum/cache.js')(shepherd);
 
 // dex
 shepherd = require('./shepherd/dex/coind.js')(shepherd);
@@ -156,5 +157,10 @@ shepherd.setIO = (io) => {
 shepherd.setVar = (_name, _body) => {
   shepherd[_name] = _body;
 };
+
+if (shepherd.appConfig.spv &&
+    shepherd.appConfig.spv.cache) {
+  shepherd.loadLocalSPVCache();
+}
 
 module.exports = shepherd;

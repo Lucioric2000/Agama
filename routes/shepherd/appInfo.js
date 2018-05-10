@@ -1,3 +1,5 @@
+const fs = require('fs-extra');
+
 const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {
     return '0 Bytes';
@@ -45,13 +47,14 @@ module.exports = (shepherd) => {
       komodoDir: shepherd.komodoDir,
       komododBin: shepherd.komododBin,
       configLocation: `${shepherd.agamaDir}/config.json`,
-      cacheLocation: `${shepherd.agamaDir}/shepherd`,
+      cacheLocation: `${shepherd.agamaDir}/spv-cache.json`,
     };
 
     return {
       sysInfo,
       releaseInfo,
       dirs,
+      cacheSize: formatBytes(fs.lstatSync(`${shepherd.agamaDir}/spv-cache.json`).size),
     };
   }
 

@@ -12,8 +12,8 @@ module.exports = (shepherd) => {
     let timestampDiffMinutes = timestampDiff / 60;
     let interest = 0;
 
-    shepherd.log(`${height} vs ${KOMODO_ENDOFERA}`);
-    shepherd.log(`${locktime} vs ${LOCKTIME_THRESHOLD}`);
+    shepherd.log(`${height} vs ${KOMODO_ENDOFERA}`, true);
+    shepherd.log(`${locktime} vs ${LOCKTIME_THRESHOLD}`, true);
 
     if (height < KOMODO_ENDOFERA &&
         locktime >= LOCKTIME_THRESHOLD) {
