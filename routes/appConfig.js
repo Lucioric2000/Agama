@@ -22,6 +22,8 @@ const appConfig = {
     fiatRates: false,
     spv: {
       maxVinParseLimit: 120,
+      cache: false,
+      proxy: false,
     },
   },
   schema: {
@@ -140,6 +142,17 @@ const appConfig = {
         displayName: 'Max tx inputs parse limit',
         info: 'Maximum inputs to parse per transaction.<br/>Change to lower values if you have the app freeze constantly or to retrieve transaction history faster but with degraded accuracy.<br/>Change to higher values to get maximum transaction history accuracy.',
         type: 'number',
+      },
+      cache: {
+        display: true,
+        displayName: 'Cache transactions data to disk',
+        type: 'boolean',
+      },
+      proxy: {
+        display: true,
+        displayName: 'Use proxy',
+        info: 'Use remote http proxies to reduce data usage (gzip compression).',        
+        type: 'boolean',
       },
     },
   },

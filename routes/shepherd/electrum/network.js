@@ -216,7 +216,8 @@ module.exports = (shepherd) => {
 
   shepherd.get('/electrum/servers/test', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const ecl = new shepherd.electrumJSCore(req.query.port, req.query.address, 'tcp'); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(null, { port: req.query.port, ip: req.query.address, proto: 'tcp' }); // tcp or tls
+      //const ecl = new shepherd.electrumJSCore(req.query.port, req.query.address, 'tcp'); // tcp or tls
 
       ecl.connect();
       ecl.serverVersion()

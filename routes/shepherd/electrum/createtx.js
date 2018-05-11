@@ -220,7 +220,8 @@ module.exports = (shepherd) => {
   }
 
   shepherd._listunspent = (grainedControlUtxos, ecl, changeAddress, network, full, verify) => {
-    console.log(`verify ${verify}`);
+    shepherd.log(`verify ${verify}`, true);
+
     return new Promise((resolve, reject) => {
       if (grainedControlUtxos) {
         resolve(grainedControlUtxos);
@@ -251,11 +252,12 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req[reqType].token)) {
       // TODO: unconf output(s) error message
       const network = req[reqType].network || shepherd.findNetworkObj(req[reqType].coin);
-      const ecl = new shepherd.electrumJSCore(
+      const ecl = shepherd.ecl(network);
+      /*const ecl = new shepherd.electrumJSCore(
         shepherd.electrumServers[network].port,
         shepherd.electrumServers[network].address,
         shepherd.electrumServers[network].proto
-      ); // tcp or tls
+      ); // tcp or tls*/
       const outputAddress = req[reqType].address;
       const changeAddress = req[reqType].change;
       const push = req[reqType].push;
@@ -570,11 +572,12 @@ module.exports = (shepherd) => {
 
                 res.end(JSON.stringify(successObj));
               } else {
-                const ecl = new shepherd.electrumJSCore(
+                const ecl = shepherd.ecl(network);
+                /*const ecl = new shepherd.electrumJSCore(
                   shepherd.electrumServers[network].port,
                   shepherd.electrumServers[network].address,
                   shepherd.electrumServers[network].proto
-                ); // tcp or tls
+                ); // tcp or tls*/
 
                 ecl.connect();
                 ecl.blockchainTransactionBroadcast(_rawtx)
@@ -672,11 +675,12 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       const rawtx = req.body.rawtx;
       const _network = req.body.network;
-      const ecl = new shepherd.electrumJSCore(
+      const ecl = shepherd.ecl(_network);
+      /*const ecl = new shepherd.electrumJSCore(
         shepherd.electrumServers[_network].port,
         shepherd.electrumServers[_network].address,
         shepherd.electrumServers[_network].proto
-      ); // tcp or tls
+      ); // tcp or tls*/
 
       ecl.connect();
       ecl.blockchainTransactionBroadcast(rawtx)

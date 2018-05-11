@@ -82,7 +82,6 @@ module.exports = (shepherd) => {
 
     _fs.access(shepherd.agamaDir, shepherd.fs.constants.R_OK, (err) => {
       if (!err) {
-
         const FixFilePermissions = () => {
           return new Promise((resolve, reject) => {
             const result = 'config.json file permissions updated to Read/Write';
@@ -202,8 +201,8 @@ module.exports = (shepherd) => {
     }
   });
 
-  shepherd.testLocation = function(path) {
-    return new Promise(function(resolve, reject) {
+  shepherd.testLocation = (path) => {
+    return new Promise((resolve, reject) => {
       fs.lstat(path, (err, stats) => {
         if (err) {
           shepherd.log(`error testing path ${path}`);
