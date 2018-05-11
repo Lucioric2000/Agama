@@ -67,7 +67,7 @@ module.exports = (shepherd) => {
           const _res = shepherd.getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
           shepherd.log(_res, true);
 
-          ecl = new shepherd.ecl(network, { ip: _randomServer[0], port: _randomServer[1], proto: _mainServer[2] });
+          ecl = shepherd.ecl(network, { ip: _randomServer[0], port: _randomServer[1], proto: _mainServer[2] });
           // ecl = new shepherd.electrumJSCore(_randomServer[1], _randomServer[0], _mainServer[2]);
           ecl.connect();
 

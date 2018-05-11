@@ -49,12 +49,17 @@ module.exports = (shepherd) => {
       configLocation: `${shepherd.agamaDir}/config.json`,
       cacheLocation: `${shepherd.agamaDir}/spv-cache.json`,
     };
+    let spvCacheSize = '2 Bytes';
+
+    try {
+      spvCacheSize = formatBytes(fs.lstatSync(`${shepherd.agamaDir}/spv-cache.json`).size)
+    } catch (e) {}
 
     return {
       sysInfo,
       releaseInfo,
       dirs,
-      cacheSize: formatBytes(fs.lstatSync(`${shepherd.agamaDir}/spv-cache.json`).size),
+      cacheSize: spvCacheSize,
     };
   }
 

@@ -151,7 +151,7 @@ const appConfig = {
       proxy: {
         display: true,
         displayName: 'Use proxy',
-        info: 'Use remote http proxies to reduce data usage (gzip compression).',        
+        // info: 'Use remote http proxy to reduce data usage (gzip compression).',
         type: 'boolean',
       },
     },

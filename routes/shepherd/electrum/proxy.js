@@ -49,7 +49,7 @@ module.exports = (shepherd) => {
 
     const makeUrl = (arr) => {
       let _url = [];
-      
+
       for (key in _electrumServer) {
         _url.push(`${key}=${_electrumServer[key]}`);
       }
@@ -132,7 +132,7 @@ module.exports = (shepherd) => {
       },
       blockchainAddressGetHistory: (address) => {
         shepherd.log(`proxy blockchainAddressGetHistory ${address}`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions?${makeUrl({ address })}`,
@@ -163,7 +163,7 @@ module.exports = (shepherd) => {
       },
       blockchainEstimatefee: (blocks) => {
         shepherd.log(`proxy blockchainEstimatefee ${blocks}`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/estimatefee?${makeUrl({ blocks })}`,
@@ -194,7 +194,7 @@ module.exports = (shepherd) => {
       },
       blockchainBlockGetHeader: (height) => {
         shepherd.log(`proxy blockchainBlockGetHeader ${height}`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo?${makeUrl({ height })}`,
@@ -225,7 +225,7 @@ module.exports = (shepherd) => {
       },
       blockchainNumblocksSubscribe: () => {
         shepherd.log(`proxy blockchainNumblocksSubscribe`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?${makeUrl()}`,
@@ -256,7 +256,7 @@ module.exports = (shepherd) => {
       },
       blockchainTransactionGet: (txid) => {
         shepherd.log(`proxy blockchainTransactionGet ${txid}`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?${makeUrl({ txid })}`,
@@ -287,10 +287,10 @@ module.exports = (shepherd) => {
       },
       blockchainTransactionGetMerkle: (txid, height) => {
         shepherd.log(`proxy blockchainTransactionGetMerkle ${txid} ${height}`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?${makeUrl({ txid, height })}`,
+            url: `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle?${makeUrl({ txid, height })}`,
             method: 'GET',
           };
 
@@ -318,7 +318,7 @@ module.exports = (shepherd) => {
       },
       serverVersion: () => {
         shepherd.log(`proxy serverVersion`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?${makeUrl()}`,
@@ -349,11 +349,14 @@ module.exports = (shepherd) => {
       },
       blockchainTransactionBroadcast: (rawtx) => {
         shepherd.log(`proxy blockchainTransactionBroadcast ${rawtx}`, true);
-        
+
         return new Promise((resolve, reject) => {
           let options = {
             url: `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
               port: _electrumServer.port,
               ip: _electrumServer.ip,

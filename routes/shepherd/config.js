@@ -25,6 +25,10 @@ module.exports = (shepherd) => {
             }
           } else {
             for (let j in obj1[i]) {
+              if (!obj2[i]) {
+                obj2[i] = {};
+              }
+
               if (!obj2[i].hasOwnProperty(j)) {
                 if (!result[i]) {
                   result[i] = {};
@@ -45,13 +49,6 @@ module.exports = (shepherd) => {
 
         if (Object.keys(compareConfigs).length) {
           const newConfig = deepmerge(defaultConf, JSON.parse(localAppConfig));
-
-          shepherd.log('appconf');
-          shepherd.log(JSON.stringify(defaultConf));
-          shepherd.log('local');
-          shepherd.log(JSON.stringify(localAppConfig));
-          shepherd.log('new conf');
-          shepherd.log(JSON.stringify(newConfig));
 
           shepherd.log('config diff is found, updating local config');
           shepherd.log('config diff:');

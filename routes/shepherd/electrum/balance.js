@@ -1,31 +1,6 @@
 const Promise = require('bluebird');
 
 module.exports = (shepherd) => {
-  // remote api switch wrapper
-
-  shepherd.ecl = (network, customElectrum) => {
-    if (shepherd.electrumServers[network].proto === 'insight') {
-      return shepherd.insightJSCore(shepherd.electrumServers[network])
-    } else {
-      if (shepherd.appConfig.spv.proxy) {
-        return shepherd.proxy(network, customElectrum);
-      } else {
-        const electrum = customElectrum ? {
-          port: customElectrum.port,
-          ip: customElectrum.ip,
-          proto: customElectrum.proto,
-        } : {
-          port: shepherd.electrumServers[network].port,
-          ip: shepherd.electrumServers[network].address,
-          proto: shepherd.electrumServers[network].proto,
-        };
-
-        return new shepherd.electrumJSCore(electrum.port, electrum.address, electrum.proto);
-        //return new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
-      }
-    }
-  }
-
   shepherd.get('/electrum/getbalance', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);

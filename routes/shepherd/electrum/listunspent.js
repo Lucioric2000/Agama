@@ -44,8 +44,8 @@ module.exports = (shepherd) => {
                         const _network = shepherd.getNetworkData(network);
                         const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
 
-                        shepherd.log('decoded tx =>', true);
-                        shepherd.log(decodedTx, true);
+                        // shepherd.log('decoded tx =>', true);
+                        // shepherd.log(decodedTx, true);
 
                         if (!decodedTx) {
                           _atLeastOneDecodeTxFailed = true;
