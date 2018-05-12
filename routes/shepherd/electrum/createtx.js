@@ -219,29 +219,59 @@ module.exports = (shepherd) => {
     }
   }
 
+  shepherd._listunspent = (grainedControlUtxos, ecl, changeAddress, network, full, verify) => {
+    shepherd.log(`verify ${verify}`, true);
+
+    return new Promise((resolve, reject) => {
+      if (grainedControlUtxos) {
+        resolve(grainedControlUtxos);
+      } else {
+        shepherd.listunspent(
+          ecl,
+          changeAddress,
+          network,
+          true,
+          verify === true ? true : null
+        )
+        .then((utxoList) => {
+          resolve(utxoList);
+        });
+      }
+    });
+  };
+
   shepherd.get('/electrum/createrawtx', (req, res, next) => {
-    if (shepherd.checkToken(req.query.token)) {
+    shepherd.createTx(req, res, next);
+  });
+
+  shepherd.post('/electrum/createrawtx', (req, res, next) => {
+    shepherd.createTx(req, res, next, 'body');
+  });
+
+  shepherd.createTx = (req, res, next, reqType = 'query') => {
+    if (shepherd.checkToken(req[reqType].token)) {
       // TODO: unconf output(s) error message
-      const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(
+      const network = req[reqType].network || shepherd.findNetworkObj(req[reqType].coin);
+      const ecl = shepherd.ecl(network);
+      /*const ecl = new shepherd.electrumJSCore(
         shepherd.electrumServers[network].port,
         shepherd.electrumServers[network].address,
         shepherd.electrumServers[network].proto
-      ); // tcp or tls
-      const outputAddress = req.query.address;
-      const changeAddress = req.query.change;
-      const push = req.query.push;
-      const opreturn = req.query.opreturn;
-      const btcFee = req.query.btcfee ? Number(req.query.btcfee) : null;
+      ); // tcp or tls*/
+      const outputAddress = req[reqType].address;
+      const changeAddress = req[reqType].change;
+      const push = req[reqType].push;
+      const opreturn = req[reqType].opreturn;
+      const btcFee = req[reqType].btcfee ? Number(req[reqType].btcfee) : null;
       let fee = shepherd.electrumServers[network].txfee;
-      let value = Number(req.query.value);
-      let wif = req.query.wif;
+      let value = Number(req[reqType].value);
+      let wif = req[reqType].wif;
 
-      if (req.query.gui) {
-        wif = shepherd.electrumKeys[req.query.coin].priv;
+      if (req[reqType].gui) {
+        wif = shepherd.electrumKeys[req[reqType].coin].priv;
       }
 
-      if (req.query.vote) {
+      if (req[reqType].vote) {
         wif = shepherd.elections.priv;
       }
 
@@ -252,13 +282,21 @@ module.exports = (shepherd) => {
       shepherd.log('electrum createrawtx =>', true);
 
       ecl.connect();
-      shepherd.listunspent(
+      shepherd._listunspent(
+        req[reqType].utxo ? req[reqType].utxo : false,
         ecl,
         changeAddress,
         network,
         true,
-        req.query.verify === 'true' ? true : null
+        req[reqType].verify === 'true' ? true : null
       )
+      /*shepherd.listunspent(
+        ecl,
+        changeAddress,
+        network,
+        true,
+        req[reqType].verify === 'true' ? true : null
+      )*/
       .then((utxoList) => {
         ecl.close();
 
@@ -475,7 +513,7 @@ module.exports = (shepherd) => {
 
               let _rawtx;
 
-              if (req.query.unsigned) {
+              if (req[reqType].unsigned) {
                 _rawtx = shepherd.buildUnsignedTx(
                   outputAddress,
                   changeAddress,
@@ -485,7 +523,7 @@ module.exports = (shepherd) => {
                   value
                 );
               } else {
-                if (!req.query.offline) {
+                if (!req[reqType].offline) {
                   if (network === 'btg' ||
                       network === 'bch') {
                     _rawtx = shepherd.buildSignedTxForks(
@@ -534,11 +572,12 @@ module.exports = (shepherd) => {
 
                 res.end(JSON.stringify(successObj));
               } else {
-                const ecl = new shepherd.electrumJSCore(
+                const ecl = shepherd.ecl(network);
+                /*const ecl = new shepherd.electrumJSCore(
                   shepherd.electrumServers[network].port,
                   shepherd.electrumServers[network].address,
                   shepherd.electrumServers[network].proto
-                ); // tcp or tls
+                ); // tcp or tls*/
 
                 ecl.connect();
                 ecl.blockchainTransactionBroadcast(_rawtx)
@@ -630,17 +669,18 @@ module.exports = (shepherd) => {
 
       res.end(JSON.stringify(errorObj));
     }
-  });
+  };
 
   shepherd.post('/electrum/pushtx', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
       const rawtx = req.body.rawtx;
       const _network = req.body.network;
-      const ecl = new shepherd.electrumJSCore(
+      const ecl = shepherd.ecl(_network);
+      /*const ecl = new shepherd.electrumJSCore(
         shepherd.electrumServers[_network].port,
         shepherd.electrumServers[_network].address,
         shepherd.electrumServers[_network].proto
-      ); // tcp or tls
+      ); // tcp or tls*/
 
       ecl.connect();
       ecl.blockchainTransactionBroadcast(rawtx)

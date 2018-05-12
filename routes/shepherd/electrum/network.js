@@ -75,7 +75,7 @@ module.exports = (shepherd) => {
         coin === 'BET' ||
         coin === 'CRYPTO' ||
         coin === 'COQUI' ||
-	coin === 'CHAIN' ||
+      	coin === 'CHAIN' ||
         coin === 'GLXT' ||
         coin === 'OOT' ||
         coin === 'HODL' ||
@@ -107,7 +107,7 @@ module.exports = (shepherd) => {
         coinUC === 'BET' ||
         coinUC === 'CRYPTO' ||
         coinUC === 'COQUI' ||
-	coinUC === 'CHAIN' ||
+      	coinUC === 'CHAIN' ||
         coinUC === 'GLXT' ||
         coinUC === 'OOT' ||
         coinUC === 'EQL' ||
@@ -216,7 +216,8 @@ module.exports = (shepherd) => {
 
   shepherd.get('/electrum/servers/test', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const ecl = new shepherd.electrumJSCore(req.query.port, req.query.address, 'tcp'); // tcp or tls
+      const ecl = new shepherd.electrumJSCore(null, { port: req.query.port, ip: req.query.address, proto: 'tcp' }); // tcp or tls
+      //const ecl = new shepherd.electrumJSCore(req.query.port, req.query.address, 'tcp'); // tcp or tls
 
       ecl.connect();
       ecl.serverVersion()
@@ -252,6 +253,34 @@ module.exports = (shepherd) => {
       res.end(JSON.stringify(errorObj));
     }
   });
+
+  // remote api switch wrapper
+
+  shepherd.ecl = (network, customElectrum) => {
+    network = network.toLowerCase();
+    network = network === 'kmd' ? 'komodo' : network;
+
+    if (shepherd.electrumServers[network].proto === 'insight') {
+      return shepherd.insightJSCore(shepherd.electrumServers[network])
+    } else {
+      if (shepherd.appConfig.spv.proxy) {
+        return shepherd.proxy(network, customElectrum);
+      } else {
+        const electrum = customElectrum ? {
+          port: customElectrum.port,
+          ip: customElectrum.ip,
+          proto: customElectrum.proto,
+        } : {
+          port: shepherd.electrumServers[network].port,
+          ip: shepherd.electrumServers[network].address,
+          proto: shepherd.electrumServers[network].proto,
+        };
+
+        return new shepherd.electrumJSCore(electrum.port, electrum.ip, electrum.proto);
+        //return new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      }
+    }
+  }
 
   return shepherd;
 };

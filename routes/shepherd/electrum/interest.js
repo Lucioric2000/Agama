@@ -12,8 +12,8 @@ module.exports = (shepherd) => {
     let timestampDiffMinutes = timestampDiff / 60;
     let interest = 0;
 
-    shepherd.log(`${height} vs ${KOMODO_ENDOFERA}`);
-    shepherd.log(`${locktime} vs ${LOCKTIME_THRESHOLD}`);
+    shepherd.log(`${height} vs ${KOMODO_ENDOFERA}`, true);
+    shepherd.log(`${locktime} vs ${LOCKTIME_THRESHOLD}`, true);
 
     if (height < KOMODO_ENDOFERA &&
         locktime >= LOCKTIME_THRESHOLD) {
@@ -24,15 +24,21 @@ module.exports = (shepherd) => {
 
       // calc interest
       if (timestampDiffMinutes >= 60) {
-        if (timestampDiffMinutes > 365 * 24 * 60) {
-          timestampDiffMinutes = 365 * 24 * 60;
-        }
-        timestampDiffMinutes -= 59;
+        if (height >= 1000000 &&
+            timestampDiffMinutes > 31 * 24 * 60) {
+          shepherd.log('kmd new interest conditions');
+          timestampDiffMinutes = 31 * 24 * 60;
+        } else {
+          if (timestampDiffMinutes > 365 * 24 * 60) {
+            timestampDiffMinutes = 365 * 24 * 60;
+          }
+          timestampDiffMinutes -= 59;
 
-        // TODO: check if interest is > 5% yr
-        // calc ytd and 5% for 1 yr
-        // const hoursInOneYear = 365 * 24;
-        // const hoursDiff = hoursInOneYear - hoursPassed;
+          // TODO: check if interest is > 5% yr
+          // calc ytd and 5% for 1 yr
+          // const hoursInOneYear = 365 * 24;
+          // const hoursDiff = hoursInOneYear - hoursPassed;
+        }
 
         interest = ((Number(value) * 0.00000001) / 10512000) * timestampDiffMinutes;
         shepherd.log(`interest ${interest}`, true);

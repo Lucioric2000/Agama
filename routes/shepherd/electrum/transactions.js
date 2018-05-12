@@ -1,8 +1,6 @@
 const async = require('async');
 const Promise = require('bluebird');
 
-const MAX_VIN_LENGTH = 150; // parse up to MAX_VIN_LENGTH vins
-
 // TODO: add z -> pub, pub -> z flag for zcash forks
 
 module.exports = (shepherd) => {
@@ -71,7 +69,8 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/listtransactions', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      const ecl = shepherd.ecl(network);
+      // const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
       const _address = req.query.address;
       const _maxlength = req.query.maxlength;
 
@@ -160,7 +159,7 @@ module.exports = (shepherd) => {
                               index2++;
 
                               if (index2 === decodedTx.inputs.length ||
-                                  index2 === MAX_VIN_LENGTH) {
+                                  index2 === shepherd.appConfig.spv.maxVinParseLimit) {
                                 shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
                                 const _parsedTx = {
                                   network: decodedTx.network,
@@ -183,7 +182,7 @@ module.exports = (shepherd) => {
                                   formattedTx.outputs = decodedTx.outputs;
                                   formattedTx.locktime = decodedTx.format.locktime;
                                   formattedTx.vinLen = decodedTx.inputs.length;
-                                  formattedTx.vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx.vinMaxLen = shepherd.appConfig.spv.maxVinParseLimit;
                                   formattedTx.opreturn = opreturn;
                                   _rawtx.push(formattedTx);
                                 } else {
@@ -195,7 +194,7 @@ module.exports = (shepherd) => {
                                   formattedTx[0].outputs = decodedTx.outputs;
                                   formattedTx[0].locktime = decodedTx.format.locktime;
                                   formattedTx[0].vinLen = decodedTx.inputs.length;
-                                  formattedTx[0].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[0].vinMaxLen = shepherd.appConfig.spv.maxVinParseLimit;
                                   formattedTx[0].opreturn = opreturn[0];
                                   formattedTx[1].height = transaction.height;
                                   formattedTx[1].blocktime = Number(transaction.height) === 0 || Number(transaction.height) === -1 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp;
@@ -205,7 +204,7 @@ module.exports = (shepherd) => {
                                   formattedTx[1].outputs = decodedTx.outputs;
                                   formattedTx[1].locktime = decodedTx.format.locktime;
                                   formattedTx[1].vinLen = decodedTx.inputs.length;
-                                  formattedTx[1].vinMaxLen = MAX_VIN_LENGTH;
+                                  formattedTx[1].vinMaxLen = shepherd.appConfig.spv.maxVinParseLimit;
                                   formattedTx[1].opreturn = opreturn[1];
                                   _rawtx.push(formattedTx[0]);
                                   _rawtx.push(formattedTx[1]);
@@ -338,11 +337,12 @@ module.exports = (shepherd) => {
   shepherd.get('/electrum/gettransaction', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
-      const ecl = new shepherd.electrumJSCore(
+      const ecl = shepherd.ecl(network);
+      /*const ecl = new shepherd.electrumJSCore(
         shepherd.electrumServers[network].port,
         shepherd.electrumServers[network].address,
         shepherd.electrumServers[network].proto
-      ); // tcp or tls
+      ); // tcp or tls*/
 
       shepherd.log('electrum gettransaction =>', true);
 
@@ -580,11 +580,12 @@ module.exports = (shepherd) => {
 
         res.end(JSON.stringify(successObj));
       } else {
-        const ecl = new shepherd.electrumJSCore(
+        const ecl = shepherd.ecl(req.query.network);
+        /*const ecl = new shepherd.electrumJSCore(
           shepherd.electrumServers[req.query.network].port,
           shepherd.electrumServers[req.query.network].address,
           shepherd.electrumServers[req.query.network].proto
-        ); // tcp or tls
+        ); // tcp or tls*/
 
         shepherd.log(decodedTx.inputs[0]);
         shepherd.log(decodedTx.inputs[0].txid);
