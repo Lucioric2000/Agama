@@ -648,8 +648,15 @@ let electrumServers = {
     abbr: 'XZC',
   },
   game: {
+    address: 'electrum1.cipig.net',
+    port: 10072,
+    proto: 'tcp',
     txfee: 100000,
     abbr: 'GAME',
+    serverList: [
+      'electrum1.cipig.net:10072',
+      'electrum2.cipig.net:10072'
+    ],
   },
   iop: {
     txfee: 10000,
