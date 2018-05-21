@@ -83,7 +83,7 @@ const appConfig = {
       display: true,
       initDisplay: true,
       displayName: 'Komodo data directory',
-      info: 'The data directory is the location where Komodo data files are stored, including the wallet data file',
+      info: 'The data directory is the location where Komodo data files are stored, including the wallet data file<br/>It must be an already existing folder e.g. /home/user/komodo_data_dir.',
       type: 'folder',
     },
     dex: {

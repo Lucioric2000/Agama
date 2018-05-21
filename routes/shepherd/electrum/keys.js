@@ -36,12 +36,30 @@ module.exports = (shepherd) => {
     }
 
     const d = bigi.fromBuffer(bytes);
-    const keyPair = shepherd.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: shepherd.getNetworkData(network) }) : new bitcoin.ECPair(d, null, { network: shepherd.getNetworkData(network) });
-    const keys = {
+    let keyPair = shepherd.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: shepherd.getNetworkData(network) }) : new bitcoin.ECPair(d, null, { network: shepherd.getNetworkData(network) });
+    let keys = {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
       pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
     };
+
+    let isWif = false;
+
+    try {
+      bs58check.decode(seed);
+      isWif = true;
+    } catch (e) {}
+
+    if (isWif) {
+      try {
+        keyPair = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(seed, shepherd.getNetworkData(network), true) : bitcoin.ECPair.fromWIF(seed, shepherd.getNetworkData(network), true);
+        keys = {
+          priv: keyPair.toWIF(),
+          pub: keyPair.getAddress(),
+          pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
+        };
+      } catch (e) {}
+    }
 
     /*shepherd.log(`seed: ${seed}`, true);
     shepherd.log(`network ${network}`, true);
