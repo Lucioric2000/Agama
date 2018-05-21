@@ -21,6 +21,17 @@ let electrumServers = {
       'electrum2.cipig.net:10026'
     ],
   },
+  prlpay: { // !estimatefee
+    address: 'electrum1.prlpay.com',
+    port: 9681,
+    proto: 'tcp',
+    txfee: 10000,
+    abbr: 'PRLPAY',
+    serverList: [
+      'electrum1.prlpay.com:9681',
+      'electrum2.prlpay.com:9681'
+    ],
+  },
   eql: { // !estimatefee
     address:'159.65.91.235',
     port: 10801,
