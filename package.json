@@ -27,6 +27,7 @@
     "electron": "2.0.0"
   },
   "dependencies": {
+    "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
     "adm-zip": "^0.4.7",
     "arch": "^2.1.0",
     "async": "^2.6.0",

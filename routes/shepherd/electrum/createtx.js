@@ -103,7 +103,7 @@ module.exports = (shepherd) => {
       const data = Buffer.from(opreturn, 'utf8');
       const dataScript = shepherd.bitcoinJS.script.nullData.output.encode(data);
       tx.addOutput(dataScript, 1000);
-      console.log(`opreturn ${opreturn}`);
+      shepherd.log(`opreturn ${opreturn}`, true);
     }
 
     if (network === 'komodo' ||

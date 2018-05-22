@@ -257,13 +257,12 @@ module.exports = (shepherd) => {
   });
 
   // remote api switch wrapper
-
   shepherd.ecl = (network, customElectrum) => {
     network = network.toLowerCase();
     network = network === 'kmd' ? 'komodo' : network;
 
     if (shepherd.electrumServers[network].proto === 'insight') {
-      return shepherd.insightJSCore(shepherd.electrumServers[network])
+      return shepherd.insightJSCore(shepherd.electrumServers[network]);
     } else {
       if (shepherd.appConfig.spv.proxy) {
         return shepherd.proxy(network, customElectrum);
