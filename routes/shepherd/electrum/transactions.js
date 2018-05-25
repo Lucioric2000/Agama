@@ -70,9 +70,9 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
       const ecl = shepherd.ecl(network);
-      // const ecl = shepherd.electrumServers[network].proto === 'insight' ? shepherd.insightJSCore(shepherd.electrumServers[network]) : new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
       const _address = req.query.address;
-      const _maxlength = req.query.maxlength;
+      const isKv = req.query.kv;
+      const _maxlength = isKv ? 10 : req.query.maxlength;
 
       shepherd.log('electrum listtransactions ==>', true);
 
@@ -146,7 +146,15 @@ module.exports = (shepherd) => {
                             decodedTx.outputs.length) {
                           for (let i = 0; i < decodedTx.outputs.length; i++) {
                             if (decodedTx.outputs[i].scriptPubKey.type === 'nulldata') {
-                              opreturn = shepherd.hex2str(decodedTx.outputs[i].scriptPubKey.hex);
+                              if (isKv) {
+                                opreturn = {
+                                  kvHex: decodedTx.outputs[i].scriptPubKey.hex,
+                                  kvAsm: decodedTx.outputs[i].scriptPubKey.asm,
+                                  kvDecoded: shepherd.kvDecode(decodedTx.outputs[i].scriptPubKey.asm.substr(10, decodedTx.outputs[i].scriptPubKey.asm.length), true),
+                                };
+                              } else {
+                                opreturn = shepherd.hex2str(decodedTx.outputs[i].scriptPubKey.hex);
+                              }
                             }
                           }
                         }
@@ -214,6 +222,19 @@ module.exports = (shepherd) => {
                                 if (index === json.length) {
                                   ecl.close();
 
+                                  if (isKv) {
+                                    let _kvTx = [];
+
+                                    for (let i = 0; i < _rawtx.length; i++) {
+                                      if (_rawtx[i].opreturn &&
+                                          _rawtx[i].opreturn.kvDecoded) {
+                                        _kvTx.push(_rawtx[i]);
+                                      }
+                                    }
+
+                                    _rawtx = _kvTx;
+                                  }
+
                                   const successObj = {
                                     msg: 'success',
                                     result: _rawtx,
@@ -263,6 +284,19 @@ module.exports = (shepherd) => {
                           if (index === json.length) {
                             ecl.close();
 
+                            if (isKv) {
+                              let _kvTx = [];
+
+                              for (let i = 0; i < _rawtx.length; i++) {
+                                if (_rawtx[i].opreturn &&
+                                    _rawtx[i].opreturn.kvDecoded) {
+                                  _kvTx.push(_rawtx[i]);
+                                }
+                              }
+
+                              _rawtx = _kvTx;
+                            }
+
                             const successObj = {
                               msg: 'success',
                               result: _rawtx,
@@ -290,6 +324,19 @@ module.exports = (shepherd) => {
 
                       if (index === json.length) {
                         ecl.close();
+
+                        if (isKv) {
+                          let _kvTx = [];
+
+                          for (let i = 0; i < _rawtx.length; i++) {
+                            if (_rawtx[i].opreturn &&
+                                _rawtx[i].opreturn.kvDecoded) {
+                              _kvTx.push(_rawtx[i]);
+                            }
+                          }
+
+                          _rawtx = _kvTx;
+                        }
 
                         const successObj = {
                           msg: 'success',
@@ -338,11 +385,6 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
       const ecl = shepherd.ecl(network);
-      /*const ecl = new shepherd.electrumJSCore(
-        shepherd.electrumServers[network].port,
-        shepherd.electrumServers[network].address,
-        shepherd.electrumServers[network].proto
-      ); // tcp or tls*/
 
       shepherd.log('electrum gettransaction =>', true);
 
@@ -581,11 +623,6 @@ module.exports = (shepherd) => {
         res.end(JSON.stringify(successObj));
       } else {
         const ecl = shepherd.ecl(req.query.network);
-        /*const ecl = new shepherd.electrumJSCore(
-          shepherd.electrumServers[req.query.network].port,
-          shepherd.electrumServers[req.query.network].address,
-          shepherd.electrumServers[req.query.network].proto
-        ); // tcp or tls*/
 
         shepherd.log(decodedTx.inputs[0]);
         shepherd.log(decodedTx.inputs[0].txid);

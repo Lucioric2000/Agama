@@ -296,6 +296,8 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.isWatchOnly = shepherd.isWatchOnly;
 				mainWindow.setPubkey = shepherd.setPubkey;
 				mainWindow.getPubkeys = shepherd.getPubkeys;
+				mainWindow.kvEncode = shepherd.kvEncode;
+				mainWindow.kvDecode = shepherd.kvDecode;
 
 			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
