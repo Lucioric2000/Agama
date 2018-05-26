@@ -29,7 +29,6 @@ module.exports = (shepherd) => {
 
     _fs.access(shepherd.agamaDir, shepherd.fs.constants.R_OK, (err) => {
       if (!err) {
-
         const FixFilePermissions = () => {
           return new Promise((resolve, reject) => {
             const result = 'spv-cache.json file permissions updated to Read/Write';

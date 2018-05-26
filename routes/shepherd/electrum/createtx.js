@@ -103,7 +103,7 @@ module.exports = (shepherd) => {
       const data = Buffer.from(opreturn, 'utf8');
       const dataScript = shepherd.bitcoinJS.script.nullData.output.encode(data);
       tx.addOutput(dataScript, 1000);
-      console.log(`opreturn ${opreturn}`);
+      shepherd.log(`opreturn ${opreturn}`, true);
     }
 
     if (network === 'komodo' ||
@@ -253,11 +253,6 @@ module.exports = (shepherd) => {
       // TODO: unconf output(s) error message
       const network = req[reqType].network || shepherd.findNetworkObj(req[reqType].coin);
       const ecl = shepherd.ecl(network);
-      /*const ecl = new shepherd.electrumJSCore(
-        shepherd.electrumServers[network].port,
-        shepherd.electrumServers[network].address,
-        shepherd.electrumServers[network].proto
-      ); // tcp or tls*/
       const outputAddress = req[reqType].address;
       const changeAddress = req[reqType].change;
       const push = req[reqType].push;
@@ -288,15 +283,8 @@ module.exports = (shepherd) => {
         changeAddress,
         network,
         true,
-        req[reqType].verify === 'true' ? true : null
+        req[reqType].verify === 'true' || req[reqType].verify === true ? true : null
       )
-      /*shepherd.listunspent(
-        ecl,
-        changeAddress,
-        network,
-        true,
-        req[reqType].verify === 'true' ? true : null
-      )*/
       .then((utxoList) => {
         ecl.close();
 
@@ -573,11 +561,6 @@ module.exports = (shepherd) => {
                 res.end(JSON.stringify(successObj));
               } else {
                 const ecl = shepherd.ecl(network);
-                /*const ecl = new shepherd.electrumJSCore(
-                  shepherd.electrumServers[network].port,
-                  shepherd.electrumServers[network].address,
-                  shepherd.electrumServers[network].proto
-                ); // tcp or tls*/
 
                 ecl.connect();
                 ecl.blockchainTransactionBroadcast(_rawtx)
@@ -676,11 +659,6 @@ module.exports = (shepherd) => {
       const rawtx = req.body.rawtx;
       const _network = req.body.network;
       const ecl = shepherd.ecl(_network);
-      /*const ecl = new shepherd.electrumJSCore(
-        shepherd.electrumServers[_network].port,
-        shepherd.electrumServers[_network].address,
-        shepherd.electrumServers[_network].proto
-      ); // tcp or tls*/
 
       ecl.connect();
       ecl.blockchainTransactionBroadcast(rawtx)

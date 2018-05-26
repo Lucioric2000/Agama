@@ -143,6 +143,9 @@ shepherd = require('./shepherd/elections.js')(shepherd);
 // explorer
 // shepherd = require('./shepherd/explorer/overview.js')(shepherd);
 
+// kv
+shepherd = require('./shepherd/kv.js')(shepherd);
+
 shepherd.printDirs();
 
 // default route

@@ -52,7 +52,7 @@ module.exports = (shepherd) => {
     let spvCacheSize = '2 Bytes';
 
     try {
-      spvCacheSize = formatBytes(fs.lstatSync(`${shepherd.agamaDir}/spv-cache.json`).size)
+      spvCacheSize = formatBytes(fs.lstatSync(`${shepherd.agamaDir}/spv-cache.json`).size);
     } catch (e) {}
 
     return {
