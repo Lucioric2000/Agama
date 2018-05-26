@@ -189,7 +189,7 @@ module.exports = (shepherd) => {
           proto: shepherd.electrumServers[network].proto,
         };
 
-        return new shepherd.electrumJSCore(electrum.port, electrum.ip, electrum.proto);
+        return new shepherd.electrumJSCore(electrum.port, electrum.ip, electrum.proto, shepherd.appConfig.spv.socketTimeout);
         //return new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
       }
     }

@@ -24,6 +24,7 @@ const appConfig = {
       maxVinParseLimit: 120,
       cache: false,
       proxy: false,
+      socketTimeout: 10000,
     },
   },
   schema: {
@@ -153,6 +154,12 @@ const appConfig = {
         displayName: 'Use proxy',
         // info: 'Use remote http proxy to reduce data usage (gzip compression).',
         type: 'boolean',
+      },
+      socketTimeout: {
+        display: true,
+        displayName: 'Socket timeout',
+        info: 'Max timeout before electrum server connection is dropped.',
+        type: 'number',
       },
     },
   },
