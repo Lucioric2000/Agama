@@ -1,6 +1,7 @@
-let electrumServers = require('agama-wallet-lib/src/electrum-servers');
+const disableCoins = require('./electrumServersConfig');
+const _electrumServers = require('agama-wallet-lib/src/electrum-servers');
 
-const _electrumServers = {
+const _electrumServersExtend = {
   zen: {
     txfee: 10000,
     abbr: 'ZEN',
@@ -176,8 +177,13 @@ const _electrumServers = {
   },
 };
 
-electrumServers = Object.assign({}, electrumServers, _electrumServers);
+let electrumServers = Object.assign({}, _electrumServers, _electrumServersExtend);
 
-console.log(electrumServers);
+for (let i = 0; i < disableCoins.length; i++) {
+  if (electrumServers[disableCoins[i]]) {
+    delete electrumServers[disableCoins[i]];
+    console.log(`disable spv coin ${disableCoins[i]}`);
+  }
+}
 
 module.exports = electrumServers;
