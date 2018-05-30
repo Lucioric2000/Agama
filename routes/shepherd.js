@@ -108,6 +108,7 @@ shepherd = require('./shepherd/electrum/btcFees.js')(shepherd);
 shepherd = require('./shepherd/electrum/insight.js')(shepherd);
 shepherd = require('./shepherd/electrum/cache.js')(shepherd);
 shepherd = require('./shepherd/electrum/proxy.js')(shepherd);
+shepherd = require('./shepherd/electrum/servers.js')(shepherd);
 
 // dex
 shepherd = require('./shepherd/dex/coind.js')(shepherd);
@@ -165,6 +166,11 @@ shepherd.setVar = (_name, _body) => {
 if (shepherd.appConfig.spv &&
     shepherd.appConfig.spv.cache) {
   shepherd.loadLocalSPVCache();
+}
+
+if (shepherd.appConfig.spv &&
+    shepherd.appConfig.spv.customServers) {
+  shepherd.loadElectrumServersList();
 }
 
 module.exports = shepherd;
