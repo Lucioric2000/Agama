@@ -58,7 +58,30 @@ app.setVersion(appBasicInfo.version);
 
 shepherd.createAgamaDirs();
 
-const appSessionHash = randomBytes(32).toString('hex');
+// parse argv
+let _argv = {};
+
+for (let i = 0; i < process.argv.length; i++) {
+  if (process.argv[i].indexOf('nogui') > -1) {
+  	_argv.nogui = true;
+    console.log('enable nogui mode');
+  }
+
+  if (process.argv[i].indexOf('=') > -1) {
+	  const _argvSplit = process.argv[i].split('=');
+	  _argv[_argvSplit[0]] = _argvSplit[1];
+  }
+
+  if (!_argv.nogui) {
+  	_argv = {};
+  } else {
+  	shepherd.argv = _argv;
+  	console.log('arguments');
+  	console.log(_argv);
+  }
+}
+
+const appSessionHash = _argv.userpass ? _argv.userpass : randomBytes(32).toString('hex');
 const _spvFees = shepherd.getSpvFees();
 
 shepherd.writeLog(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
@@ -71,7 +94,8 @@ shepherd.writeLog(`platform: ${osPlatform}`);
 shepherd.writeLog(`os_release: ${os.release()}`);
 shepherd.writeLog(`os_type: ${os.type()}`);
 
-if (process.argv.indexOf('devmode') > -1) {
+if (process.argv.indexOf('devmode') > -1 ||
+		process.argv.indexOf('nogui') > -1) {
 	shepherd.log(`app init ${appSessionHash}`);
 }
 
@@ -156,6 +180,28 @@ let mainWindow;
 let appCloseWindow;
 let closeAppAfterLoading = false;
 let forceQuitApp = false;
+
+// apply parsed argv
+if (shepherd.argv) {
+	if (shepherd.argv.coins) {
+		const _coins = shepherd.argv.coins.split(',');
+
+		for (let i = 0; i < _coins.length; i++) {
+			shepherd.addElectrumCoin(_coins[i].toUpperCase());
+			console.log(`add coin from argv ${_coins[i]}`);
+		}
+	}
+
+	if (shepherd.argv.seed) {
+		const _seed = shepherd.argv.seed.split('=');
+
+		if (_seed &&
+				_seed[0]) {
+			console.log('load seed from argv');
+			shepherd.auth(_seed[0], true);
+		}
+	}
+}
 
 module.exports = guiapp;
 let agamaIcon;

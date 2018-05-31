@@ -36,7 +36,7 @@ shepherd.rpcConf = {};
 shepherd.appRuntimeLog = [];
 shepherd.appRuntimeSPVLog = [];
 shepherd.lockDownAddCoin = false;
-shepherd.isWatchOnly = false;
+shepherd._isWatchOnly = false;
 
 shepherd.staking = {};
 
