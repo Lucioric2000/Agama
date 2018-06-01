@@ -3,6 +3,20 @@ const _fs = require('graceful-fs');
 const fsnode = require('fs');
 const Promise = require('bluebird');
 
+const _ticker = {
+  litecoin: 'ltc',
+  bitcoin: 'btc',
+  argentum: 'arg',
+  komodo: 'kmd',
+  monacoin: 'mona',
+  crown: 'crw',
+  faircoin: 'fair',
+  namecoin: 'nmc',
+  vertcoin: 'vtc',
+  viacoin: 'via',
+  dogecoin: 'doge',
+};
+
 module.exports = (shepherd) => {
   shepherd.loadElectrumServersList = () => {
     if (fs.existsSync(`${shepherd.agamaDir}/electrumServers.json`)) {
@@ -74,6 +88,100 @@ module.exports = (shepherd) => {
       }
     });
   };
+
+  shepherd.saveKvElectrumServersCache = (list) => {
+    const kvElectrumServersListFileName = `${shepherd.agamaDir}/kvElectrumServersCache.json`;
+
+    _fs.access(shepherd.agamaDir, shepherd.fs.constants.R_OK, (err) => {
+      if (!err) {
+        const FixFilePermissions = () => {
+          return new Promise((resolve, reject) => {
+            const result = 'kvElectrumServersCache.json file permissions updated to Read/Write';
+
+            fsnode.chmodSync(kvElectrumServersListFileName, '0666');
+
+            setTimeout(() => {
+              shepherd.log(result);
+              shepherd.writeLog(result);
+              resolve(result);
+            }, 1000);
+          });
+        }
+
+        const FsWrite = () => {
+          return new Promise((resolve, reject) => {
+            const result = 'kvElectrumServersCache.json write file is done';
+
+            fs.writeFile(kvElectrumServersListFileName,
+                        JSON.stringify(list)
+                        .replace(/,/g, ',\n') // format json in human readable form
+                        .replace(/":/g, '": ')
+                        .replace(/{/g, '{\n')
+                        .replace(/}/g, '\n}'), 'utf8', (err) => {
+              if (err)
+                return shepherd.log(err);
+            });
+
+            fsnode.chmodSync(kvElectrumServersListFileName, '0666');
+            setTimeout(() => {
+              shepherd.log(result);
+              shepherd.log(`kvElectrumServersCache.json file is created successfully at: ${shepherd.agamaDir}`);
+              shepherd.writeLog(`kvElectrumServersCache.json file is created successfully at: ${shepherd.agamaDir}`);
+              resolve(result);
+            }, 2000);
+          });
+        }
+
+        FsWrite()
+        .then(FixFilePermissions());
+      }
+    });
+  };
+
+  shepherd.get('/electrum/kv/electrum/servers', (req, res, next) => {
+    if (shepherd.checkToken(req.query.token)) {
+      shepherd.listtransactions({
+        network: 'KV',
+        coin: 'KV',
+        address: 'RYTyftx9JEmzaXqQzpBBjJsHe9ZwLpzwCj',
+        kv: true,
+        maxlength: 100,
+        full: true,
+      })
+      .then((txhistory) => {
+        let _kvElectrum = {};
+
+        for (let i = 0; i < txhistory.result.length; i++) {
+          try {
+            const _kvElectrumItem = JSON.parse(txhistory.result[i].opreturn.kvDecoded.content.body);
+            _kvElectrum = Object.assign(_kvElectrum, _kvElectrumItem);
+          } catch (e) {}
+        }
+
+        shepherd.log(`kv electrum servers, got ${Object.keys(_kvElectrum).length} records`);
+
+        for (let key in _ticker) {
+          _kvElectrum[_ticker[key]] = _kvElectrum[key];
+        }
+
+        if (req.query.save) {
+          shepherd.saveKvElectrumServersCache(_kvElectrum);
+        }
+
+        res.end(JSON.stringify({
+          msg: 'success',
+          result: _kvElectrum,
+        }));
+      });
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
+    }
+  });
 
   return shepherd;
 };

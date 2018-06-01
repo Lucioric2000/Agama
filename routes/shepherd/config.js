@@ -75,7 +75,7 @@ module.exports = (shepherd) => {
   };
 
   shepherd.saveLocalAppConf = (appSettings) => {
-    let appConfFileName = `${shepherd.agamaDir}/config.json`;
+    const appConfFileName = `${shepherd.agamaDir}/config.json`;
 
     _fs.access(shepherd.agamaDir, shepherd.fs.constants.R_OK, (err) => {
       if (!err) {

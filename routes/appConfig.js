@@ -25,6 +25,8 @@ const appConfig = {
       cache: false,
       proxy: false,
       socketTimeout: 10000,
+      customServers: false,
+      syncServerListFromKv: false,
     },
   },
   schema: {
@@ -160,6 +162,18 @@ const appConfig = {
         displayName: 'Socket timeout',
         info: 'Max timeout before electrum server connection is dropped.',
         type: 'number',
+      },
+      customServers: {
+        display: true,
+        displayName: 'Custom electrum servers list',
+        info: 'Allow electrum servers list changes.',
+        type: 'boolean',
+      },
+      syncServerListFromKv: {
+        display: true,
+        displayName: 'Sync electrum servers list from KV',
+        info: 'Warning, this is highly experimental feature!',
+        type: 'boolean',
       },
     },
   },

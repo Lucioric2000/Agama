@@ -68,15 +68,38 @@ module.exports = (shepherd) => {
 
   shepherd.get('/electrum/listtransactions', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
+      shepherd.listtransactions({
+        network: req.query.network,
+        coin: req.query.coin,
+        address: req.query.address,
+        kv: req.query.kv,
+        maxlength: req.query.maxlength,
+        full: req.query.full,
+      })
+      .then((txhistory) => {
+        res.end(JSON.stringify(txhistory));
+      });
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
+    }
+  });
+
+  shepherd.listtransactions = (config, options) => {
+    return new Promise((resolve, reject) => {
+      const network = config.network || shepherd.findNetworkObj(config.coin);
       const ecl = shepherd.ecl(network);
-      const _address = req.query.address;
-      const isKv = req.query.kv;
-      const _maxlength = isKv ? 10 : req.query.maxlength;
+      const _address = config.address;
+      const isKv = config.kv;
+      const _maxlength = isKv ? 10 : config.maxlength;
 
       shepherd.log('electrum listtransactions ==>', true);
 
-      if (!req.query.full ||
+      if (!config.full ||
           ecl.insight) {
         ecl.connect();
         ecl.blockchainAddressGetHistory(_address)
@@ -86,12 +109,10 @@ module.exports = (shepherd) => {
 
           json = shepherd.sortTransactions(json, 'timestamp');
 
-          const successObj = {
+          resolve({
             msg: 'success',
             result: json,
-          };
-
-          res.end(JSON.stringify(successObj));
+          });
         });
       } else {
         // !expensive call!
@@ -235,12 +256,10 @@ module.exports = (shepherd) => {
                                     _rawtx = _kvTx;
                                   }
 
-                                  const successObj = {
+                                  resolve({
                                     msg: 'success',
                                     result: _rawtx,
-                                  };
-
-                                  res.end(JSON.stringify(successObj));
+                                  });
                                 }
 
                                 callback();
@@ -297,12 +316,10 @@ module.exports = (shepherd) => {
                               _rawtx = _kvTx;
                             }
 
-                            const successObj = {
+                            resolve({
                               msg: 'success',
                               result: _rawtx,
-                            };
-
-                            res.end(JSON.stringify(successObj));
+                            });
                           } else {
                             callback();
                           }
@@ -338,12 +355,10 @@ module.exports = (shepherd) => {
                           _rawtx = _kvTx;
                         }
 
-                        const successObj = {
+                        resolve({
                           msg: 'success',
                           result: _rawtx,
-                        };
-
-                        res.end(JSON.stringify(successObj));
+                        });
                       } else {
                         callback();
                       }
@@ -353,33 +368,22 @@ module.exports = (shepherd) => {
               } else {
                 ecl.close();
 
-                const successObj = {
+                resolve({
                   msg: 'success',
                   result: [],
-                };
-
-                res.end(JSON.stringify(successObj));
+                });
               }
             });
           } else {
-            const successObj = {
+            resolve({
               msg: 'error',
               result: 'cant get current height',
-            };
-
-            res.end(JSON.stringify(successObj));
+            });
           }
         });
       }
-    } else {
-      const errorObj = {
-        msg: 'error',
-        result: 'unauthorized access',
-      };
-
-      res.end(JSON.stringify(errorObj));
-    }
-  });
+    });
+  };
 
   shepherd.get('/electrum/gettransaction', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
