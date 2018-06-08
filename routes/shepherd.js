@@ -171,6 +171,8 @@ if (shepherd.appConfig.spv &&
 if (shepherd.appConfig.spv &&
     shepherd.appConfig.spv.customServers) {
   shepherd.loadElectrumServersList();
+} else {
+  shepherd.mergeLocalKvElectrumServers();
 }
 
 module.exports = shepherd;
