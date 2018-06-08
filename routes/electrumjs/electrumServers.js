@@ -2,145 +2,263 @@ const disableCoins = require('./electrumServersConfig');
 const _electrumServers = require('agama-wallet-lib/src/electrum-servers');
 
 const _electrumServersExtend = {
+  vpn: {
+    txfee: 10000,
+  },
+  nrg: {
+    txfee: 10000,
+  },
+  pot: {
+    txfee: 10000,
+  },
+  wc: {
+    txfee: 10000,
+  },
   zen: {
     txfee: 10000,
-    abbr: 'ZEN',
   },
   xzc: {
     txfee: 10000,
-    abbr: 'XZC',
   },
   iop: {
-    txfee: 10000,
-    abbr: 'IOP',
+    txfee: 1000,
   },
   sys: {
     txfee: 10000,
-    abbr: 'SYS',
   },
   bta: {
     txfee: 100000,
-    abbr: 'BTA',
   },
   erc: {
-    txfee: 10000,
-    abbr: 'ERC',
+    txfee: 100000,
   },
   lbc: {
     txfee: 1000,
-    abbr: 'LBC',
   },
   bsd: {
-    txfee: 10000,
-    abbr: 'BSD',
+    txfee: 100000,
   },
   gbx: {
-    txfee: 10000,
-    abbr: 'GBX',
+    txfee: 1000,
   },
   efl: {
     txfee: 100000,
-    abbr: 'EFL',
   },
   xwc: {
     txfee: 10000,
-    abbr: 'XWC',
   },
   vivo: {
     txfee: 10000,
-    abbr: 'VIVO',
   },
   xvg: {
     txfee: 10000,
-    abbr: 'XVG',
   },
   xvc: {
     txfee: 10000,
-    abbr: 'XVC',
   },
   uno: {
     txfee: 10000,
-    abbr: 'UNO',
   },
   smart: {
     txfee: 10000,
-    abbr: 'SMART',
   },
   rdd: {
     txfee: 10000,
-    abbr: 'RDD',
   },
   pivx: {
     txfee: 10000,
-    abbr: 'PIVX',
   },
   omni: {
     txfee: 10000,
-    abbr: 'OMNI',
   },
   ok: {
     txfee: 10000,
-    abbr: 'OK',
   },
   neos: {
     txfee: 10000,
-    abbr: 'NEOS',
   },
   nav: {
     txfee: 10000,
-    abbr: 'NAV',
   },
   mnx: {
     txfee: 10000,
-    abbr: 'MNX',
   },
   lcc: {
-    txfee: 10000,
-    abbr: 'LCC',
+    txfee: 1000000,
   },
   nlg: {
-    txfee: 10000,
-    abbr: 'NLG',
+    txfee: 1000000,
   },
   flash: {
-    txfee: 10000,
-    abbr: 'FLASH',
+    txfee: 100,
   },
   ftc: {
-    proto: 'tcp',
-    txfee: 10000,
+    txfee: 2000000,
   },
   excl: {
     txfee: 10000,
-    abbr: 'EXCL',
   },
   dmd: {
-    proto: 'tcp',
     txfee: 10000,
   },
   crave: {
     txfee: 10000,
-    abbr: 'CRAVE',
   },
   club: {
     txfee: 10000,
-    abbr: 'CLUB',
   },
   clam: {
     txfee: 10000,
-    abbr: 'CLAM',
   },
   bca: {
     txfee: 10000,
-    abbr: 'BCA',
   },
   aur: {
-    txfee: 10000,
-    abbr: 'AUR',
+    txfee: 100000,
   },
   acc: {
+    txfee: 100000,
+  },
+  usc: {
     txfee: 10000,
-    abbr: 'ACC',
+  },
+  toa: {
+    txfee: 10000,
+  },
+  strat: {
+    txfee: 10000,
+  },
+  smly: {
+    txfee: 10000,
+  },
+  slr: {
+    txfee: 10000,
+  },
+  rby: {
+    txfee: 10000,
+  },
+  vox: {
+    txfee: 500000,
+  },
+  put: {
+    txfee: 10000,
+  },
+  posw: {
+    txfee: 10000,
+  },
+  pink: {
+    txfee: 10000,
+  },
+  psb: {
+    txfee: 10000,
+  },
+  nsr: {
+    txfee: 10000,
+  },
+  nvc: {
+    txfee: 10000,
+  },
+  nyc: {
+    txfee: 10000,
+  },
+  nro: {
+    txfee: 10000,
+  },
+  lynx: {
+    txfee: 10000,
+  },
+  linx: {
+    txfee: 10000,
+  },
+  ldcn: {
+    txfee: 10000,
+  },
+  kobo: {
+    txfee: 10000,
+  },
+  ixc: {
+    txfee: 100000,
+  },
+  insn: {
+    txfee: 10000,
+  },
+  thc: {
+    txfee: 10000,
+  },
+  hnc: {
+    txfee: 10000,
+  },
+  grc: {
+    txfee: 10000,
+  },
+  gcr: {
+    txfee: 10000,
+  },
+  frst: {
+    txfee: 10000,
+  },
+  erc: {
+    txfee: 10000,
+  },
+  edrc: {
+    txfee: 10000,
+  },
+  ecn: {
+    txfee: 10000,
+  },
+  dgc: {
+    txfee: 5000000,
+  },
+  defc: {
+    txfee: 10000,
+  },
+  cmp: {
+    txfee: 10000,
+  },
+  ccn: {
+    txfee: 10000,
+  },
+  cdn: {
+    txfee: 100000,
+  },
+  brit: {
+    txfee: 10000,
+  },
+  xbc: {
+    txfee: 10000,
+  },
+  bela: {
+    txfee: 10000,
+  },
+  ac: {
+    txfee: 10000,
+  },
+  usnbt: {
+    txfee: 10000,
+  },
+  onx: {
+    txfee: 10000,
+  },
+  zet: {
+    txfee: 10000,
+  },
+  jbs: {
+    txfee: 10000,
+  },
+  slm: {
+    txfee: 10000,
+  },
+  axe: {
+    txfee: 10000,
+  },
+  ppc: {
+    txfee: 10000,
+  },
+  mzc: {
+    txfee: 10000,
+  },
+  sdc: {
+    txfee: 10000,
   },
   // insight
   aby: {
@@ -148,7 +266,6 @@ const _electrumServersExtend = {
     proto: 'insight',
     insightRawApi: false,
     txfee: 100000,
-    abbr: 'ABY',
     serverList: 'none',
   },
   mac: { // cloudfare captcha :(
@@ -156,7 +273,6 @@ const _electrumServersExtend = {
     proto: 'insight',
     insightRawApi: false,
     txfee: 100000,
-    abbr: 'MAC',
     serverList: 'none',
   },
   vot: {
@@ -164,7 +280,6 @@ const _electrumServersExtend = {
     proto: 'insight',
     insightRawApi: false,
     txfee: 10000,
-    abbr: 'VOT',
     serverList: 'none',
   },
   bdl: {
@@ -172,7 +287,6 @@ const _electrumServersExtend = {
     proto: 'insight',
     insightRawApi: false,
     txfee: 10000,
-    abbr: 'BDL',
     serverList: 'none',
   },
 };

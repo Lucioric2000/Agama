@@ -101,7 +101,7 @@ const appConfig = {
     cliStopTimeout: {
       display: true,
       displayName: 'CLI stop timeout',
-      info: 'Timeout between consequent CLI stop commands',
+      info: 'Timeout between consequent CLI stop commands. Value is in milliseconds.',
       type: 'number',
     },
     stopNativeDaemonsOnQuit: {
@@ -160,7 +160,7 @@ const appConfig = {
       socketTimeout: {
         display: true,
         displayName: 'Socket timeout',
-        info: 'Max timeout before electrum server connection is dropped.',
+        info: 'Max timeout before electrum server connection is dropped. Value is in milliseconds.',
         type: 'number',
       },
       customServers: {
