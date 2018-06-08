@@ -32,7 +32,6 @@ module.exports = (shepherd) => {
 
     for (let key in shepherd.electrumCoins) {
       if (key !== 'auth') {
-        const _abbr = key;
         const _seed = seed;
         let keys;
         let isWif = false;
@@ -40,7 +39,7 @@ module.exports = (shepherd) => {
         if (_seed.match('^[a-zA-Z0-9]{34}$') &&
             shepherd.appConfig.experimentalFeatures) {
           shepherd.log('watchonly pub addr');
-          shepherd.electrumKeys[_abbr] = {
+          shepherd.electrumKeys[key] = {
             priv: _seed,
             pub: _seed,
           };
@@ -55,10 +54,10 @@ module.exports = (shepherd) => {
 
           if (isWif) {
             try {
-              let key = shepherd.isZcash(_abbr.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, shepherd.getNetworkData(_abbr.toLowerCase()), true) : bitcoin.ECPair.fromWIF(_seed, shepherd.getNetworkData(_abbr.toLowerCase()), true);
+              const _key = shepherd.isZcash(key.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, shepherd.getNetworkData(key.toLowerCase()), true) : bitcoin.ECPair.fromWIF(_seed, shepherd.getNetworkData(key.toLowerCase()), true);
               keys = {
-                priv: key.toWIF(),
-                pub: key.getAddress(),
+                priv: _key.toWIF(),
+                pub: _key.getAddress(),
               };
             } catch (e) {
               _wifError = true;
@@ -67,12 +66,12 @@ module.exports = (shepherd) => {
           } else {
             keys = shepherd.seedToWif(
               _seed,
-              shepherd.findNetworkObj(_abbr),
+              shepherd.findNetworkObj(key),
               isIguana,
             );
           }
 
-          shepherd.electrumKeys[_abbr] = {
+          shepherd.electrumKeys[key] = {
             priv: keys.priv,
             pub: keys.pub,
           };

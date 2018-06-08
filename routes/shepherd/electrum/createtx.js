@@ -263,7 +263,7 @@ module.exports = (shepherd) => {
       let wif = req[reqType].wif;
 
       if (req[reqType].gui) {
-        wif = shepherd.electrumKeys[req[reqType].coin].priv;
+        wif = shepherd.electrumKeys[req[reqType].coin.toLowerCase()].priv;
       }
 
       if (req[reqType].vote) {

@@ -67,8 +67,8 @@ module.exports = (shepherd) => {
           const _res = shepherd.getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
           shepherd.log(_res, true);
 
-          ecl = shepherd.ecl(network, { ip: _randomServer[0], port: _randomServer[1], proto: _mainServer[2] });
-          // ecl = new shepherd.electrumJSCore(_randomServer[1], _randomServer[0], _mainServer[2]);
+          ecl = shepherd.ecl(network, { ip: _randomServer[0], port: _randomServer[1], proto: _randomServer[2] });
+          // ecl = new shepherd.electrumJSCore(_randomServer[1], _randomServer[0], randomServer[2]);
           ecl.connect();
 
           shepherd.getBlockHeader(height, network, ecl)
@@ -116,7 +116,7 @@ module.exports = (shepherd) => {
         let _filteredServerList = [];
 
         for (let i = 0; i < _serverList.length; i++) {
-          if (_serverList[i] !== shepherd.electrumCoins[coin].server.ip + ':' + shepherd.electrumCoins[coin].server.port) {
+          if (_serverList[i] !== shepherd.electrumCoins[coin].server.ip + ':' + shepherd.electrumCoins[coin].server.port + ':' + shepherd.electrumCoins[coin].server.proto) {
             _filteredServerList.push(_serverList[i]);
           }
         }
@@ -125,7 +125,7 @@ module.exports = (shepherd) => {
           txid,
           height,
           _filteredServerList,
-          shepherd.electrumCoins[coin].server.ip + ':' + shepherd.electrumCoins[coin].server.port + ':' + shepherd.electrumServers[coin === 'KMD' || coin === 'komodo' ? 'komodo' : coin.toLowerCase()].proto,
+          shepherd.electrumCoins[coin].server.ip + ':' + shepherd.electrumCoins[coin].server.port + ':' + shepherd.electrumCoins[coin === 'KMD' || coin === 'komodo' ? 'komodo' : coin].server.proto,
           coin
         )
         .then((proof) => {
