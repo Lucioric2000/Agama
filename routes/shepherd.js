@@ -163,6 +163,7 @@ shepherd.setVar = (_name, _body) => {
   shepherd[_name] = _body;
 };
 
+// spv
 if (shepherd.appConfig.spv &&
     shepherd.appConfig.spv.cache) {
   shepherd.loadLocalSPVCache();
@@ -174,5 +175,7 @@ if (shepherd.appConfig.spv &&
 } else {
   shepherd.mergeLocalKvElectrumServers();
 }
+
+shepherd.checkCoinConfigIntegrity();
 
 module.exports = shepherd;

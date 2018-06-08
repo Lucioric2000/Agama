@@ -296,7 +296,7 @@ let electrumServers = Object.assign({}, _electrumServers, _electrumServersExtend
 for (let i = 0; i < disableCoins.length; i++) {
   if (electrumServers[disableCoins[i]]) {
     delete electrumServers[disableCoins[i]];
-    console.log(`disable spv coin ${disableCoins[i]}`);
+    // console.log(`disable spv coin ${disableCoins[i]}`);
   }
 }
 

@@ -204,7 +204,7 @@ module.exports = (shepherd) => {
             const _kvElectrumItem = JSON.parse(txhistory.result[i].opreturn.kvDecoded.content.body);
             _kvElectrum = deepmerge(_kvElectrum, _kvElectrumItem);
           } catch (e) {
-            shepherd.log(`kv electrum servers parse error ${e}`);
+            shepherd.log(`kv electrum servers parse error ${e}`, true);
             // shepherd.log(txhistory.result[i].opreturn.kvDecoded.content.body);
           }
         }

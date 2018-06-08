@@ -14,7 +14,7 @@ const disableCoins = [
   'ecn', // needs kv edit
   'smart', // wrong address
   'ac', // awaiting funds
-  //'btcp', // sort out kv
+  'btcp', // sort out kv
   // untested coins
   'usc',
   'bca',

@@ -135,5 +135,22 @@ module.exports = (shepherd) => {
     }
   });
 
+  shepherd.checkCoinConfigIntegrity = (coin) => {
+    let _totalCoins = 0;
+
+    for (let key in shepherd.electrumJSNetworks) {
+      if (!shepherd.electrumServers[key] ||
+          (shepherd.electrumServers[key] &&
+          !shepherd.electrumServers[key].serverList)) {
+        shepherd.log(`disable ${key}, coin config check not passed`, true);
+        delete shepherd.electrumServers[key];
+      } else {
+        _totalCoins++;
+      }
+    }
+
+    shepherd.log(`total supported spv coins ${_totalCoins}`);
+  };
+
   return shepherd;
 };
