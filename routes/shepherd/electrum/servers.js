@@ -186,7 +186,7 @@ module.exports = (shepherd) => {
     });
   };
 
-  shepherd.get('/electrum/kv/electrum/servers', (req, res, next) => {
+  shepherd.get('/electrum/kv/servers', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       shepherd.listtransactions({
         network: 'KV',

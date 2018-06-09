@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const _fs = require('graceful-fs');
 const fsnode = require('fs');
 const Promise = require('bluebird');
-const defaultConf = require('../appConfig.js').config
+const defaultConf = require('../appConfig.js').config;
 const deepmerge = require('./deepmerge.js');
 
 module.exports = (shepherd) => {
@@ -34,7 +34,7 @@ module.exports = (shepherd) => {
                   result[i] = {};
                 }
 
-                console.log(`settings multi-level diff ${i} -> ${j}`);
+                shepherd.log(`settings multi-level diff ${i} -> ${j}`, true);
                 result[i][j] = obj1[i][j];
               }
             }

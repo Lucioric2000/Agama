@@ -42,9 +42,9 @@ module.exports = (shepherd) => {
     }
 
     const _electrumServer = {
-      port: shepherd.electrumServers[network].port,
-      ip: shepherd.electrumServers[network].address,
-      proto: shepherd.electrumServers[network].proto,
+      port: shepherd.electrumCoins[network].server.port || shepherd.electrumServers[network].port,
+      ip: shepherd.electrumCoins[network].server.ip || shepherd.electrumServers[network].address,
+      proto: shepherd.electrumCoins[network].server.proto || shepherd.electrumServers[network].proto,
     };
 
     const makeUrl = (arr) => {

@@ -178,4 +178,8 @@ if (shepherd.appConfig.spv &&
 
 shepherd.checkCoinConfigIntegrity();
 
+if (shepherd.appConfig.loadCoinsFromStorage) {
+  shepherd.loadCoinsListFromFile();
+}
+
 module.exports = shepherd;

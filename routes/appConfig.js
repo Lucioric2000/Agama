@@ -20,6 +20,7 @@ const appConfig = {
     lang: 'EN',
     rpc2cli: false,
     fiatRates: false,
+    loadCoinsFromStorage: false,
     spv: {
       maxVinParseLimit: 120,
       cache: false,
@@ -135,6 +136,12 @@ const appConfig = {
       display: true,
       displayName: 'Fetch fiat rates',
       info: 'Get coin fiat rates from atomicexplorer.com',
+      type: 'boolean',
+    },
+    loadCoinsFromStorage: {
+      display: true,
+      displayName: 'Load coins list from file',
+      info: 'Add favourite coins on app start from a file',
       type: 'boolean',
     },
     spv: {
