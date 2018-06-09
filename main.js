@@ -26,8 +26,6 @@ if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
 }
 
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
-
 // GUI APP settings and starting gui on address http://120.0.0.1:17777
 let shepherd = require('./routes/shepherd');
 let guiapp = express();
@@ -64,7 +62,7 @@ let _argv = {};
 for (let i = 0; i < process.argv.length; i++) {
   if (process.argv[i].indexOf('nogui') > -1) {
   	_argv.nogui = true;
-    console.log('enable nogui mode');
+    shepherd.log('enable nogui mode');
   }
 
   if (process.argv[i].indexOf('=') > -1) {
@@ -76,12 +74,12 @@ for (let i = 0; i < process.argv.length; i++) {
   	_argv = {};
   } else {
   	shepherd.argv = _argv;
-  	console.log('arguments');
-  	console.log(_argv);
+  	shepherd.log('arguments');
+  	shepherd.log(_argv);
   }
 }
 
-const appSessionHash = _argv.userpass ? _argv.userpass : randomBytes(32).toString('hex');
+const appSessionHash = _argv.token ? _argv.token : randomBytes(32).toString('hex');
 const _spvFees = shepherd.getSpvFees();
 
 shepherd.writeLog(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
@@ -219,7 +217,19 @@ function forseCloseApp() {
 	app.quit();
 }
 
-app.on('ready', () => createWindow('open', process.argv.indexOf('dexonly') > -1 ? true : null));
+if (!_argv.nogui || (_argv.nogui && _argv.nogui === '1')) {
+	app.on('ready', () => createWindow('open', process.argv.indexOf('dexonly') > -1 ? true : null));
+} else {
+	server.listen(appConfig.agamaPort, () => {
+		shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
+		shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
+		// start sockets.io
+		io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
+	});
+	shepherd.setIO(io); // pass sockets object to shepherd router
+	shepherd.setVar('appBasicInfo', appBasicInfo);
+	shepherd.setVar('appSessionHash', appSessionHash);
+}
 
 function createAppCloseWindow() {
 	// initialise window
