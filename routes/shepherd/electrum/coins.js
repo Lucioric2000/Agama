@@ -124,6 +124,8 @@ module.exports = (shepherd) => {
         result: _electrumCoins,
       };
 
+      console.log(shepherd.electrumCoins);
+
       res.end(JSON.stringify(successObj));
     } else {
       const errorObj = {

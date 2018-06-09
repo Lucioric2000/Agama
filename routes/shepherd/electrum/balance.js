@@ -14,7 +14,8 @@ module.exports = (shepherd) => {
         if (json &&
             json.hasOwnProperty('confirmed') &&
             json.hasOwnProperty('unconfirmed')) {
-          if (network === 'komodo') {
+          if (network === 'komodo' ||
+              network.toLowerCase() === 'kmd') {
             ecl.blockchainAddressListunspent(req.query.address)
             .then((utxoList) => {
               if (utxoList &&
