@@ -83,8 +83,6 @@ module.exports = (shepherd) => {
       };
 
       request(options, (error, response, body) => {
-        console.log(body);
-
         try {
           const txhistory = JSON.parse(body);
 

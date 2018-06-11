@@ -21,6 +21,7 @@ const appConfig = {
     rpc2cli: false,
     fiatRates: false,
     loadCoinsFromStorage: false,
+    requirePinToConfirmTx: false,
     spv: {
       maxVinParseLimit: 120,
       cache: false,
@@ -142,6 +143,11 @@ const appConfig = {
       display: true,
       displayName: 'Load coins list from file',
       info: 'Add favourite coins on app start from a file',
+      type: 'boolean',
+    },
+    requirePinToConfirmTx: {
+      display: true,
+      displayName: 'Require PIN to confirm a transaction',
       type: 'boolean',
     },
     spv: {

@@ -125,7 +125,7 @@ module.exports = (shepherd) => {
           txid,
           height,
           _filteredServerList,
-          shepherd.electrumCoins[coin].server.ip + ':' + shepherd.electrumCoins[coin].server.port + ':' + shepherd.electrumCoins[coin.toLowerCase() === 'kmd' || coin === 'komodo' ? 'komodo' : coin].server.proto,
+          shepherd.electrumCoins[coin].server.ip + ':' + shepherd.electrumCoins[coin].server.port + ':' + shepherd.electrumCoins[coin.toLowerCase() === 'kmd' || coin === 'komodo' ? 'kmd' : coin].server.proto,
           coin
         )
         .then((proof) => {
