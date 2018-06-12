@@ -59,7 +59,7 @@ const appConfig = {
       },
     },
     dev: {
-      display: true,
+      display: false,
       initDisplay: true,
       displayName: 'Developer mode',
       info: 'Enable developer mode',
