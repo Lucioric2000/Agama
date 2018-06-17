@@ -44,7 +44,7 @@ module.exports = (shepherd) => {
 
     if (isKomodoCoin(coin) ||
         isKomodoCoin(coinUC)) {
-      return shepherd.electrumJSNetworks.komodo;
+      return shepherd.electrumJSNetworks.kmd;
     } else {
       return shepherd.electrumJSNetworks[network];
     }
@@ -52,7 +52,7 @@ module.exports = (shepherd) => {
 
   shepherd.findNetworkObj = (coin) => {
     for (let key in shepherd.electrumServers) {
-      if (shepherd.electrumServers[key].abbr === coin) {
+      if (key.toLowerCase() === coin.toLowerCase()) {
         return key;
       }
     }
@@ -60,11 +60,11 @@ module.exports = (shepherd) => {
 
   shepherd.get('/electrum/servers', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      if (req.query.abbr) {
+      if (req.query.abbr) { // (?) change
         let _electrumServers = {};
 
         for (let key in shepherd.electrumServers) {
-          _electrumServers[shepherd.electrumServers[key].abbr] = shepherd.electrumServers[key];
+          _electrumServers[key] = shepherd.electrumServers[key];
         }
 
         const successObj = {
@@ -100,12 +100,14 @@ module.exports = (shepherd) => {
       shepherd.electrumCoins[req.query.coin].server = {
         ip: req.query.address,
         port: req.query.port,
+        proto: req.query.proto,
       };
 
       for (let key in shepherd.electrumServers) {
-        if (shepherd.electrumServers[key].abbr === req.query.coin) {
+        if (key === req.query.coin) {
           shepherd.electrumServers[key].address = req.query.address;
           shepherd.electrumServers[key].port = req.query.port;
+          shepherd.electrumServers[key].proto = req.query.proto;
           break;
         }
       }
@@ -130,7 +132,8 @@ module.exports = (shepherd) => {
 
   shepherd.get('/electrum/servers/test', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const ecl = new shepherd.electrumJSCore(null, { port: req.query.port, ip: req.query.address, proto: 'tcp' }); // tcp or tls
+      const ecl = shepherd.ecl(null, { port: req.query.port, ip: req.query.address, proto: req.query.proto });
+      //const ecl = new shepherd.electrumJSCore(null, { port: req.query.port, ip: req.query.address, proto: req.query.proto }); // tcp or tls
       //const ecl = new shepherd.electrumJSCore(req.query.port, req.query.address, 'tcp'); // tcp or tls
 
       ecl.connect();
@@ -170,27 +173,54 @@ module.exports = (shepherd) => {
 
   // remote api switch wrapper
   shepherd.ecl = (network, customElectrum) => {
-    network = network.toLowerCase();
-    network = network === 'kmd' ? 'komodo' : network;
-
-    if (shepherd.electrumServers[network].proto === 'insight') {
-      return shepherd.insightJSCore(shepherd.electrumServers[network]);
+    if (!network) {
+      return new shepherd.electrumJSCore(customElectrum.port, customElectrum.ip, customElectrum.proto, shepherd.appConfig.spv.socketTimeout);
     } else {
-      if (shepherd.appConfig.spv.proxy) {
-        return shepherd.proxy(network, customElectrum);
-      } else {
-        const electrum = customElectrum ? {
-          port: customElectrum.port,
-          ip: customElectrum.ip,
-          proto: customElectrum.proto,
-        } : {
-          port: shepherd.electrumServers[network].port,
-          ip: shepherd.electrumServers[network].address,
-          proto: shepherd.electrumServers[network].proto,
-        };
+      let _currentElectrumServer;
+      network = network.toLowerCase();
 
-        return new shepherd.electrumJSCore(electrum.port, electrum.ip, electrum.proto, shepherd.appConfig.spv.socketTimeout);
-        //return new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+      /*console.log(`ecl net ${network}`);
+      console.log(shepherd.electrumCoins[network]);
+      console.log(shepherd.electrumServers[network].serverList);*/
+
+      if (shepherd.electrumCoins[network]) {
+        _currentElectrumServer = shepherd.electrumCoins[network];
+      } else {
+        const _server = shepherd.electrumServers[network].serverList[0].split(':');
+        _currentElectrumServer = {
+          ip: _server[0],
+          port: _server[1],
+          proto: _server[2],
+        };
+      }
+
+      if (shepherd.electrumServers[network].proto === 'insight') {
+        return shepherd.insightJSCore(shepherd.electrumServers[network]);
+      } else {
+        if (shepherd.appConfig.spv.proxy) {
+          return shepherd.proxy(network, customElectrum);
+        } else {
+          const electrum = customElectrum ? {
+            port: customElectrum.port,
+            ip: customElectrum.ip,
+            proto: customElectrum.proto,
+          } : {
+            port: shepherd.electrumCoins[network] && shepherd.electrumCoins[network].server.port || _currentElectrumServer.port,
+            ip: shepherd.electrumCoins[network] && shepherd.electrumCoins[network].server.ip || _currentElectrumServer.ip,
+            proto: shepherd.electrumCoins[network] && shepherd.electrumCoins[network].server.proto || _currentElectrumServer.proto,
+          };
+
+          /*if (customElectrum) {
+            console.log('custom electrum');
+            console.log(customElectrum);
+          }
+
+          console.log('electrum');
+          console.log(electrum);*/
+
+          return new shepherd.electrumJSCore(electrum.port, electrum.ip, electrum.proto, shepherd.appConfig.spv.socketTimeout);
+          //return new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
+        }
       }
     }
   }

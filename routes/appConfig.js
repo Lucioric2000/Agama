@@ -20,11 +20,15 @@ const appConfig = {
     lang: 'EN',
     rpc2cli: false,
     fiatRates: false,
+    loadCoinsFromStorage: false,
+    requirePinToConfirmTx: false,
     spv: {
       maxVinParseLimit: 120,
       cache: false,
       proxy: false,
       socketTimeout: 10000,
+      customServers: false,
+      syncServerListFromKv: false,
     },
   },
   schema: {
@@ -55,7 +59,7 @@ const appConfig = {
       },
     },
     dev: {
-      display: true,
+      display: false,
       initDisplay: true,
       displayName: 'Developer mode',
       info: 'Enable developer mode',
@@ -99,7 +103,7 @@ const appConfig = {
     cliStopTimeout: {
       display: true,
       displayName: 'CLI stop timeout',
-      info: 'Timeout between consequent CLI stop commands',
+      info: 'Timeout between consequent CLI stop commands. Value is in milliseconds.',
       type: 'number',
     },
     stopNativeDaemonsOnQuit: {
@@ -135,6 +139,17 @@ const appConfig = {
       info: 'Get coin fiat rates from atomicexplorer.com',
       type: 'boolean',
     },
+    loadCoinsFromStorage: {
+      display: true,
+      displayName: 'Load coins list from file',
+      info: 'Add favourite coins on app start from a file',
+      type: 'boolean',
+    },
+    requirePinToConfirmTx: {
+      display: true,
+      displayName: 'Require PIN to confirm a transaction',
+      type: 'boolean',
+    },
     spv: {
       display: true,
       displayName: 'Lite mode',
@@ -158,8 +173,20 @@ const appConfig = {
       socketTimeout: {
         display: true,
         displayName: 'Socket timeout',
-        info: 'Max timeout before electrum server connection is dropped.',
+        info: 'Max timeout before electrum server connection is dropped. Value is in milliseconds.',
         type: 'number',
+      },
+      customServers: {
+        display: true,
+        displayName: 'Custom electrum servers list',
+        info: 'Allow electrum servers list changes.',
+        type: 'boolean',
+      },
+      syncServerListFromKv: {
+        display: true,
+        displayName: 'Sync electrum servers list from KV',
+        info: 'Warning, this is highly experimental feature!',
+        type: 'boolean',
       },
     },
   },
