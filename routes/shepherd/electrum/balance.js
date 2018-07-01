@@ -149,6 +149,7 @@ module.exports = (shepherd) => {
           const successObj = {
             msg: 'error',
             result: shepherd.CONNECTION_ERROR_OR_INCOMPLETE_DATA,
+            electrumres: json,
           };
 
           res.end(JSON.stringify(successObj));
