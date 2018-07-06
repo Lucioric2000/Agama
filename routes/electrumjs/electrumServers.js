@@ -17,9 +17,6 @@ const _electrumServersExtend = {
   zen: {
     txfee: 10000,
   },
-  xzc: {
-    txfee: 10000,
-  },
   iop: {
     txfee: 1000,
   },
@@ -37,9 +34,6 @@ const _electrumServersExtend = {
   },
   bsd: {
     txfee: 100000,
-  },
-  gbx: {
-    txfee: 1000,
   },
   efl: {
     txfee: 100000,
@@ -91,9 +85,6 @@ const _electrumServersExtend = {
   },
   flash: {
     txfee: 100,
-  },
-  ftc: {
-    txfee: 2000000,
   },
   excl: {
     txfee: 10000,

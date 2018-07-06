@@ -1,7 +1,7 @@
 {
   "name": "agama-app",
   "productName": "Agama",
-  "version": "0.2.40",
+  "version": "0.2.41",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "agama",
     "SuperNET",
     "komodo",
-    "multicoin",
+    "multi coin",
+    "multi currency",
     "wallet",
     "spv",
     "jumblr"
@@ -24,7 +25,7 @@
   "author": "SuperNET Team",
   "license": "MIT",
   "devDependencies": {
-    "electron": "2.0.0"
+    "electron": "2.0.3"
   },
   "dependencies": {
     "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
@@ -41,7 +42,7 @@
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",
     "coinselect": "github:bitcoinjs/coinselect",
-    "electron": "2.0.0",
+    "electron": "2.0.3",
     "express": "^4.14.0",
     "fix-path": "^2.1.0",
     "fs-extra": "^4.0.2",

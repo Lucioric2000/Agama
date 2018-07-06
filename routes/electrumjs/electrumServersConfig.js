@@ -15,6 +15,8 @@ const disableCoins = [
   'smart', // wrong address
   'ac', // awaiting funds
   'btcp', // sort out kv
+  'blk',
+  'arg',
   // untested coins
   'usc',
   'bca',
