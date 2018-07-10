@@ -30,6 +30,7 @@ const appConfig = {
       customServers: false,
       syncServerListFromKv: false,
     },
+    darkmode: false,
   },
   schema: {
     host: {
@@ -188,6 +189,11 @@ const appConfig = {
         info: 'Warning, this is highly experimental feature!',
         type: 'boolean',
       },
+    },
+    darkmode: {
+      display: true,
+      displayName: 'Dark UI theme',
+      type: 'boolean',
     },
   },
 };
