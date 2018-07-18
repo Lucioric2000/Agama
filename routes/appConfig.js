@@ -148,7 +148,7 @@ const appConfig = {
     },
     requirePinToConfirmTx: {
       display: true,
-      displayName: 'Require PIN to confirm a transaction',
+      displayName: 'Require PIN to confirm a transaction.<br/>Only if you are using seed storage authorization method.<br/>Will not work with a plain seed/WIF.',
       type: 'boolean',
     },
     spv: {
