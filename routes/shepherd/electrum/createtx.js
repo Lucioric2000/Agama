@@ -486,11 +486,11 @@ module.exports = (shepherd) => {
               shepherd.log(`vin sum ${vinSum} (${vinSum * 0.00000001})`, true);
               shepherd.log(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`, true);
               // double check no extra fee is applied
-              shepherd.log(`vin - vout ${vinSum - value - _change}`);
+              shepherd.log(`vin - vout ${vinSum - value - _change}`, true);
 
               if ((vinSum - value - _change) > fee) {
                 _change += fee;
-                shepherd.log(`double fee, increase change by ${fee}`);
+                shepherd.log(`double fee, increase change by ${fee}`, true);
               } else if ((vinSum - value - _change) === 0) { // max amount spend edge case
                 shepherd.log(`zero fee, reduce output size by ${fee}`);
                 value = value - fee;
@@ -592,7 +592,7 @@ module.exports = (shepherd) => {
                   .then((txid) => {
                     ecl.close();
 
-                    const _rawObj = {
+                    let _rawObj = {
                       utxoSet: inputs,
                       change: _change,
                       changeAdjusted: _change,
@@ -608,7 +608,42 @@ module.exports = (shepherd) => {
                     };
 
                     if (txid &&
-                        txid.indexOf('bad-txns-inputs-spent') > -1) {
+                        JSON.stringify(txid).indexOf('fee not met') > -1) {
+                      _rawObj.txid = JSON.stringify(_rawObj.txid);
+
+                      const successObj = {
+                        msg: 'error',
+                        result: 'Missing fee',
+                        raw: _rawObj,
+                      };
+
+                      res.end(JSON.stringify(successObj));
+                    } else if (txid && txid.indexOf('bad-txns-inputs-spent') > -1) {
+                      const successObj = {
+                        msg: 'error',
+                        result: 'Bad transaction inputs spent',
+                        raw: _rawObj,
+                      };
+
+                      res.end(JSON.stringify(successObj));
+                    } else if (txid && txid.length === 64) {
+                      if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                        const successObj = {
+                          msg: 'error',
+                          result: 'Bad transaction inputs spent',
+                          raw: _rawObj,
+                        };
+
+                        res.end(JSON.stringify(successObj));
+                      } else {
+                        const successObj = {
+                          msg: 'success',
+                          result: _rawObj,
+                        };
+
+                        res.end(JSON.stringify(successObj));
+                      }
+                    } else if (txid && txid.indexOf('bad-txns-in-belowout') > -1) {
                       const successObj = {
                         msg: 'error',
                         result: 'Bad transaction inputs spent',
@@ -617,44 +652,13 @@ module.exports = (shepherd) => {
 
                       res.end(JSON.stringify(successObj));
                     } else {
-                      if (txid &&
-                          txid.length === 64) {
-                        if (txid.indexOf('bad-txns-in-belowout') > -1) {
-                          const successObj = {
-                            msg: 'error',
-                            result: 'Bad transaction inputs spent',
-                            raw: _rawObj,
-                          };
+                      const successObj = {
+                        msg: 'error',
+                        result: 'Can\'t broadcast transaction',
+                        raw: _rawObj,
+                      };
 
-                          res.end(JSON.stringify(successObj));
-                        } else {
-                          const successObj = {
-                            msg: 'success',
-                            result: _rawObj,
-                          };
-
-                          res.end(JSON.stringify(successObj));
-                        }
-                      } else {
-                        if (txid &&
-                            txid.indexOf('bad-txns-in-belowout') > -1) {
-                          const successObj = {
-                            msg: 'error',
-                            result: 'Bad transaction inputs spent',
-                            raw: _rawObj,
-                          };
-
-                          res.end(JSON.stringify(successObj));
-                        } else {
-                          const successObj = {
-                            msg: 'error',
-                            result: 'Can\'t broadcast transaction',
-                            raw: _rawObj,
-                          };
-
-                          res.end(JSON.stringify(successObj));
-                        }
-                      }
+                      res.end(JSON.stringify(successObj));
                     }
                   });
                 }
