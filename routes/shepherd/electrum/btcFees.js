@@ -36,14 +36,9 @@ module.exports = (shepherd) => {
       if (checkTimestamp(btcFees.lastUpdated) > BTC_FEES_MIN_ELAPSED_TIME) {
         const _randomServer = shepherd.electrumServers.btc.serverList[getRandomIntInclusive(0, shepherd.electrumServers.btc.serverList.length - 1)].split(':');
         const ecl = shepherd.ecl(network, { port: _randomServer[1], ip: _randomServer[0], port: 'tcp' });
-        /*const ecl = new shepherd.electrumJSCore(
-          _randomServer[1],
-          _randomServer[0],
-          'tcp'
-        );*/
         let _btcFeeEstimates = [];
 
-        console.log(`btc fees server ${_randomServer.join(':')}`);
+        shepherd.log(`btc fees server ${_randomServer.join(':')}`, true);
 
         ecl.connect();
         Promise.all(btcFeeBlocks.map((coin, index) => {
@@ -61,12 +56,11 @@ module.exports = (shepherd) => {
         .then(result => {
           ecl.close();
 
-          btcFees.electrum = result && result.length ? _btcFeeEstimates : 'error';
-
-          let options = {
+          const options = {
             url: `https://bitcoinfees.earn.com/api/v1/fees/recommended`,
             method: 'GET',
           };
+          btcFees.electrum = result && result.length ? _btcFeeEstimates : 'error';
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour

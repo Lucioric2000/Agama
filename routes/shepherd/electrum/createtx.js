@@ -491,6 +491,9 @@ module.exports = (shepherd) => {
               if ((vinSum - value - _change) > fee) {
                 _change += fee;
                 shepherd.log(`double fee, increase change by ${fee}`);
+              } else if ((vinSum - value - _change) === 0) { // max amount spend edge case
+                shepherd.log(`zero fee, reduce output size by ${fee}`);
+                value = value - fee;
               }
 
               // TODO: use individual dust thresholds
