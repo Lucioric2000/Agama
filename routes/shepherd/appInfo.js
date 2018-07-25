@@ -26,14 +26,14 @@ const formatBytes = (bytes, decimals) => {
 module.exports = (shepherd) => {
   shepherd.SystemInfo = () => {
     const os_data = {
-      'totalmem_bytes': shepherd.os.totalmem(),
-      'totalmem_readable': formatBytes(shepherd.os.totalmem()),
-      'arch': shepherd.os.arch(),
-      'cpu': shepherd.os.cpus()[0].model,
-      'cpu_cores': shepherd.os.cpus().length,
-      'platform': shepherd.os.platform(),
-      'os_release': shepherd.os.release(),
-      'os_type': shepherd.os.type(),
+      totalmem_bytes: shepherd.os.totalmem(),
+      totalmem_readable: formatBytes(shepherd.os.totalmem()),
+      arch: shepherd.os.arch(),
+      cpu: shepherd.os.cpus()[0].model,
+      cpu_cores: shepherd.os.cpus().length,
+      platform: shepherd.os.platform(),
+      os_release: shepherd.os.release(),
+      os_type: shepherd.os.type(),
     };
 
     return os_data;

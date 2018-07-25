@@ -74,8 +74,8 @@ module.exports = (shepherd) => {
 
     if (selection === 'KMD') {
       herdData = {
-        'ac_name': 'komodod',
-        'ac_options': [
+        ac_name: 'komodod',
+        ac_options: [
           '-daemon=0',
           '-addnode=78.47.196.146',
         ],
@@ -90,8 +90,8 @@ module.exports = (shepherd) => {
       selection === 'BNTN'
     ) {
       herdData = {
-        'ac_name': acHerdData[selection].name,
-        'ac_options': [
+        ac_name: acHerdData[selection].name,
+        ac_options: [
           '-daemon=0',
           '-server',
           `-ac_name=${acHerdData[selection].name}`,
@@ -103,14 +103,14 @@ module.exports = (shepherd) => {
       httpRequest();
     } else {
       const herdData = [{
-        'ac_name': 'komodod',
-        'ac_options': [
+        ac_name: 'komodod',
+        ac_options: [
           '-daemon=0',
           '-addnode=78.47.196.146',
         ],
       }, {
-        'ac_name': 'REVS',
-        'ac_options': [
+        ac_name: 'REVS',
+        ac_options: [
           '-daemon=0',
           '-server',
           `-ac_name=REVS`,
@@ -118,8 +118,8 @@ module.exports = (shepherd) => {
           '-ac_supply=1300000',
         ],
       }, {
-        'ac_name': 'JUMBLR',
-        'ac_options': [
+        ac_name: 'JUMBLR',
+        ac_options: [
           '-daemon=0',
           '-server',
           `-ac_name=JUMBLR`,

@@ -119,7 +119,21 @@ module.exports = (shepherd) => {
   });
 
   shepherd.getCoinByPub = (address) => {
-    const _skipNetworks = ['btc', 'crw', 'dgb', 'arg', 'zec', 'nmc', 'ltc', 'vtc', 'via', 'fair', 'doge', 'kmd', 'mona'];
+    const _skipNetworks = [
+      'btc',
+      'crw',
+      'dgb',
+      'arg',
+      'zec',
+      'nmc',
+      'ltc',
+      'vtc',
+      'via',
+      'fair',
+      'doge',
+      'kmd',
+      'mona'
+    ];
 
     try {
       const _b58check = shepherd.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
