@@ -36,6 +36,7 @@ const assetChainPorts = {
   EQL: 10306,
   PRLPAY: 9679,
   ZILLA: 10041,
+  DSEC: 11557,
 };
 
 module.exports = assetChainPorts;
