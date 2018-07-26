@@ -103,7 +103,7 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       const rootLocation = path.join(__dirname, '../../');
       const options = {
-        url: 'https://github.com/pbca26/dl-test/raw/master/version',
+        url: 'https://raw.githubusercontent.com/KomodoPlatform/Agama/pkg_automation_electrum/version',
         method: 'GET',
       };
 
@@ -142,7 +142,8 @@ module.exports = (shepherd) => {
           }
         } else {
           res.end({
-            err: 'error getting update',
+            msg: 'error',
+            result: 'error getting update',
           });
         }
       });
