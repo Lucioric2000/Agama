@@ -257,8 +257,8 @@ module.exports = (shepherd) => {
       const changeAddress = req[reqType].change;
       const push = req[reqType].push;
       const opreturn = req[reqType].opreturn;
-      const btcFee = req[reqType].btcfee ? Number(req[reqType].btcfee) : null;
-      let fee = shepherd.electrumServers[network].txfee;
+      const btcFee = req[reqType].customFee && Number(req[reqType].customFee) !== 0 ? null : (req[reqType].btcfee ? Number(req[reqType].btcfee) : null);
+      let fee = req[reqType].customFee && Number(req[reqType].customFee) !== 0 ? Number(req[reqType].customFee) : shepherd.electrumServers[network].txfee;
       let value = Number(req[reqType].value);
       let wif = req[reqType].wif;
 
@@ -335,7 +335,7 @@ module.exports = (shepherd) => {
           targets[0].value = targets[0].value + fee;
 
           shepherd.log(`default fee ${fee}`, true);
-          shepherd.log(`targets ==>`, true);
+          shepherd.log('targets ==>', true);
           shepherd.log(targets, true);
 
           // default coin selection algo blackjack with fallback to accumulative

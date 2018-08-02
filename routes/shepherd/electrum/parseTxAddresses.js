@@ -1,9 +1,6 @@
 module.exports = (shepherd) => {
   shepherd.parseTransactionAddresses = (tx, targetAddress, network, skipTargetAddress) => {
-    // TODO: - sum vins / sum vouts to the same address
-    //       - multi vin multi vout
-    //       - detect change address
-    //       - double check for exact sum input/output values
+    // TODO: calc tx fee
     let result = [];
     let _parse = {
       inputs: {},
