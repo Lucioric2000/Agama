@@ -31,6 +31,8 @@ const appConfig = {
       syncServerListFromKv: false,
       allowCustomFees: false,
     },
+    coinControl: false,
+    defaultFiatCurrency: 'usd',
     // darkmode: false,
   },
   schema: {
@@ -141,6 +143,11 @@ const appConfig = {
       info: 'Get coin fiat rates from atomicexplorer.com',
       type: 'boolean',
     },
+    defaultFiatCurrency: {
+      display: true,
+      displayName: 'Fiat currency',
+      type: 'boolean',
+    },
     loadCoinsFromStorage: {
       display: true,
       displayName: 'Load coins list from file',
@@ -195,6 +202,12 @@ const appConfig = {
         displayName: 'Allow custom fees',
         type: 'boolean',
       },
+    },
+    coinControl: {
+      display: true,
+      displayName: 'Coin control',
+      info: 'Advanced coin control e.g. UTXO management, split/merge. <br/>Warning: Only for experienced users.!',
+      type: 'boolean',
     },
     /*darkmode: {
       display: true,
