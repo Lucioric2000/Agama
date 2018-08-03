@@ -1,3 +1,5 @@
+const fiatList = require('./fiatList');
+
 const appConfig = {
   config: { // default config
     host: '127.0.0.1',
@@ -20,6 +22,7 @@ const appConfig = {
     lang: 'EN',
     rpc2cli: false,
     fiatRates: false,
+    defaultFiatCurrency: 'usd',
     loadCoinsFromStorage: false,
     requirePinToConfirmTx: false,
     spv: {
@@ -32,7 +35,6 @@ const appConfig = {
       allowCustomFees: false,
     },
     coinControl: false,
-    defaultFiatCurrency: 'usd',
     // darkmode: false,
   },
   schema: {
@@ -126,10 +128,8 @@ const appConfig = {
       display: true,
       displayName: 'Language',
       type: 'select',
-      data: [
-        { name: 'EN', label: 'English' },
-        { name: 'DE', label: 'German' }
-      ],
+      translateSelector: 'LANG',
+      data: ['en', 'de'],
     },
     rpc2cli: {
       display: true,
@@ -146,7 +146,9 @@ const appConfig = {
     defaultFiatCurrency: {
       display: true,
       displayName: 'Fiat currency',
-      type: 'boolean',
+      type: 'select',
+      translateSelector: 'FIAT_CURRENCIES',
+      data: fiatList,
     },
     loadCoinsFromStorage: {
       display: true,
@@ -156,7 +158,8 @@ const appConfig = {
     },
     requirePinToConfirmTx: {
       display: true,
-      displayName: 'Require PIN to confirm a transaction.<br/>Only if you are using seed storage authorization method.<br/>Will not work with a plain seed/WIF.',
+      displayName: 'Require PIN to confirm a transaction.',
+      info: 'Only if you are using seed storage authorization method.<br/>Will not work with a plain seed/WIF.',
       type: 'boolean',
     },
     spv: {
