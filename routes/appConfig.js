@@ -31,7 +31,7 @@ const appConfig = {
       syncServerListFromKv: false,
       allowCustomFees: false,
     },
-    darkmode: false,
+    // darkmode: false,
   },
   schema: {
     host: {
@@ -196,11 +196,11 @@ const appConfig = {
         type: 'boolean',
       },
     },
-    darkmode: {
+    /*darkmode: {
       display: true,
       displayName: 'Dark UI theme',
       type: 'boolean',
-    },
+    },*/
   },
 };
 
