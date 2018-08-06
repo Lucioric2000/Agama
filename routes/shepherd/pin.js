@@ -233,7 +233,7 @@ module.exports = (shepherd) => {
       } else {
         const errorObj = {
           msg: 'error',
-          result: 'pin folder doesnt exist',
+          result: 'pin folder doesn\'t exist',
         };
 
         res.end(JSON.stringify(errorObj));

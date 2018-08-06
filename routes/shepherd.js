@@ -140,6 +140,7 @@ shepherd = require('./shepherd/daemonControl.js')(shepherd);
 shepherd = require('./shepherd/auth.js')(shepherd);
 shepherd = require('./shepherd/coins.js')(shepherd);
 shepherd = require('./shepherd/coindWalletKeys.js')(shepherd);
+shepherd = require('./shepherd/addressBook.js')(shepherd);
 
 // elections
 shepherd = require('./shepherd/elections.js')(shepherd);
