@@ -315,7 +315,7 @@ function createWindow(status, hideLoadingWindow) {
 				shepherd.writeLog('show agama gui');
 				mainWindow.appConfig = appConfig;
 				mainWindow.appConfigSchema = shepherd.appConfigSchema;
-				mainWindow.arch = arch();
+				mainWindow.arch = localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch();
 				mainWindow.appBasicInfo = appBasicInfo;
 				mainWindow.appSessionHash = appSessionHash;
 				mainWindow.assetChainPorts = require('./routes/ports.js');
