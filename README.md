@@ -2,7 +2,7 @@
 Desktop App for SuperNET DAPPs
 
 #### For Developers
-You must have `node.js` and `npm` installed on your machine.
+You must have `node.js`, `npm` and `webpack` (npm install webpack@3.0.0) installed on your machine.
 
 Use install.sh script or
 
@@ -42,6 +42,8 @@ npm install electron-prebuilt -g
 ```
 
 #### **Build the Wallet-App**
+You need to install webpack and webpack-cli first.
+
 Refer to the original [electron-packager](https://github.com/electron-userland/electron-packager) repository for more detailed information.
 
 ##### Linux
