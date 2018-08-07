@@ -8,7 +8,8 @@
     "start": "electron .",
     "make-patch": "./make-patch.sh",
     "make-rpm": "node make-rpm.js",
-    "make-deb": "node make-deb.js"
+    "make-deb": "node make-deb.js",
+    "build-linux": "./build-linux.sh"
   },
   "repository": "https://github.com/KomodoPlatform/Agama/",
   "homepage": "http://komodoplatform.com",
