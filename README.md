@@ -4,12 +4,14 @@ Desktop App for SuperNET DAPPs
 #### For Developers
 You must have `node.js` and `npm` installed on your machine.
 
+Use install.sh script or
+
 Clone Agama Desktop App with EasyDEX-GUI submodule
 ```shell
-1) git clone https://github.com/supernetorg/agama --recursive --branch pkg_automation_electrum --single-branch
-with this command you git clone agama - but explicitly just the pkg_automation_electrum branch (therefore --single-branch) which we also use for the release packages.
+1) git clone https://github.com/komodoplatform/agama --recursive --branch dev --single-branch
+with this command you git clone agama - but explicitly just the dev branch (therefore --single-branch) which we also use for the release packages.
 2) cd agama && cd gui/EasyDEX-GUI/
-3) git checkout electrum && git pull origin electrum
+3) git checkout dev && git pull origin dev
 4) npm install && npm install webpack
 5) ./binary_artifacts.sh
 6) npm start in project root folder
