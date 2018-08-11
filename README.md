@@ -47,24 +47,24 @@ You need to install webpack and webpack-cli first.
 Refer to the original [electron-packager](https://github.com/electron-userland/electron-packager) repository for more detailed information.
 
 ##### Linux
-Change directory to iguana and execute the following command to build the Linux app
+Change directory to agama and execute the following command to build the Linux app
 ```shell
-cd iguana
+cd agama
 electron-packager . --platform=linux --arch=x64 --icon=assets/icons/agama_icons/128x128.png --out=build/ --buildVersion=VERSION_NUMBER_HERE --ignore=assets/bin/win64 --ignore=assets/bin/osx --overwrite
 ```
 change architecture build parameter to ```--arch=x32``` for 32 bit build
 
 ##### OSX
-Change directory to iguana and execute the following command to build the OSX app
+Change directory to agama and execute the following command to build the OSX app
 ```shell
-cd iguana
+cd agama
 electron-packager . --platform=darwin --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.icns --out=build/ --buildVersion=VERSION_NUMBER_HERE --ignore=assets/bin/win64 --ignore=assets/bin/linux64 --overwrite
 ```
 
 ##### Windows
-Change directory to iguana and execute the following command to build the Windows app
+Change directory to agama and execute the following command to build the Windows app
 ```shell
-dir iguana
+dir agama
 electron-packager . --platform=win32 --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.ico --out=build/ --buildVersion=VERSION_NUMBER_HERE --ignore=assets/bin/osx --ignore=assets/bin/linux64 --overwrite
 
 # If generating 32bit desktop package
@@ -79,7 +79,7 @@ change architecture build parameter to ```--arch=x64``` for 64 bit build
 ## Troubleshooting Instructions
 
 ### Windows DLL issues
-On Windows it's noticed iguana.exe complains about `VCRUNTIME140D.DLL` and `ucrtbased.dll` file.
+On Windows it's noticed agama.exe complains about `VCRUNTIME140D.DLL` and `ucrtbased.dll` file.
 
 Please see **windeps** directory and README file for instructions to install the required DLL files on Windows, and then try again running Agama App.
 
