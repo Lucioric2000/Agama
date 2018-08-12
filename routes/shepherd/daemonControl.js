@@ -126,7 +126,7 @@ module.exports = (shepherd) => {
       shepherd.writeLog(`selected data: ${data}`);
 
       // datadir case, check if komodo/chain folder exists
-      if (shepherd.appConfig.dataDir.length &&
+      if (shepherd.appConfig.native.dataDir.length &&
           data.ac_name !== 'komodod') {
         const _dir = data.ac_name !== 'komodod' ? `${shepherd.komodoDir}/${data.ac_name}` : shepherd.komodoDir;
 
@@ -179,7 +179,7 @@ module.exports = (shepherd) => {
         portscanner.checkPortStatus(_port, '127.0.0.1', (error, status) => {
           // Status is 'open' if currently in use or 'closed' if available
           if (status === 'closed' ||
-              !shepherd.appConfig.stopNativeDaemonsOnQuit) {
+              !shepherd.appConfig.native.stopNativeDaemonsOnQuit) {
             // start komodod via exec
             const _customParamDict = {
               silent: '&',
@@ -200,8 +200,8 @@ module.exports = (shepherd) => {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}${data.ac_custom_param_value}`;
             }
 
-            if (shepherd.appConfig.dataDir.length) {
-              _customParam = _customParam + ' -datadir=' + shepherd.appConfig.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
+            if (shepherd.appConfig.native.dataDir.length) {
+              _customParam = _customParam + ' -datadir=' + shepherd.appConfig.native.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
             }
 
             shepherd.log(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
@@ -227,7 +227,7 @@ module.exports = (shepherd) => {
                 shepherd.log(`error accessing ${_daemonLogName}, doesnt exist or another proc is already running`);
               }
 
-              if (!shepherd.appConfig.stopNativeDaemonsOnQuit) {
+              if (!shepherd.appConfig.native.stopNativeDaemonsOnQuit) {
                 let spawnOut = fs.openSync(_daemonLogName, 'a');
                 let spawnErr = fs.openSync(_daemonLogName, 'a');
 
@@ -811,7 +811,7 @@ module.exports = (shepherd) => {
             portscanner.checkPortStatus(_port, '127.0.0.1', (error, status) => {
               // Status is 'open' if currently in use or 'closed' if available
               if (status === 'open' &&
-                  shepherd.appConfig.stopNativeDaemonsOnQuit) {
+                  shepherd.appConfig.native.stopNativeDaemonsOnQuit) {
                 if (!skipError) {
                   shepherd.log(`komodod service start error at port ${_port}, reason: port is closed`);
                   shepherd.writeLog(`komodod service start error at port ${_port}, reason: port is closed`);

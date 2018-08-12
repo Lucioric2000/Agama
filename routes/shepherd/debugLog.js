@@ -10,21 +10,21 @@ module.exports = (shepherd) => {
    */
   shepherd.post('/debuglog', (req, res) => {
     if (shepherd.checkToken(req.body.token)) {
+      const _platform = os.platform();
       let _herd = req.body.herdname;
       let _ac = req.body.ac;
       let _lastNLines = req.body.lastLines;
       let _location;
-      const _platform = os.platform();
 
       switch (_platform) {
         case 'darwin':
-          shepherd.komodoDir = shepherd.appConfig.dataDir.length ? shepherd.appConfig.dataDir : `${process.env.HOME}/Library/Application Support/Komodo`;
+          shepherd.komodoDir = shepherd.appConfig.native.dataDir.length ? shepherd.appConfig.native.dataDir : `${process.env.HOME}/Library/Application Support/Komodo`;
           break;
         case 'linux':
-          shepherd.komodoDir = shepherd.appConfig.dataDir.length ? shepherd.appConfig.dataDir : `${process.env.HOME}/.komodo`;
+          shepherd.komodoDir = shepherd.appConfig.native.dataDir.length ? shepherd.appConfig.native.dataDir : `${process.env.HOME}/.komodo`;
           break;
         case 'win32':
-          shepherd.komodoDir = shepherd.appConfig.dataDir.length ? shepherd.appConfig.dataDir : `${process.env.APPDATA}/Komodo`;
+          shepherd.komodoDir = shepherd.appConfig.native.dataDir.length ? shepherd.appConfig.native.dataDir : `${process.env.APPDATA}/Komodo`;
           shepherd.komodoDir = path.normalize(shepherd.komodoDir);
           break;
       }

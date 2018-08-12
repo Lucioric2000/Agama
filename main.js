@@ -424,7 +424,7 @@ function createWindow(status, hideLoadingWindow) {
 						shepherd.log('Closing Main Window...');
 						shepherd.writeLog('exiting app...');
 
-						shepherd.quitKomodod(appConfig.cliStopTimeout);
+						shepherd.quitKomodod(appConfig.native.cliStopTimeout);
 
 						const result = 'Closing daemons: done';
 
@@ -475,11 +475,11 @@ function createWindow(status, hideLoadingWindow) {
 					shepherd.killRogueProcess('marketmaker');
 				}
 				if (!Object.keys(shepherd.coindInstanceRegistry).length ||
-						!appConfig.stopNativeDaemonsOnQuit) {
+						!appConfig.native.stopNativeDaemonsOnQuit) {
 					closeApp();
 				} else {
 					createAppCloseWindow();
-					shepherd.quitKomodod(appConfig.cliStopTimeout);
+					shepherd.quitKomodod(appConfig.native.cliStopTimeout);
 					_appClosingInterval = setInterval(() => {
 						if (!Object.keys(shepherd.coindInstanceRegistry).length) {
 							closeApp();

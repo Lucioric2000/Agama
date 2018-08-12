@@ -9,7 +9,7 @@ module.exports = (shepherd) => {
     shepherd.lockDownAddCoin = true;
 
     for (let key in shepherd.coindInstanceRegistry) {
-      if (shepherd.appConfig.stopNativeDaemonsOnQuit) {
+      if (shepherd.appConfig.native.stopNativeDaemonsOnQuit) {
         const chain = key !== 'komodod' ? key : null;
         let _coindQuitCmd = shepherd.komodocliBin;
 
@@ -31,14 +31,14 @@ module.exports = (shepherd) => {
 
             _arg.push(`-ac_name=${chain}`);
 
-            if (shepherd.appConfig.dataDir.length) {
-              _arg.push(`-datadir=${shepherd.appConfig.dataDir + (key !== 'komodod' ? '/' + key : '')}`);
+            if (shepherd.appConfig.native.dataDir.length) {
+              _arg.push(`-datadir=${shepherd.appConfig.native.dataDir + (key !== 'komodod' ? '/' + key : '')}`);
             }
           } else if (
             key === 'komodod' &&
-            shepherd.appConfig.dataDir.length
+            shepherd.appConfig.native.dataDir.length
           ) {
-            _arg.push(`-datadir=${shepherd.appConfig.dataDir}`);
+            _arg.push(`-datadir=${shepherd.appConfig.native.dataDir}`);
           }
 
           _arg.push('stop');
@@ -100,11 +100,11 @@ module.exports = (shepherd) => {
 
         _arg.push(`-ac_name=${_chain}`);
 
-        if (shepherd.appConfig.dataDir.length) {
-          _arg.push(`-datadir=${shepherd.appConfig.dataDir + (_chain ? '/' + _chain : '')}`);
+        if (shepherd.appConfig.native.dataDir.length) {
+          _arg.push(`-datadir=${shepherd.appConfig.native.dataDir + (_chain ? '/' + _chain : '')}`);
         }
-      } else if (!_chain && shepherd.appConfig.dataDir.length) {
-        _arg.push(`-datadir=${shepherd.appConfig.dataDir}`);
+      } else if (!_chain && shepherd.appConfig.native.dataDir.length) {
+        _arg.push(`-datadir=${shepherd.appConfig.native.dataDir}`);
       }
 
       _arg.push('stop');

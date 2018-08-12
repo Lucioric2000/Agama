@@ -110,8 +110,8 @@ module.exports = (shepherd) => {
 
             let _arg = (_chain ? ' -ac_name=' + _chain : '') + ' ' + _cmd + (typeof _params === 'object' ? _params.join(' ') : _params);
 
-            if (shepherd.appConfig.dataDir.length) {
-              _arg = `${_arg} -datadir=${shepherd.appConfig.dataDir  + (_chain ? '/' + key : '')}`;
+            if (shepherd.appConfig.native.dataDir.length) {
+              _arg = `${_arg} -datadir=${shepherd.appConfig.native.dataDir  + (_chain ? '/' + key : '')}`;
             }
 
             exec(`"${_coindCliBin}" ${_arg}`, (error, stdout, stderr) => {
@@ -297,8 +297,8 @@ module.exports = (shepherd) => {
 
           let _arg = (_chain ? ' -ac_name=' + _chain : '') + ' ' + _cmd + _params;
 
-          if (shepherd.appConfig.dataDir.length) {
-            _arg = `${_arg} -datadir=${shepherd.appConfig.dataDir  + (_chain ? '/' + key : '')}`;
+          if (shepherd.appConfig.native.dataDir.length) {
+            _arg = `${_arg} -datadir=${shepherd.appConfig.native.dataDir  + (_chain ? '/' + key : '')}`;
           }
 
           _arg = _arg.trim().split(' ');

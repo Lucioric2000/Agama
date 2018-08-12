@@ -45,6 +45,44 @@ module.exports = (shepherd) => {
       };
 
       if (localAppConfig) {
+        // update config to v2.42 compatible
+        if (!JSON.parse(localAppConfig).native) {
+          let _localAppConfig = JSON.parse(localAppConfig);
+
+          _localAppConfig['native'] = {
+            dataDir: defaultConf.native.dataDir,
+            cliStopTimeout: defaultConf.native.cliStopTimeout,
+            failedRPCAttemptsThreshold: defaultConf.native.failedRPCAttemptsThreshold,
+            stopNativeDaemonsOnQuit: defaultConf.native.stopNativeDaemonsOnQuit,
+            rpc2cli: defaultConf.native.rpc2cli,
+          };
+
+          if (_localAppConfig.hasOwnProperty('dataDir')) {
+            _localAppConfig.native.dataDir = _localAppConfig.dataDir;
+            delete _localAppConfig.dataDir;
+          }
+          if (_localAppConfig.hasOwnProperty('cliStopTimeout')) {
+            _localAppConfig.native.cliStopTimeout = _localAppConfig.cliStopTimeout;
+            delete _localAppConfig.cliStopTimeout;
+          }
+          if (_localAppConfig.hasOwnProperty('failedRPCAttemptsThreshold')) {
+            _localAppConfig.native.failedRPCAttemptsThreshold = _localAppConfig.failedRPCAttemptsThreshold;
+            delete _localAppConfig.failedRPCAttemptsThreshold;
+          }
+          if (_localAppConfig.hasOwnProperty('stopNativeDaemonsOnQuit')) {
+            _localAppConfig.native.stopNativeDaemonsOnQuit = _localAppConfig.stopNativeDaemonsOnQuit;
+            delete _localAppConfig.stopNativeDaemonsOnQuit;
+          }
+          if (_localAppConfig.hasOwnProperty('rpc2cli')) {
+            _localAppConfig.native.rpc2cli = _localAppConfig.rpc2cli;
+            delete _localAppConfig.rpc2cli;
+          }
+
+          console.warn('update config to v2.42 compatible');
+          localAppConfig = JSON.stringify(_localAppConfig);
+          shepherd.saveLocalAppConf(_localAppConfig);
+        }
+
         const compareConfigs = compareJSON(defaultConf, JSON.parse(localAppConfig));
 
         if (Object.keys(compareConfigs).length) {

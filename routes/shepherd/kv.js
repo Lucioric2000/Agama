@@ -59,7 +59,7 @@ const KV_CONTENT_HEADER_SIZE = [
   128, // title
 ];
 
-const KV_MAX_CONTENT_SIZE = 4096;
+const KV_MAX_CONTENT_SIZE = 7096;
 
 module.exports = (shepherd) => {
   shepherd.kvEncode = (data) => {
