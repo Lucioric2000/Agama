@@ -9,7 +9,7 @@ module.exports = (shepherd) => {
         network: req.query.network,
         coin: req.query.coin,
         address: req.query.address,
-        maxlength: 400,
+        maxlength: shepherd.appConfig.spv.csvListtransactionsMaxLength,
         full: true,
       })
       .then((txhistory) => {
@@ -65,7 +65,7 @@ module.exports = (shepherd) => {
         cmd: 'listtransactions',
         params: [
           '*',
-          1000,
+          shepherd.appConfig.native.csvListtransactionsMaxLength,
           0
         ],
         rpc2cli: req.query.rpc2cli || false,

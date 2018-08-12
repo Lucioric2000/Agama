@@ -73,7 +73,7 @@ module.exports = (shepherd) => {
         coin: req.query.coin,
         address: req.query.address,
         kv: req.query.kv,
-        maxlength: req.query.maxlength,
+        maxlength: shepherd.appConfig.spv.listtransactionsMaxLength,
         full: req.query.full,
       })
       .then((txhistory) => {

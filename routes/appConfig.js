@@ -28,6 +28,8 @@ const appConfig = {
       customServers: false,
       syncServerListFromKv: false,
       allowCustomFees: false,
+      listtransactionsMaxLength: 10,
+      csvListtransactionsMaxLength: 400,
     },
     native: {
       rpc2cli: false,
@@ -35,6 +37,8 @@ const appConfig = {
       failedRPCAttemptsThreshold: 10,
       stopNativeDaemonsOnQuit: true,
       dataDir: '',
+      listtransactionsMaxLength: 300,
+      csvListtransactionsMaxLength: 1000,
     },
     coinControl: false,
     // darkmode: false,
@@ -168,13 +172,24 @@ const appConfig = {
       syncServerListFromKv: {
         display: true,
         displayName: 'Sync electrum servers list from KV',
-        info: 'Warning, this is highly experimental feature!',
+        info: 'Warning: this is highly experimental feature!',
         type: 'boolean',
       },
       allowCustomFees: {
         display: true,
         displayName: 'Allow custom fees',
         type: 'boolean',
+      },
+      listtransactionsMaxLength: {
+        display: true,
+        displayName: 'Max transactions history count',
+        type: 'number',
+      },
+      csvListtransactionsMaxLength: {
+        display: true,
+        displayName: 'CSV export max transactions history count',
+        info: 'Warning: keep this settings option within a sane range of values (default value: 400).<br/>The higher the value the more time it will require to process transactions history.<br/>If multiple transactions are considerably large it may froze the app completely.',
+        type: 'number',
       },
     },
     native: {
@@ -209,6 +224,17 @@ const appConfig = {
         display: true,
         displayName: 'Failed RPC connect attempts threshold',
         info: 'Number of allowed consequent RPC connect failures before the app marks native coin daemon as not running properly',
+        type: 'number',
+      },
+      listtransactionsMaxLength: {
+        display: true,
+        displayName: 'Max transactions history count',
+        type: 'number',
+      },
+      csvListtransactionsMaxLength: {
+        display: true,
+        displayName: 'CSV export max transactions history count',
+        info: 'Warning: keep this settings option within a sane range of values (default value: 1000).<br/>The higher the value the more time it will require to process transactions history.',
         type: 'number',
       },
     },

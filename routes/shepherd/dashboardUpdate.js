@@ -288,7 +288,7 @@ module.exports = (shepherd) => {
         if (_call === 'listtransactions') {
           _params = [
             '*',
-            300,
+            shepherd.appConfig.native.listtransactionsMaxLength,
             0
           ];
         }
