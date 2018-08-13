@@ -252,6 +252,7 @@ module.exports = (shepherd) => {
                     shepherd.log(`exec error: ${error}`);
                     shepherd.writeLog(`exec error: ${error}`);
 
+                    // TODO: check other edge cases
                     if (error.toString().indexOf('using -reindex') > -1) {
                       shepherd.io.emit('service', {
                         komodod: {

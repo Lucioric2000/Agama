@@ -96,7 +96,7 @@ module.exports = (shepherd) => {
   });
 
   shepherd.get('/electrum/coins/server/set', (req, res, next) => {
-    const _coin = req.query.coin;
+    const _coin = req.query.coin.toLowerCase();
 
     if (shepherd.checkToken(req.query.token)) {
       shepherd.electrumCoins[_coin].server = {
@@ -134,9 +134,11 @@ module.exports = (shepherd) => {
 
   shepherd.get('/electrum/servers/test', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const ecl = shepherd.ecl(null, { port: req.query.port, ip: req.query.address, proto: req.query.proto });
-      //const ecl = new shepherd.electrumJSCore(null, { port: req.query.port, ip: req.query.address, proto: req.query.proto }); // tcp or tls
-      //const ecl = new shepherd.electrumJSCore(req.query.port, req.query.address, 'tcp'); // tcp or tls
+      const ecl = shepherd.ecl(null, {
+        port: req.query.port,
+        ip: req.query.address,
+        proto: req.query.proto,
+      });
 
       ecl.connect();
       ecl.serverVersion()
@@ -154,13 +156,36 @@ module.exports = (shepherd) => {
           };
 
           res.end(JSON.stringify(successObj));
-        } else {
-          const successObj = {
+        } else if (
+          serverData &&
+          typeof serverData === 'object'
+        ) {
+          for (let i = 0; i < serverData.length; i++) {
+            if (serverData[i].indexOf('Electrum') > -1) {
+              const successObj = {
+                msg: 'success',
+                result: true,
+              };
+
+              res.end(JSON.stringify(successObj));
+              break;
+              return true;
+            }
+          }
+
+          const retObj = {
             msg: 'error',
             result: false,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
+        } else {
+          const retObj = {
+            msg: 'error',
+            result: false,
+          };
+
+          res.end(JSON.stringify(retObj));
         }
       });
     } else {
@@ -176,7 +201,12 @@ module.exports = (shepherd) => {
   // remote api switch wrapper
   shepherd.ecl = (network, customElectrum) => {
     if (!network) {
-      return new shepherd.electrumJSCore(customElectrum.port, customElectrum.ip, customElectrum.proto, shepherd.appConfig.spv.socketTimeout);
+      return new shepherd.electrumJSCore(
+        customElectrum.port,
+        customElectrum.ip,
+        customElectrum.proto,
+        shepherd.appConfig.spv.socketTimeout
+      );
     } else {
       let _currentElectrumServer;
       network = network.toLowerCase();
@@ -212,16 +242,7 @@ module.exports = (shepherd) => {
             proto: shepherd.electrumCoins[network] && shepherd.electrumCoins[network].server.proto || _currentElectrumServer.proto,
           };
 
-          /*if (customElectrum) {
-            console.log('custom electrum');
-            console.log(customElectrum);
-          }
-
-          console.log('electrum');
-          console.log(electrum);*/
-
           return new shepherd.electrumJSCore(electrum.port, electrum.ip, electrum.proto, shepherd.appConfig.spv.socketTimeout);
-          //return new shepherd.electrumJSCore(shepherd.electrumServers[network].port, shepherd.electrumServers[network].address, shepherd.electrumServers[network].proto); // tcp or tls
         }
       }
     }
