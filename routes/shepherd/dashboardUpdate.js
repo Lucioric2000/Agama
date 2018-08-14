@@ -165,7 +165,12 @@ module.exports = (shepherd) => {
                   return new Promise((resolve, reject) => {
                     _bitcoinRPC(coin, 'z_getbalance', [_address])
                     .then((__json) => {
-                      __json = JSON.parse(__json);
+                      try {
+                        __json = JSON.parse(__json);
+                      } catch (e) {
+                        __json = { error: 'can\'t parse json' };
+                      }
+
                       if (__json &&
                           __json.error) {
                         resolve(0);

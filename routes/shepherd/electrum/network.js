@@ -168,6 +168,7 @@ module.exports = (shepherd) => {
               };
 
               res.end(JSON.stringify(successObj));
+
               break;
               return true;
             }

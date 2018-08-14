@@ -118,6 +118,28 @@ module.exports = (shepherd) => {
     }
   });
 
+  shepherd.get('/electrum/seedtowif', (req, res, next) => {
+    if (shepherd.checkToken(req.query.token)) {
+      let keys = shepherd.seedToWif(req.query.seed, req.query.network.toLowerCase(), req.query.iguana);
+
+      const successObj = {
+        msg: 'success',
+        result: {
+          keys,
+        },
+      };
+
+      res.end(JSON.stringify(successObj));
+    } else {
+      const errorObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(errorObj));
+    }
+  });
+
   shepherd.getCoinByPub = (address) => {
     const _skipNetworks = [
       'btc',
