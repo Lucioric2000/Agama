@@ -24,7 +24,7 @@
   "author": "SuperNET Team",
   "license": "MIT",
   "devDependencies": {
-    "electron": "2.0.0"
+    "electron": "2.0.8"
   },
   "dependencies": {
     "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
@@ -41,7 +41,7 @@
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",
     "coinselect": "github:bitcoinjs/coinselect",
-    "electron": "2.0.0",
+    "electron": "2.0.8",
     "express": "^4.14.0",
     "fix-path": "^2.1.0",
     "fs-extra": "^4.0.2",
