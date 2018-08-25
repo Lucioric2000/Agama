@@ -26,7 +26,7 @@ curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases/latest \
   | cut -d '"' -f 4 \
   | wget -qi -
 unzip komodo_win_master.zip
-mv kmd_bins_win bins_win/
+mv komodo_win_master bins_win/
 cd ..
 echo =========================================
 echo
