@@ -46,17 +46,17 @@ if [ "$checksum" = "4bb33149e4322d6d4a4c9ea41c3baa33ce125c4f2ccb7e7336fcd4f295ea
     exit 0
 fi
 
-echo Moving legacy libs to assets/bin
-wget https://supernetorg.bintray.com/misc/libs_legacy_osx.zip
-checksum=`shasum -a 256 libs_legacy_osx.zip | awk '{ print $1 }'`
-if [ "$checksum" = "e9474aa243694a2d4c87fccc443e4b16a9a5172a24da76af9e5ecddd006649bb" ]; then
-    echo "Checksum is correct."
-    unzip libs_legacy_osx.zip
-    cp -rvf libs_legacy_osx/* assets/bin/osx/.
-  else
-    echo "Checksum is incorrect!"
-    exit 0
-fi
+# echo Moving legacy libs to assets/bin
+# wget https://supernetorg.bintray.com/misc/libs_legacy_osx.zip
+# checksum=`shasum -a 256 libs_legacy_osx.zip | awk '{ print $1 }'`
+# if [ "$checksum" = "e9474aa243694a2d4c87fccc443e4b16a9a5172a24da76af9e5ecddd006649bb" ]; then
+#     echo "Checksum is correct."
+#     unzip libs_legacy_osx.zip
+#     cp -rvf libs_legacy_osx/* assets/bin/osx/.
+#   else
+#     echo "Checksum is incorrect!"
+#     exit 0
+# fi
 
 echo =========================================
 echo Moving Windows binaries to assets/bin/win64/
