@@ -140,7 +140,7 @@ module.exports = (shepherd) => {
   shepherd.saveKvElectrumServersCache = (list) => {
     const kvElectrumServersListFileName = `${shepherd.agamaDir}/kvElectrumServersCache.json`;
 
-    _fs.access(shepherd.agamaDir, shepherd.fs.constants.R_OK, (err) => {
+    _fs.access(shepherd.agamaDir, fs.constants.R_OK, (err) => {
       if (!err) {
         const FixFilePermissions = () => {
           return new Promise((resolve, reject) => {

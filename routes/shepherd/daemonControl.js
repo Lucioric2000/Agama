@@ -955,13 +955,13 @@ module.exports = (shepherd) => {
 
   shepherd.setConfKMD = (isChips) => {
     // check if kmd conf exists
-    _fs.access(isChips ? `${shepherd.chipsDir}/chips.conf` : `${shepherd.komodoDir}/komodo.conf`, shepherd.fs.constants.R_OK, (err) => {
+    _fs.access(isChips ? `${shepherd.chipsDir}/chips.conf` : `${shepherd.komodoDir}/komodo.conf`, fs.constants.R_OK, (err) => {
       if (err) {
         shepherd.log(isChips ? 'creating chips conf' : 'creating komodo conf');
         shepherd.writeLog(isChips ? `creating chips conf in ${shepherd.chipsDir}/chips.conf` : `creating komodo conf in ${shepherd.komodoDir}/komodo.conf`);
         setConf(isChips ? 'chipsd' : 'komodod');
       } else {
-        const _confSize = shepherd.fs.lstatSync(isChips ? `${shepherd.chipsDir}/chips.conf` : `${shepherd.komodoDir}/komodo.conf`);
+        const _confSize = fs.lstatSync(isChips ? `${shepherd.chipsDir}/chips.conf` : `${shepherd.komodoDir}/komodo.conf`);
 
         if (_confSize.size === 0) {
           shepherd.log(isChips ? 'err: chips conf file is empty, creating chips conf' : 'err: komodo conf file is empty, creating komodo conf');

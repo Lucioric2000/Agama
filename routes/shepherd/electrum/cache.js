@@ -27,7 +27,7 @@ module.exports = (shepherd) => {
   shepherd.saveLocalSPVCache = () => {
     let spvCacheFileName = `${shepherd.agamaDir}/spv-cache.json`;
 
-    _fs.access(shepherd.agamaDir, shepherd.fs.constants.R_OK, (err) => {
+    _fs.access(shepherd.agamaDir, fs.constants.R_OK, (err) => {
       if (!err) {
         const FixFilePermissions = () => {
           return new Promise((resolve, reject) => {
@@ -96,6 +96,54 @@ module.exports = (shepherd) => {
       res.end(JSON.stringify(errorObj));
     }
   });
+
+  shepherd.getTransaction = (txid, network, ecl) => {
+    return new Promise((resolve, reject) => {
+      if (!shepherd.electrumCache[network]) {
+        shepherd.electrumCache[network] = {};
+      }
+      if (!shepherd.electrumCache[network].tx) {
+        shepherd.electrumCache[network].tx = {};
+      }
+
+      if (!shepherd.electrumCache[network].tx[txid]) {
+        shepherd.log(`electrum raw input tx ${txid}`, true);
+
+        ecl.blockchainTransactionGet(txid)
+        .then((_rawtxJSON) => {
+          shepherd.electrumCache[network].tx[txid] = _rawtxJSON;
+          resolve(_rawtxJSON);
+        });
+      } else {
+        shepherd.log(`electrum cached raw input tx ${txid}`, true);
+        resolve(shepherd.electrumCache[network].tx[txid]);
+      }
+    });
+  }
+
+  shepherd.getBlockHeader = (height, network, ecl) => {
+    return new Promise((resolve, reject) => {
+      if (!shepherd.electrumCache[network]) {
+        shepherd.electrumCache[network] = {};
+      }
+      if (!shepherd.electrumCache[network].blockHeader) {
+        shepherd.electrumCache[network].blockHeader = {};
+      }
+
+      if (!shepherd.electrumCache[network].blockHeader[height]) {
+        shepherd.log(`electrum raw block ${height}`, true);
+
+        ecl.blockchainBlockGetHeader(height)
+        .then((_rawtxJSON) => {
+          shepherd.electrumCache[network].blockHeader[height] = _rawtxJSON;
+          resolve(_rawtxJSON);
+        });
+      } else {
+        shepherd.log(`electrum cached raw block ${height}`, true);
+        resolve(shepherd.electrumCache[network].blockHeader[height]);
+      }
+    });
+  }
 
   return shepherd;
 };

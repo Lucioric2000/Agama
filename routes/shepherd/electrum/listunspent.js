@@ -34,7 +34,7 @@ module.exports = (shepherd) => {
                 } else {
                   Promise.all(_utxo.map((_utxoItem, index) => {
                     return new Promise((resolve, reject) => {
-                      shepherd.getTransaction(_utxoItem['tx_hash'], network, ecl)
+                      shepherd.getTransaction(_utxoItem.tx_hash, network, ecl)
                       .then((_rawtxJSON) => {
                         shepherd.log('electrum gettransaction ==>', true);
                         shepherd.log(`${index} | ${(_rawtxJSON.length - 1)}`, true);
@@ -61,8 +61,8 @@ module.exports = (shepherd) => {
                             }
 
                             let _resolveObj = {
-                              txid: _utxoItem['tx_hash'],
-                              vout: _utxoItem['tx_pos'],
+                              txid: _utxoItem.tx_hash,
+                              vout: _utxoItem.tx_pos,
                               address,
                               amount: Number(_utxoItem.value) * 0.00000001,
                               amountSats: _utxoItem.value,
@@ -78,7 +78,7 @@ module.exports = (shepherd) => {
                             if (verify) {
                               shepherd.verifyMerkleByCoin(
                                 shepherd.findCoinName(network),
-                                _utxoItem['tx_hash'],
+                                _utxoItem.tx_hash,
                                 _utxoItem.height
                               )
                               .then((verifyMerkleRes) => {
@@ -95,8 +95,8 @@ module.exports = (shepherd) => {
                             }
                           } else {
                             let _resolveObj = {
-                              txid: _utxoItem['tx_hash'],
-                              vout: _utxoItem['tx_pos'],
+                              txid: _utxoItem.tx_hash,
+                              vout: _utxoItem.tx_pos,
                               address,
                               amount: Number(_utxoItem.value) * 0.00000001,
                               amountSats: _utxoItem.value,
@@ -109,7 +109,7 @@ module.exports = (shepherd) => {
                             if (verify) {
                               shepherd.verifyMerkleByCoin(
                                 shepherd.findCoinName(network),
-                                _utxoItem['tx_hash'],
+                                _utxoItem.tx_hash,
                                 _utxoItem.height
                               )
                               .then((verifyMerkleRes) => {

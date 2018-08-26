@@ -1,4 +1,5 @@
 const fs = require('fs-extra');
+const os = require('os');
 
 const formatBytes = (bytes, decimals) => {
   if (bytes === 0) {
@@ -26,14 +27,14 @@ const formatBytes = (bytes, decimals) => {
 module.exports = (shepherd) => {
   shepherd.SystemInfo = () => {
     const os_data = {
-      totalmem_bytes: shepherd.os.totalmem(),
-      totalmem_readable: formatBytes(shepherd.os.totalmem()),
-      arch: shepherd.os.arch(),
-      cpu: shepherd.os.cpus()[0].model,
-      cpu_cores: shepherd.os.cpus().length,
-      platform: shepherd.os.platform(),
-      os_release: shepherd.os.release(),
-      os_type: shepherd.os.type(),
+      totalmem_bytes: os.totalmem(),
+      totalmem_readable: formatBytes(os.totalmem()),
+      arch: os.arch(),
+      cpu: os.cpus()[0].model,
+      cpu_cores: os.cpus().length,
+      platform: os.platform(),
+      os_release: os.release(),
+      os_type: os.type(),
     };
 
     return os_data;

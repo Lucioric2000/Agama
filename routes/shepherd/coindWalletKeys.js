@@ -17,7 +17,7 @@ module.exports = (shepherd) => {
       _walletDatLocation = chain === 'CHIPS' ? `${shepherd.chipsDir}/wallet.dat` : _walletDatLocation;
 
       try {
-        _fs.access(_walletDatLocation, shepherd.fs.constants.R_OK, (err) => {
+        _fs.access(_walletDatLocation, fs.constants.R_OK, (err) => {
           if (err) {
             shepherd.log(`error reading ${_walletDatLocation}`);
             successObj = {

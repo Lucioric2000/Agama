@@ -3,25 +3,6 @@ const express = require('express');
 const app = electron.app;
 let shepherd = express.Router();
 
-shepherd.path = require('path');
-shepherd.os = require('os');
-shepherd.fsnode = require('fs');
-shepherd.fs = require('fs-extra');
-shepherd._fs = require('graceful-fs');
-shepherd.md5 = require('./md5.js');
-shepherd.request = require('request');
-shepherd.portscanner = require('portscanner');
-shepherd.AdmZip = require('adm-zip');
-shepherd.remoteFileSize = require('remote-file-size');
-shepherd.Promise = require('bluebird');
-shepherd.exec = require('child_process').exec;
-shepherd.execFile = require('child_process').execFile;
-shepherd.sha256 = require('sha256');
-shepherd.bitcoinJS = require('bitcoinjs-lib');
-shepherd.coinSelect = require('coinselect');
-shepherd.fixPath = require('fix-path');
-shepherd.crypto = require('crypto');
-
 shepherd.setconf = require('../private/setconf.js');
 shepherd.nativeCoind = require('./nativeCoind.js');
 shepherd.nativeCoindList = {};
@@ -112,12 +93,13 @@ shepherd = require('./shepherd/electrum/cache.js')(shepherd);
 shepherd = require('./shepherd/electrum/proxy.js')(shepherd);
 shepherd = require('./shepherd/electrum/servers.js')(shepherd);
 shepherd = require('./shepherd/electrum/csv.js')(shepherd);
+shepherd = require('./shepherd/electrum/utils.js')(shepherd);
 
 // dex
-shepherd = require('./shepherd/dex/coind.js')(shepherd);
+/*shepherd = require('./shepherd/dex/coind.js')(shepherd);
 shepherd = require('./shepherd/dex/mmControl.js')(shepherd);
 shepherd = require('./shepherd/dex/mmRequest.js')(shepherd);
-shepherd = require('./shepherd/dex/electrumServersList.js')(shepherd);
+shepherd = require('./shepherd/dex/electrumServersList.js')(shepherd);*/
 
 // core
 shepherd = require('./shepherd/addCoinShortcuts.js')(shepherd);

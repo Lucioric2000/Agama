@@ -74,15 +74,15 @@ module.exports = (shepherd) => {
           shepherd.getBlockHeader(height, network, ecl)
           .then((blockInfo) => {
             if (blockInfo &&
-                blockInfo['merkle_root']) {
+                blockInfo.merkle_root) {
               ecl.close();
               shepherd.log('blockinfo =>', true);
               shepherd.log(blockInfo, true);
-              shepherd.log(blockInfo['merkle_root'], true);
+              shepherd.log(blockInfo.merkle_root, true);
 
               if (blockInfo &&
-                  blockInfo['merkle_root']) {
-                if (_res === blockInfo['merkle_root']) {
+                  blockInfo.merkle_root) {
+                if (_res === blockInfo.merkle_root) {
                   resolve(true);
                 } else {
                   resolve(false);

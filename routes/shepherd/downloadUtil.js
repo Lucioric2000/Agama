@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const fs = require('fs-extra');
+const request = require('request');
 
 module.exports = (shepherd) => {
   /**
@@ -11,7 +12,7 @@ module.exports = (shepherd) => {
       let receivedBytes = 0;
       let totalBytes = 0;
 
-      let req = shepherd.request({
+      const req = request({
         method: 'GET',
         uri: configuration.remoteFile,
         agentOptions: {

@@ -4,68 +4,6 @@ const Promise = require('bluebird');
 // TODO: add z -> pub, pub -> z flag for zcash forks
 
 module.exports = (shepherd) => {
-  shepherd.sortTransactions = (transactions, sortBy) => {
-    return transactions.sort((b, a) => {
-      if (a[sortBy ? sortBy : 'height'] < b[sortBy ? sortBy : 'height']) {
-        return -1;
-      }
-
-      if (a[sortBy ? sortBy : 'height'] > b[sortBy ? sortBy : 'height']) {
-        return 1;
-      }
-
-      return 0;
-    });
-  }
-
-  shepherd.getTransaction = (txid, network, ecl) => {
-    return new Promise((resolve, reject) => {
-      if (!shepherd.electrumCache[network]) {
-        shepherd.electrumCache[network] = {};
-      }
-      if (!shepherd.electrumCache[network].tx) {
-        shepherd.electrumCache[network]['tx'] = {};
-      }
-
-      if (!shepherd.electrumCache[network].tx[txid]) {
-        shepherd.log(`electrum raw input tx ${txid}`, true);
-
-        ecl.blockchainTransactionGet(txid)
-        .then((_rawtxJSON) => {
-          shepherd.electrumCache[network].tx[txid] = _rawtxJSON;
-          resolve(_rawtxJSON);
-        });
-      } else {
-        shepherd.log(`electrum cached raw input tx ${txid}`, true);
-        resolve(shepherd.electrumCache[network].tx[txid]);
-      }
-    });
-  }
-
-  shepherd.getBlockHeader = (height, network, ecl) => {
-    return new Promise((resolve, reject) => {
-      if (!shepherd.electrumCache[network]) {
-        shepherd.electrumCache[network] = {};
-      }
-      if (!shepherd.electrumCache[network].blockHeader) {
-        shepherd.electrumCache[network]['blockHeader'] = {};
-      }
-
-      if (!shepherd.electrumCache[network].blockHeader[height]) {
-        shepherd.log(`electrum raw block ${height}`, true);
-
-        ecl.blockchainBlockGetHeader(height)
-        .then((_rawtxJSON) => {
-          shepherd.electrumCache[network].blockHeader[height] = _rawtxJSON;
-          resolve(_rawtxJSON);
-        });
-      } else {
-        shepherd.log(`electrum cached raw block ${height}`, true);
-        resolve(shepherd.electrumCache[network].blockHeader[height]);
-      }
-    });
-  }
-
   shepherd.get('/electrum/listtransactions', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       shepherd.listtransactions({

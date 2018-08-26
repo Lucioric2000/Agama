@@ -34,8 +34,8 @@ shepherd.createAgamaDirs();
 
 let appConfig = shepherd.loadLocalConfig(); // load app config
 
-const nativeCoindList = shepherd.scanNativeCoindBins();
-shepherd.setVar('nativeCoindList', nativeCoindList);
+/*const nativeCoindList = shepherd.scanNativeCoindBins(); // dex related
+shepherd.setVar('nativeCoindList', nativeCoindList);*/
 
 let localVersion;
 let localVersionFile = shepherd.readVersionFile();
@@ -323,7 +323,7 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.testLocation = shepherd.testLocation;
 				mainWindow.kmdMainPassiveMode = shepherd.kmdMainPassiveMode;
 				mainWindow.getAppRuntimeLog = shepherd.getAppRuntimeLog;
-				mainWindow.nativeCoindList = nativeCoindList;
+				// mainWindow.nativeCoindList = nativeCoindList;
 				mainWindow.zcashParamsExist = _zcashParamsExist;
 				mainWindow.zcashParamsExistPromise = shepherd.zcashParamsExistPromise;
 				mainWindow.zcashParamsDownloadLinks = shepherd.zcashParamsDownloadLinks;

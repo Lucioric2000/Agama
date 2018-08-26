@@ -2,6 +2,7 @@ const path = require('path');
 const _fs = require('graceful-fs');
 const Promise = require('bluebird');
 const os = require('os');
+const fs = require('fs');
 
 module.exports = (shepherd) => {
   /*
@@ -102,7 +103,7 @@ module.exports = (shepherd) => {
     return new Promise((resolve, reject) => {
       if (lastNLines) {
         try {
-          _fs.access(fileLocation, shepherd.fs.constants.R_OK, (err) => {
+          _fs.access(fileLocation, fs.constants.R_OK, (err) => {
             if (err) {
               shepherd.log(`error reading ${fileLocation}`);
               shepherd.writeLog(`error reading ${fileLocation}`);

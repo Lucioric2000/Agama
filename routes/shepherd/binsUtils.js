@@ -1,6 +1,7 @@
 const os = require('os');
 const fsnode = require('fs');
 const _fs = require('graceful-fs');
+const exec = require('child_process').exec;
 
 module.exports = (shepherd) => {
   // osx and linux
@@ -45,7 +46,7 @@ module.exports = (shepherd) => {
         break;
     }
 
-    shepherd.exec(processGrep, (error, stdout, stderr) => {
+    exec(processGrep, (error, stdout, stderr) => {
       if (stdout.indexOf(processName) > -1) {
         const pkillCmd = osPlatform === 'win32' ? `taskkill /f /im ${processName}.exe` : `pkill -15 ${processName}`;
 

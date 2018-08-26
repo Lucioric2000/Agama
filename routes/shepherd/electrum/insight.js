@@ -57,7 +57,7 @@ module.exports = (shepherd) => {
         shepherd.log('insight blockchainAddressGetBalance', true);
 
         return new Promise((resolve, reject) => {
-          let options = {
+          const options = {
             url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`,
             method: 'GET',
           };
@@ -99,7 +99,7 @@ module.exports = (shepherd) => {
         shepherd.log('insight blockchainAddressListunspent', true);
 
         return new Promise((resolve, reject) => {
-          let options = {
+          const options = {
             url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`,
             method: 'GET',
           };
@@ -151,8 +151,8 @@ module.exports = (shepherd) => {
       blockchainAddressGetHistory: (address) => {
         shepherd.log('insight blockchainAddressGetHistory', true);
 
-        return new shepherd.Promise((resolve, reject) => {
-          let options = {
+        return new Promise((resolve, reject) => {
+          const options = {
             url: `${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('transactions', address)}`,
             method: 'GET',
           };
