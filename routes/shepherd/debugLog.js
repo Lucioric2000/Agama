@@ -105,14 +105,14 @@ module.exports = (shepherd) => {
         try {
           _fs.access(fileLocation, fs.constants.R_OK, (err) => {
             if (err) {
-              shepherd.log(`error reading ${fileLocation}`);
+              shepherd.log(`error reading ${fileLocation}`, 'native.debug');
               shepherd.writeLog(`error reading ${fileLocation}`);
               reject(`readDebugLog error: ${err}`);
             } else {
-              shepherd.log(`reading ${fileLocation}`);
+              shepherd.log(`reading ${fileLocation}`, 'native.debug');
               _fs.readFile(fileLocation, 'utf-8', (err, data) => {
                 if (err) {
-                  shepherd.writeLog(`readDebugLog err: ${err}`);
+                  shepherd.writeLog(`readDebugLog err: ${err}`, 'native.debug');
                   shepherd.log(`readDebugLog err: ${err}`);
                 }
 

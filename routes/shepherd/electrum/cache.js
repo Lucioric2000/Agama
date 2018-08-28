@@ -8,17 +8,17 @@ module.exports = (shepherd) => {
     if (fs.existsSync(`${shepherd.agamaDir}/spv-cache.json`)) {
       let localCache = fs.readFileSync(`${shepherd.agamaDir}/spv-cache.json`, 'utf8');
 
-      shepherd.log('local spv cache loaded from local file');
+      shepherd.log('local spv cache loaded from local file', 'spv.cache');
 
       try {
         shepherd.electrumCache = JSON.parse(localCache);
       } catch (e) {
-        shepherd.log('local spv cache file is damaged, create new');
+        shepherd.log('local spv cache file is damaged, create new', 'spv.cache');
         shepherd.saveLocalSPVCache();
         shepherd.electrumCache = {};
       }
     } else {
-      shepherd.log('local spv cache file is not found, create new');
+      shepherd.log('local spv cache file is not found, create new', 'spv.cache');
       shepherd.saveLocalSPVCache();
       shepherd.electrumCache = {};
     }
@@ -36,7 +36,7 @@ module.exports = (shepherd) => {
             fsnode.chmodSync(spvCacheFileName, '0666');
 
             setTimeout(() => {
-              shepherd.log(result);
+              shepherd.log(result, 'spv.cache');
               shepherd.writeLog(result);
               resolve(result);
             }, 1000);
@@ -55,12 +55,12 @@ module.exports = (shepherd) => {
                         .replace(/}/g, '\n}')*/, 'utf8');
 
             if (err)
-              return shepherd.log(err);
+              return shepherd.log(err, 'spv.cache');
 
             fsnode.chmodSync(spvCacheFileName, '0666');
             setTimeout(() => {
-              shepherd.log(result);
-              shepherd.log(`spv-cache.json file is created successfully at: ${shepherd.agamaDir}`);
+              shepherd.log(result, 'spv.cache');
+              shepherd.log(`spv-cache.json file is created successfully at: ${shepherd.agamaDir}`, 'spv.cache');
               resolve(result);
             }, 2000);
           });
@@ -83,7 +83,7 @@ module.exports = (shepherd) => {
 
       const returnObj = {
         msg: 'success',
-        result: `spv cache is removed`,
+        result: 'spv cache is removed',
       };
 
       res.end(JSON.stringify(returnObj));
@@ -107,7 +107,7 @@ module.exports = (shepherd) => {
       }
 
       if (!shepherd.electrumCache[network].tx[txid]) {
-        shepherd.log(`electrum raw input tx ${txid}`, true);
+        shepherd.log(`electrum raw input tx ${txid}`, 'spv.cache');
 
         ecl.blockchainTransactionGet(txid)
         .then((_rawtxJSON) => {
@@ -115,10 +115,27 @@ module.exports = (shepherd) => {
           resolve(_rawtxJSON);
         });
       } else {
-        shepherd.log(`electrum cached raw input tx ${txid}`, true);
+        shepherd.log(`electrum cached raw input tx ${txid}`, 'spv.cached');
         resolve(shepherd.electrumCache[network].tx[txid]);
       }
     });
+  }
+
+  shepherd.getTransactionDecoded = (txid, network, data) => {
+    if (!shepherd.electrumCache[network].txDecoded) {
+      shepherd.electrumCache[network].txDecoded = {};
+    }
+
+    if (shepherd.electrumCache[network].txDecoded[txid]) {
+      shepherd.log(`electrum raw input tx decoded ${txid}`, 'spv.cache');
+      return shepherd.electrumCache[network].txDecoded[txid];
+    } else {
+      if (data) {
+        shepherd.electrumCache[coin].txDecoded[txid] = data;
+      } else {
+        return false;
+      }
+    }
   }
 
   shepherd.getBlockHeader = (height, network, ecl) => {
@@ -131,7 +148,7 @@ module.exports = (shepherd) => {
       }
 
       if (!shepherd.electrumCache[network].blockHeader[height]) {
-        shepherd.log(`electrum raw block ${height}`, true);
+        shepherd.log(`electrum raw block ${height}`, 'spv.cache');
 
         ecl.blockchainBlockGetHeader(height)
         .then((_rawtxJSON) => {
@@ -139,7 +156,7 @@ module.exports = (shepherd) => {
           resolve(_rawtxJSON);
         });
       } else {
-        shepherd.log(`electrum cached raw block ${height}`, true);
+        shepherd.log(`electrum cached raw block ${height}`, 'spv.cache');
         resolve(shepherd.electrumCache[network].blockHeader[height]);
       }
     });

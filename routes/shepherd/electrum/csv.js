@@ -16,7 +16,7 @@ module.exports = (shepherd) => {
         const _coin = req.query.coin || req.query.network;
         const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
 
-        shepherd.log(`csv ${_coin} txhistory length ${txhistory.result.length}`, true);
+        shepherd.log(`csv ${_coin} txhistory length ${txhistory.result.length}`, 'spv.csv');
 
         if (txhistory.msg === 'success' &&
             txhistory.result &&
@@ -90,7 +90,7 @@ module.exports = (shepherd) => {
               !txhistory.id &&
               txhistory.result &&
               txhistory.result.length) {
-            shepherd.log(`csv ${_coin} native txhistory length ${txhistory.result.length}`, true);
+            shepherd.log(`csv ${_coin} native txhistory length ${txhistory.result.length}`, 'spv.csv');
 
             let _csv = ['Direction, Time, Amount, Address, TXID'];
 
@@ -118,7 +118,7 @@ module.exports = (shepherd) => {
             }));
           }
         } catch (e) {
-          shepherd.log(`csv ${_coin} native txhistory error ${e}`);
+          shepherd.log(`csv ${_coin} native txhistory error ${e}`, 'spv.csv');
         }
       });
     } else {

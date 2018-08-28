@@ -10,8 +10,8 @@ module.exports = (shepherd) => {
   shepherd.insightJSCoreActiveCoin = {};
 
   shepherd.insightJSCore = (electrumServer) => {
-    shepherd.log('insight =>');
-    shepherd.log(electrumServer, true);
+    shepherd.log('insight =>', 'insight.server');
+    shepherd.log(electrumServer, 'insight.server');
 
     if (electrumServer) {
       shepherd.insightJSCoreActiveCoin = electrumServer;
@@ -48,13 +48,13 @@ module.exports = (shepherd) => {
     return {
       insight: true,
       connect: () => {
-        shepherd.log('insight fake connect', true);
+        shepherd.log('insight fake connect', 'insight.conn');
       },
       close: () => {
-        shepherd.log('insight fake close', true);
+        shepherd.log('insight fake close', 'insight.closeConn');
       },
       blockchainAddressGetBalance: (address) => {
-        shepherd.log('insight blockchainAddressGetBalance', true);
+        shepherd.log('insight blockchainAddressGetBalance', 'insight.getbalance');
 
         return new Promise((resolve, reject) => {
           const options = {
@@ -62,7 +62,7 @@ module.exports = (shepherd) => {
             method: 'GET',
           };
 
-          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`);
+          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`, 'insight.getbalance');
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour
@@ -72,7 +72,8 @@ module.exports = (shepherd) => {
                 response.statusCode === 200) {
               try {
                 const _parsedBody = JSON.parse(body);
-                console.log(_parsedBody);
+                console.log(_parsedBody, 'insight.getbalance');
+
                 if (_parsedBody) {
                   let _balance = 0;
 
@@ -85,18 +86,18 @@ module.exports = (shepherd) => {
                     unconfirmed: 0,
                   });
                 }
-                shepherd.log(`insight blockchainAddressGetBalance ${address}`);
+                shepherd.log(`insight blockchainAddressGetBalance ${address}`, 'insight.getbalance');
               } catch (e) {
-                shepherd.log(`parse error insight blockchainAddressGetBalance ${address}`, true);
+                shepherd.log(`parse error insight blockchainAddressGetBalance ${address}`, 'insight.getbalance');
               }
             } else {
-              shepherd.log(`req error insight blockchainAddressGetBalance ${address}`, true);
+              shepherd.log(`req error insight blockchainAddressGetBalance ${address}`, 'insight.getbalance');
             }
           });
         });
       },
       blockchainAddressListunspent: (address) => {
-        shepherd.log('insight blockchainAddressListunspent', true);
+        shepherd.log('insight blockchainAddressListunspent', 'insight.getbalance');
 
         return new Promise((resolve, reject) => {
           const options = {
@@ -104,7 +105,7 @@ module.exports = (shepherd) => {
             method: 'GET',
           };
 
-          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`);
+          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('utxo', address)}`, 'insight.listunspent');
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour
@@ -114,7 +115,7 @@ module.exports = (shepherd) => {
                 response.statusCode === 200) {
               try {
                 const _parsedBody = JSON.parse(body);
-                console.log(_parsedBody);
+                console.log(_parsedBody, 'insight.listunspent');
 
                 if (_parsedBody) {
                   let _utxos = [];
@@ -138,18 +139,18 @@ module.exports = (shepherd) => {
 
                   resolve(_utxos);
                 }
-                shepherd.log(`insight blockchainAddressListunspent ${address}`);
+                shepherd.log(`insight blockchainAddressListunspent ${address}`, 'insight.listunspent');
               } catch (e) {
-                shepherd.log(`parse error insight blockchainAddressListunspent ${address}`, true);
+                shepherd.log(`parse error insight blockchainAddressListunspent ${address}`, 'insight.listunspent');
               }
             } else {
-              shepherd.log(`req error insight blockchainAddressListunspent ${address}`, true);
+              shepherd.log(`req error insight blockchainAddressListunspent ${address}`, 'insight.listunspent');
             }
           });
         });
       },
       blockchainAddressGetHistory: (address) => {
-        shepherd.log('insight blockchainAddressGetHistory', true);
+        shepherd.log('insight blockchainAddressGetHistory', 'insight.listtransactions');
 
         return new Promise((resolve, reject) => {
           const options = {
@@ -157,18 +158,18 @@ module.exports = (shepherd) => {
             method: 'GET',
           };
 
-          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('transactions', address)}`);
+          console.log(`${shepherd.insightJSCoreActiveCoin.address}/${apiRoutes('transactions', address)}`, 'insight.listtransactions');
 
           // send back body on both success and error
           // this bit replicates iguana core's behaviour
           request(options, (error, response, body) => {
-              console.log(body);
+            // console.log(body);
             if (response &&
                 response.statusCode &&
                 response.statusCode === 200) {
               try {
                 const _parsedBody = JSON.parse(body);
-                console.log(_parsedBody.txs || _parsedBody.transactions);
+                console.log(_parsedBody.txs || _parsedBody.transactions, 'insight.listtransactions');
 
                 if (_parsedBody &&
                     (_parsedBody.txs || _parsedBody.transactions)) {
@@ -218,12 +219,12 @@ module.exports = (shepherd) => {
 
                   resolve(txs);
                 }
-                shepherd.log(`insight blockchainAddressGetHistory ${address}`);
+                shepherd.log(`insight blockchainAddressGetHistory ${address}`, 'insight.listtransactions');
               } catch (e) {
-                shepherd.log(`parse error insight blockchainAddressGetHistory ${address}`, true);
+                shepherd.log(`parse error insight blockchainAddressGetHistory ${address}`, 'insight.listtransactions');
               }
             } else {
-              shepherd.log(`req error insight blockchainAddressGetHistory ${address}`, true);
+              shepherd.log(`req error insight blockchainAddressGetHistory ${address}`, 'insight.listtransactions');
             }
           });
         });

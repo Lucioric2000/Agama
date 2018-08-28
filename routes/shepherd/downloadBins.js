@@ -61,7 +61,7 @@ module.exports = (shepherd) => {
       res.end(JSON.stringify(successObj));
 
       const _os = os.platform();
-      shepherd.log(`checking bins: ${_os}`);
+      shepherd.log(`checking bins: ${_os}`, 'update.bins');
 
       shepherd.io.emit('patch', {
         patch: {
@@ -75,11 +75,11 @@ module.exports = (shepherd) => {
         remoteFileSize(remoteBinLocation[_os] + latestBins[_os][i], (err, remoteBinSize) => {
           const localBinSize = fs.statSync(rootLocation + localBinLocation[_os] + latestBins[_os][i]).size;
 
-          shepherd.log('remote url: ' + (remoteBinLocation[_os] + latestBins[_os][i]) + ' (' + remoteBinSize + ')');
-          shepherd.log('local file: ' + (rootLocation + localBinLocation[_os] + latestBins[_os][i]) + ' (' + localBinSize + ')');
+          shepherd.log('remote url: ' + (remoteBinLocation[_os] + latestBins[_os][i]) + ' (' + remoteBinSize + ')', 'update.bins');
+          shepherd.log('local file: ' + (rootLocation + localBinLocation[_os] + latestBins[_os][i]) + ' (' + localBinSize + ')', 'update.bins');
 
           if (remoteBinSize !== localBinSize) {
-            shepherd.log(`${latestBins[_os][i]} can be updated`);
+            shepherd.log(`${latestBins[_os][i]} can be updated`, 'update.bins');
             binsToUpdate.push({
               name: latestBins[_os][i],
               rSize: remoteBinSize,
@@ -161,7 +161,7 @@ module.exports = (shepherd) => {
                 status: 'done',
               },
             });
-            shepherd.log(`file ${binsToUpdate[i].name} succesfully downloaded`);
+            shepherd.log(`file ${binsToUpdate[i].name} succesfully downloaded`, 'update.bins');
           } else {
             shepherd.io.emit('patch', {
               msg: {
@@ -170,7 +170,7 @@ module.exports = (shepherd) => {
                 message: 'size mismatch',
               },
             });
-            shepherd.log(`error: ${binsToUpdate[i].name} file size doesnt match remote!`);
+            shepherd.log(`error: ${binsToUpdate[i].name} file size doesnt match remote!`, 'update.bins');
           }
         });
       }

@@ -12,7 +12,7 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       fs.writeFile(`${shepherd.agamaDir}/shepherd/addressBook.json`, JSON.stringify(data), (err) => {
         if (err) {
-          shepherd.log('error writing address book file');
+          shepherd.log('error writing address book file', 'addressBook');
 
           const returnObj = {
             msg: 'error',

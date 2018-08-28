@@ -7,6 +7,7 @@ for (let i = 0; i < 25; i++) {
   btcFeeBlocks.push(i);
 }
 
+// TODO: use agama-wallet-lib
 const checkTimestamp = (dateToCheck) => {
   const currentEpochTime = new Date(Date.now()) / 1000;
   const secondsElapsed = Number(currentEpochTime) - Number(dateToCheck);
@@ -35,10 +36,14 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       if (checkTimestamp(btcFees.lastUpdated) > BTC_FEES_MIN_ELAPSED_TIME) {
         const _randomServer = shepherd.electrumServers.btc.serverList[getRandomIntInclusive(0, shepherd.electrumServers.btc.serverList.length - 1)].split(':');
-        const ecl = shepherd.ecl(network, { port: _randomServer[1], ip: _randomServer[0], port: 'tcp' });
+        const ecl = shepherd.ecl(network, {
+          port: _randomServer[1],
+          ip: _randomServer[0],
+          port: 'tcp',
+        });
         let _btcFeeEstimates = [];
 
-        shepherd.log(`btc fees server ${_randomServer.join(':')}`, true);
+        shepherd.log(`btc fees server ${_randomServer.join(':')}`, 'spv.btcFees');
 
         ecl.connect();
         Promise.all(btcFeeBlocks.map((coin, index) => {
@@ -73,10 +78,10 @@ module.exports = (shepherd) => {
                 btcFees.lastUpdated = Math.floor(Date.now() / 1000);
                 btcFees.recommended = _parsedBody;
               } catch (e) {
-                shepherd.log('unable to retrieve BTC fees / recommended', true);
+                shepherd.log('unable to retrieve BTC fees / recommended', 'spv.btcFees');
               }
             } else {
-              shepherd.log('unable to retrieve BTC fees / recommended', true);
+              shepherd.log('unable to retrieve BTC fees / recommended', 'spv.btcFees');
             }
 
             res.end(JSON.stringify({
@@ -86,7 +91,7 @@ module.exports = (shepherd) => {
           });
         });
       } else {
-        shepherd.log('btcfees, use cache', true);
+        shepherd.log('btcfees, use cache', 'spv.btcFees');
 
         const successObj = {
           msg: 'success',

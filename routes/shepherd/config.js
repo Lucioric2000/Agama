@@ -10,7 +10,7 @@ module.exports = (shepherd) => {
     if (fs.existsSync(`${shepherd.agamaDir}/config.json`)) {
       let localAppConfig = fs.readFileSync(`${shepherd.agamaDir}/config.json`, 'utf8');
 
-      shepherd.log('app config set from local file');
+      shepherd.log('app config set from local file', 'settings');
       shepherd.writeLog('app config set from local file');
 
       // find diff between local and hardcoded configs
@@ -34,7 +34,7 @@ module.exports = (shepherd) => {
                   result[i] = {};
                 }
 
-                shepherd.log(`settings multi-level diff ${i} -> ${j}`, true);
+                shepherd.log(`settings multi-level diff ${i} -> ${j}`, 'settings');
                 result[i][j] = obj1[i][j];
               }
             }
@@ -78,7 +78,7 @@ module.exports = (shepherd) => {
             delete _localAppConfig.rpc2cli;
           }
 
-          console.warn('update config to v2.42 compatible');
+          console.warn('update config to v2.42 compatible', 'settings');
           localAppConfig = JSON.stringify(_localAppConfig);
           shepherd.saveLocalAppConf(_localAppConfig);
         }
@@ -88,9 +88,9 @@ module.exports = (shepherd) => {
         if (Object.keys(compareConfigs).length) {
           const newConfig = deepmerge(defaultConf, JSON.parse(localAppConfig));
 
-          shepherd.log('config diff is found, updating local config');
-          shepherd.log('config diff:');
-          shepherd.log(compareConfigs);
+          shepherd.log('config diff is found, updating local config', 'settings');
+          shepherd.log('config diff:', 'settings');
+          shepherd.log(compareConfigs, 'settings');
           shepherd.writeLog('aconfig diff is found, updating local config');
           shepherd.writeLog('config diff:');
           shepherd.writeLog(compareConfigs);
@@ -104,7 +104,7 @@ module.exports = (shepherd) => {
         return shepherd.appConfig;
       }
     } else {
-      shepherd.log('local config file is not found!');
+      shepherd.log('local config file is not found!', 'settings');
       shepherd.writeLog('local config file is not found!');
       shepherd.saveLocalAppConf(shepherd.appConfig);
 
@@ -124,7 +124,7 @@ module.exports = (shepherd) => {
             fsnode.chmodSync(appConfFileName, '0666');
 
             setTimeout(() => {
-              shepherd.log(result);
+              shepherd.log(result, 'settings');
               shepherd.writeLog(result);
               resolve(result);
             }, 1000);
@@ -147,8 +147,8 @@ module.exports = (shepherd) => {
 
             fsnode.chmodSync(appConfFileName, '0666');
             setTimeout(() => {
-              shepherd.log(result);
-              shepherd.log(`app conf.json file is created successfully at: ${shepherd.agamaDir}`);
+              shepherd.log(result, 'settings');
+              shepherd.log(`app conf.json file is created successfully at: ${shepherd.agamaDir}`, 'settings');
               shepherd.writeLog(`app conf.json file is created successfully at: ${shepherd.agamaDir}`);
               resolve(result);
             }, 2000);
@@ -240,13 +240,13 @@ module.exports = (shepherd) => {
     return new Promise((resolve, reject) => {
       fs.lstat(path, (err, stats) => {
         if (err) {
-          shepherd.log(`error testing path ${path}`);
+          shepherd.log(`error testing path ${path}`, 'settings');
           resolve(-1);
         } else {
           if (stats.isDirectory()) {
             resolve(true);
           } else {
-            shepherd.log(`error testing path ${path} not a folder`);
+            shepherd.log(`error testing path ${path} not a folder`, 'settings');
             resolve(false);
           }
         }

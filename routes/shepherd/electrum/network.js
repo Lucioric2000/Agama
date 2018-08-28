@@ -144,8 +144,8 @@ module.exports = (shepherd) => {
       ecl.serverVersion()
       .then((serverData) => {
         ecl.close();
-        shepherd.log('serverData', true);
-        shepherd.log(serverData, true);
+        shepherd.log('serverData', 'spv.server.test');
+        shepherd.log(serverData, 'spv.server,test');
 
         if (serverData &&
             typeof serverData === 'string' &&

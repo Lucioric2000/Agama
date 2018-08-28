@@ -39,7 +39,7 @@ module.exports = (shepherd) => {
         const pubkey = req.body.pubkey ? req.body.pubkey : keyPair.getAddress();
 
         if (passwdStrength(_pin) < 29) {
-          shepherd.log('seed storage weak pin!');
+          shepherd.log('seed storage weak pin!', 'pin');
 
           const returnObj = {
             msg: 'error',
@@ -55,7 +55,7 @@ module.exports = (shepherd) => {
             .then((encryptedString) => {
               fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
                 if (err) {
-                  shepherd.log('error writing pin file');
+                  shepherd.log('error writing pin file', 'pin');
 
                   const returnObj = {
                     msg: 'error',
@@ -136,11 +136,11 @@ module.exports = (shepherd) => {
               if (_regexTest) { // re-encrypt with a new method
                 encrypt(decryptedKey, _key)
                 .then((encryptedString) => {
-                  shepherd.log(`seed encrypt old method detected for file ${_pubkey}`);
+                  shepherd.log(`seed encrypt old method detected for file ${_pubkey}`, 'pin');
 
                   fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${_pubkey}.pin`, encryptedString, (err) => {
                     if (err) {
-                      shepherd.log(`error re-encrypt pin file ${_pubkey}`);
+                      shepherd.log(`error re-encrypt pin file ${_pubkey}`, 'pin');
                     } else {
                       returnObj = {
                         msg: 'success',
@@ -154,7 +154,7 @@ module.exports = (shepherd) => {
               } else {
                 decrypt(data, _key)
                 .then((decryptedKey) => {
-                  shepherd.log(`pin ${_pubkey} decrypted`);
+                  shepherd.log(`pin ${_pubkey} decrypted`, 'pin');
 
                   returnObj = {
                     msg: 'success',
@@ -164,7 +164,7 @@ module.exports = (shepherd) => {
                   res.end(JSON.stringify(returnObj));
                 })
                 .catch((err) => {
-                  shepherd.log(`pin ${_pubkey} decrypt err ${err}`);
+                  shepherd.log(`pin ${_pubkey} decrypt err ${err}`, 'pin');
 
                   returnObj = {
                     msg: 'error',
@@ -280,7 +280,7 @@ module.exports = (shepherd) => {
                   if (_customPinFilenameTest.test(pubkeynew)) {
                     fs.writeFile(`${shepherd.agamaDir}/shepherd/pin/${pubkeynew}.pin`, data, (err) => {
                       if (err) {
-                        shepherd.log('error writing pin file');
+                        shepherd.log('error writing pin file', 'pin');
 
                         const returnObj = {
                           msg: 'error',

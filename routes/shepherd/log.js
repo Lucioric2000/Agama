@@ -2,15 +2,16 @@ const fs = require('fs-extra');
 const Promise = require('bluebird');
 
 module.exports = (shepherd) => {
-  shepherd.log = (msg, isSpvOut) => {
+  shepherd.log = (msg, type) => {
     if (shepherd.appConfig.dev ||
         shepherd.appConfig.debug) {
       console.log(msg);
     }
 
-    shepherd[!isSpvOut ? 'appRuntimeLog' : 'appRuntimeSPVLog'].push({
+    shepherd.appRuntimeLog.push({
       time: Date.now(),
       msg: msg,
+      type: type,
     });
   }
 
@@ -39,7 +40,7 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       const successObj = {
         msg: 'success',
-        result: req.query.spv && req.query.spv === 'true' ? shepherd.appRuntimeSPVLog : shepherd.appRuntimeLog,
+        result: shepherd.appRuntimeLog,
       };
 
       res.end(JSON.stringify(successObj));
@@ -59,7 +60,7 @@ module.exports = (shepherd) => {
     });
   };
 
-  /*
+  /*  needs a fix
    *  type: POST
    *  params: payload
    */
@@ -152,10 +153,10 @@ module.exports = (shepherd) => {
   });
 
   shepherd.printDirs = () => {
-    shepherd.log(`agama dir: ${shepherd.agamaDir}`);
+    shepherd.log(`agama dir: ${shepherd.agamaDir}`, 'env');
     shepherd.log('--------------------------')
-    shepherd.log(`komodo dir: ${shepherd.komododBin}`);
-    shepherd.log(`komodo bin: ${shepherd.komodoDir}`);
+    shepherd.log(`komodo dir: ${shepherd.komododBin}`, 'env');
+    shepherd.log(`komodo bin: ${shepherd.komodoDir}`, 'env');
     shepherd.writeLog(`agama dir: ${shepherd.agamaDir}`);
     shepherd.writeLog(`komodo dir: ${shepherd.komododBin}`);
     shepherd.writeLog(`komodo bin: ${shepherd.komodoDir}`);

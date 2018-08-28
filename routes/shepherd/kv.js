@@ -59,7 +59,7 @@ const KV_CONTENT_HEADER_SIZE = [
   128, // title
 ];
 
-const KV_MAX_CONTENT_SIZE = 7096;
+const KV_MAX_CONTENT_SIZE = 4096;
 
 module.exports = (shepherd) => {
   shepherd.kvEncode = (data) => {
@@ -81,16 +81,16 @@ module.exports = (shepherd) => {
     kvBuf[5].write(data.content.title);
     kvBuf[6].write(data.content.body);
 
-    shepherd.log(data.content.body.length, true);
-    shepherd.log(data.content.body, true);
-    shepherd.log(kvBuf[6], true);
-    shepherd.log(kvBuf[6].toString(), true);
+    shepherd.log(data.content.body.length, 'kv');
+    shepherd.log(data.content.body, 'kv');
+    shepherd.log(kvBuf[6], 'kv');
+    shepherd.log(kvBuf[6].toString(), 'kv');
 
     const out = Buffer.concat(kvBuf);
 
-    shepherd.log(out, true);
-    shepherd.log(out.toString('hex'), true);
-    shepherd.log(out.toString('hex').length, true);
+    shepherd.log(out, 'kv');
+    shepherd.log(out.toString('hex'), 'kv');
+    shepherd.log(out.toString('hex').length, 'kv');
 
     if (out.toString('hex').length > KV_MAX_CONTENT_SIZE + KV_CONTENT_HEADER_SIZE[0] + KV_CONTENT_HEADER_SIZE[1] + KV_CONTENT_HEADER_SIZE[2]) {
       return -1;
@@ -100,7 +100,7 @@ module.exports = (shepherd) => {
   }
 
   shepherd.kvDecode = (hex, fromTx) => {
-    shepherd.log(Buffer.from(hex, 'hex').toString(), true);
+    shepherd.log(Buffer.from(hex, 'hex').toString(), 'kv');
 
     if (fromTx) {
       hex = Buffer.from(hex, 'hex').toString();
@@ -118,13 +118,13 @@ module.exports = (shepherd) => {
       _kvBuf.slice(KV_HEADER_SIZE[0] + KV_HEADER_SIZE[1] + KV_HEADER_SIZE[2] + KV_CONTENT_HEADER_SIZE[0] + KV_CONTENT_HEADER_SIZE[1] + KV_CONTENT_HEADER_SIZE[2], _kvBuf.length)
     ];
 
-    shepherd.log('kv buffer', true);
-    shepherd.log(kvBuf, true);
+    shepherd.log('kv buffer', 'kv');
+    shepherd.log(kvBuf, 'kv');
 
     for (let i = 0; i < kvBuf.length; i++) {
-      shepherd.log(`kv buffer ${i}, ${kvBuf[i].length} bytes`, true);
-      shepherd.log(`kv buffer -> string ${kvBuf[i].length} bytes`, true);
-      shepherd.log(kvBuf[i].toString(), true);
+      shepherd.log(`kv buffer ${i}, ${kvBuf[i].length} bytes`, 'kv');
+      shepherd.log(`kv buffer -> string ${kvBuf[i].length} bytes`, 'kv');
+      shepherd.log(kvBuf[i].toString(), 'kv');
     }
 
     const out = {

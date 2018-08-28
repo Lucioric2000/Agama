@@ -36,9 +36,9 @@ module.exports = (shepherd) => {
                     return new Promise((resolve, reject) => {
                       shepherd.getTransaction(_utxoItem.tx_hash, network, ecl)
                       .then((_rawtxJSON) => {
-                        shepherd.log('electrum gettransaction ==>', true);
-                        shepherd.log(`${index} | ${(_rawtxJSON.length - 1)}`, true);
-                        shepherd.log(_rawtxJSON, true);
+                        shepherd.log('electrum gettransaction ==>', 'spv.listunspent');
+                        shepherd.log(`${index} | ${(_rawtxJSON.length - 1)}`, 'spv.listunspent');
+                        shepherd.log(_rawtxJSON, 'spv.listunspent');
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
@@ -133,10 +133,10 @@ module.exports = (shepherd) => {
                     ecl.close();
 
                     if (!_atLeastOneDecodeTxFailed) {
-                      shepherd.log(promiseResult, true);
+                      shepherd.log(promiseResult, 'spv.listunspent');
                       resolve(promiseResult);
                     } else {
-                      shepherd.log('listunspent error, cant decode tx(s)', true);
+                      shepherd.log('listunspent error, cant decode tx(s)', 'spv.listunspent');
                       resolve('decode error');
                     }
                   });
@@ -186,7 +186,7 @@ module.exports = (shepherd) => {
           req.query.verify
         )
         .then((listunspent) => {
-          shepherd.log('electrum listunspent ==>', true);
+          shepherd.log('electrum listunspent ==>', 'spv.listunspent');
 
           const successObj = {
             msg: 'success',
@@ -199,7 +199,7 @@ module.exports = (shepherd) => {
         shepherd.listunspent(ecl, req.query.address, network)
         .then((listunspent) => {
           ecl.close();
-          shepherd.log('electrum listunspent ==>', true);
+          shepherd.log('electrum listunspent ==>', 'spv.listunspent');
 
           const successObj = {
             msg: 'success',

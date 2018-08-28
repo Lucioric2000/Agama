@@ -42,7 +42,7 @@ module.exports = (shepherd) => {
       let isWif = false;
 
       if (_seed.match('^[a-zA-Z0-9]{34}$')) {
-        shepherd.log('watchonly elections pub addr');
+        shepherd.log('watchonly elections pub addr', 'elections');
         shepherd.elections = {
           priv: _seed,
           pub: _seed,
@@ -122,10 +122,10 @@ module.exports = (shepherd) => {
               .then((rawInput) => {
                 const decodedVinVout = shepherd.electrumJSTxDecoder(rawInput, network, _network);
 
-                shepherd.log('electrum raw input tx ==>', true);
+                shepherd.log('electrum raw input tx ==>', 'elections.decodeTx');
 
                 if (decodedVinVout) {
-                  shepherd.log(decodedVinVout.outputs[_decodedInput.n], true);
+                  shepherd.log(decodedVinVout.outputs[_decodedInput.n], 'elections.decodeTx');
                   txInputs.push(decodedVinVout.outputs[_decodedInput.n]);
                   _resolve(true);
                 } else {
@@ -175,7 +175,7 @@ module.exports = (shepherd) => {
       const type = req.query.type;
       const _address = req.query.address;
 
-      shepherd.log('electrum elections listtransactions ==>', true);
+      shepherd.log('electrum elections listtransactions ==>', 'elections.listtransactions');
 
       const MAX_TX = req.query.maxlength || 10;
       ecl.connect();
@@ -189,7 +189,7 @@ module.exports = (shepherd) => {
           json = shepherd.sortTransactions(json);
           // json = json.length > MAX_TX ? json.slice(0, MAX_TX) : json;
 
-          shepherd.log(json.length, true);
+          shepherd.log(json.length, 'elections.listtransactions');
 
           Promise.all(json.map((transaction, index) => {
             return new Promise((resolve, reject) => {
@@ -217,7 +217,7 @@ module.exports = (shepherd) => {
                         if (decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') > -1) {
                           _opreturnFound = true;
                           _region = shepherd.hex2str(decodedTx.outputs[i].scriptPubKey.hex.substr(4, decodedTx.outputs[i].scriptPubKey.hex.length));
-                          shepherd.log(`found opreturn tag ${_region}`);
+                          shepherd.log(`found opreturn tag ${_region}`, 'elections.listtransactions');
                           break;
                         }
                       }
@@ -239,7 +239,7 @@ module.exports = (shepherd) => {
                               'ne2k18-sh'
                             ];
 
-                            shepherd.log(`i voted ${decodedTx.outputs[i].value} for ${decodedTx.outputs[i].scriptPubKey.addresses[0]}`);
+                            shepherd.log(`i voted ${decodedTx.outputs[i].value} for ${decodedTx.outputs[i].scriptPubKey.addresses[0]}`, 'elections.listtransactions');
                             _rawtx.push({
                               address: decodedTx.outputs[i].scriptPubKey.addresses[0],
                               amount: decodedTx.outputs[i].value,
@@ -248,7 +248,7 @@ module.exports = (shepherd) => {
                             });
                             resolve(true);
                           } else {
-                            shepherd.log(`i voted ${decodedTx.outputs[i].value} for ${decodedTx.outputs[i].scriptPubKey.addresses[0]}`);
+                            shepherd.log(`i voted ${decodedTx.outputs[i].value} for ${decodedTx.outputs[i].scriptPubKey.addresses[0]}`, 'elections.listtransactions');
                             _rawtx.push({
                               address: decodedTx.outputs[i].scriptPubKey.addresses[0],
                               amount: decodedTx.outputs[i].value,
@@ -280,7 +280,7 @@ module.exports = (shepherd) => {
                                 _address
                               )
                               .then((res) => {
-                                shepherd.log(`i received ${decodedTx.outputs[i].value} from ${res.outputAddresses[0]} out ${i} region ${_regionsLookup[i]}`);
+                                shepherd.log(`i received ${decodedTx.outputs[i].value} from ${res.outputAddresses[0]} out ${i} region ${_regionsLookup[i]}`, 'elections.listtransactions');
                                 _rawtx.push({
                                   address: res.outputAddresses[0],
                                   timestamp: blockInfo.timestamp,
@@ -313,7 +313,7 @@ module.exports = (shepherd) => {
                               }
 
                               if (i === decodedTx.outputs.length - 1) {
-                                shepherd.log(`i received ${_candidate.amount} from ${_candidate.address} region ${_region}`);
+                                shepherd.log(`i received ${_candidate.amount} from ${_candidate.address} region ${_region}`, 'elections.listtransactions');
                                 _rawtx.push(_candidate);
                                 resolve(true);
                               }
@@ -322,7 +322,7 @@ module.exports = (shepherd) => {
                         }
                       }
                     } else {
-                      shepherd.log('elections regular tx', true);
+                      shepherd.log('elections regular tx', 'elections.listtransactions');
                       shepherd.electionsDecodeTx(
                         decodedTx,
                         ecl,
@@ -341,7 +341,7 @@ module.exports = (shepherd) => {
                             amount: _regularTx[type === 'voter' ? 0 : 1].amount,
                             region: 'unknown',
                             regularTx: true,
-                            hash: transaction['tx_hash'],
+                            hash: transaction.tx_hash,
                           });
                         } else {
                           if ((type === 'voter' && _regularTx.type !== 'received') &&
@@ -352,7 +352,7 @@ module.exports = (shepherd) => {
                               amount: _regularTx.amount,
                               region: 'unknown',
                               regularTx: true,
-                              hash: transaction['tx_hash'],
+                              hash: transaction.tx_hash,
                             });
                           }
                         }

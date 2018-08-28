@@ -30,8 +30,8 @@ module.exports = (shepherd) => {
       ecl.blockchainBlockGetHeader(height)
       .then((json) => {
         ecl.close();
-        shepherd.log('electrum getblockinfo ==>', true);
-        shepherd.log(json, true);
+        shepherd.log('electrum getblockinfo ==>', 'spv.getblockinfo');
+        shepherd.log(json, 'spv.getblockinfo');
 
         resolve(json);
       });
@@ -68,11 +68,11 @@ module.exports = (shepherd) => {
       .then((json) => {
         ecl.close();
 
-        shepherd.log('electrum currentblock (electrum >= v1.1) ==>', true);
-        shepherd.log(json, true);
+        shepherd.log('electrum currentblock (electrum >= v1.1) ==>', 'spv.currentblock');
+        shepherd.log(json, 'spv.currentblock');
 
-        if (json['block_height']) {
-          resolve(json['block_height']);
+        if (json.block_height) {
+          resolve(json.block_height);
         } else {
           resolve(json);
         }

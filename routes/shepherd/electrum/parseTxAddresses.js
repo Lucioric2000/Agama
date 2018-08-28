@@ -19,7 +19,7 @@ module.exports = (shepherd) => {
       outputs: [],
     };
 
-    shepherd.log('parseTransactionAddresses result ==>', true);
+    shepherd.log('parseTransactionAddresses result ==>', 'spv.parseAddress');
 
     if (tx.format === 'cant parse') {
       return {
@@ -41,9 +41,9 @@ module.exports = (shepherd) => {
       }
 
       for (let i = 0; i < _parse[key].length; i++) {
-        shepherd.log(`key ==>`, true);
-        shepherd.log(_parse[key][i], true);
-        shepherd.log(Number(_parse[key][i].value), true);
+        shepherd.log(`key ==>`, 'spv.parseAddress');
+        shepherd.log(_parse[key][i], 'spv.parseAddress');
+        shepherd.log(Number(_parse[key][i].value), 'spv.parseAddress');
 
         _total[key] += Number(_parse[key][i].value);
 
@@ -72,10 +72,10 @@ module.exports = (shepherd) => {
     _addresses.inputs = [ ...new Set(_addresses.inputs) ];
     _addresses.outputs = [ ...new Set(_addresses.outputs) ];
 
-    shepherd.log('addresses in =>', true);
-    shepherd.log(_addresses.inputs, true);
-    shepherd.log('addresses out =>', true);
-    shepherd.log(_addresses.outputs, true);
+    shepherd.log('addresses in =>', 'spv.parseAddress');
+    shepherd.log(_addresses.inputs, 'spv.parseAddress');
+    shepherd.log('addresses out =>', 'spv.parseAddress');
+    shepherd.log(_addresses.outputs, 'spv.parseAddress');
 
     let isSelfSend = {
       inputs: false,
@@ -178,8 +178,8 @@ module.exports = (shepherd) => {
       };
     }
 
-    shepherd.log(_sum, true);
-    shepherd.log(result, true);
+    shepherd.log(_sum, 'spv.parseAddress');
+    shepherd.log(result, 'spv.parseAddress');
 
     return result;
   }

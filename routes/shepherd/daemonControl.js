@@ -19,9 +19,9 @@ module.exports = (shepherd) => {
       flock = 'chipsd';
     }
 
-    shepherd.log(flock);
-    shepherd.log(`getconf coind ${coind}`);
-    shepherd.writeLog(`getconf flock: ${flock}`);
+    shepherd.log(flock, 'native.confd');
+    shepherd.log(`getconf coind ${coind}`, 'native.confd');
+    shepherd.writeLog(`getconf flock: ${flock}`, 'native.confd');
 
     if (coind) {
       switch (_platform) {
@@ -42,7 +42,7 @@ module.exports = (shepherd) => {
         DaemonConfPath = shepherd.komodoDir;
         if (_platform === 'win32') {
           DaemonConfPath = path.normalize(DaemonConfPath);
-          shepherd.log('===>>> SHEPHERD API OUTPUT ===>>>');
+          shepherd.log('===>>> SHEPHERD API OUTPUT ===>>>', 'native.confd');
         }
         break;
       case 'zcashd':
@@ -68,7 +68,7 @@ module.exports = (shepherd) => {
     }
 
     shepherd.writeLog(`getconf path: ${DaemonConfPath}`);
-    shepherd.log(`daemon path: ${DaemonConfPath}`);
+    shepherd.log(`daemon path: ${DaemonConfPath}`, 'native.confd');
 
     return DaemonConfPath;
   }
@@ -78,11 +78,11 @@ module.exports = (shepherd) => {
   const herder = (flock, data, coind) => {
     if (data === undefined) {
       data = 'none';
-      shepherd.log('it is undefined');
+      shepherd.log('it is undefined', 'native.confd');
     }
 
-    shepherd.log(`herder flock: ${flock} coind: ${coind}`);
-    shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`);
+    shepherd.log(`herder flock: ${flock} coind: ${coind}`, 'native.confd');
+    shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`, 'native.confd');
 
     // TODO: notify gui that reindex/rescan param is used to reflect on the screen
     //       asset chain debug.log unlink
@@ -101,29 +101,29 @@ module.exports = (shepherd) => {
           if (_coindCustomPort[1]) {
             shepherd.assetChainPorts[data.ac_name] = _coindCustomPort[1];
             shepherd.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name].port = _coindCustomPort[1];
-            shepherd.log(`${data.ac_name} custom port ${_coindCustomPort[1]}`);
+            shepherd.log(`${data.ac_name} custom port ${_coindCustomPort[1]}`, 'native.confd');
           } else {
             shepherd.assetChainPorts[data.ac_name] = shepherd.assetChainPortsDefault[data.ac_name];
             shepherd.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name].port = shepherd.assetChainPortsDefault[data.ac_name];
-            shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`);
+            shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`, 'native.confd');
           }
         } else {
           shepherd.assetChainPorts[data.ac_name] = shepherd.assetChainPortsDefault[data.ac_name];
           shepherd.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name].port = shepherd.assetChainPortsDefault[data.ac_name];
-          shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`);
+          shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`, 'native.confd');
         }
       } catch (e) {
         if (shepherd.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name]) {
           shepherd.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name].port = shepherd.assetChainPortsDefault[data.ac_name];
         }
         shepherd.assetChainPorts[data.ac_name] = shepherd.assetChainPortsDefault[data.ac_name];
-        shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`);
+        shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`, 'native.confd');
       }
 
-      shepherd.log('komodod flock selected...');
-      shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`);
-      shepherd.writeLog('komodod flock selected...');
-      shepherd.writeLog(`selected data: ${data}`);
+      shepherd.log('komodod flock selected...', 'native.confd');
+      shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`, 'native.confd');
+      shepherd.writeLog('komodod flock selected...', 'native.confd');
+      shepherd.writeLog(`selected data: ${data}`, 'native.confd');
 
       // datadir case, check if komodo/chain folder exists
       if (shepherd.appConfig.native.dataDir.length &&
@@ -133,17 +133,17 @@ module.exports = (shepherd) => {
         try {
           _fs.accessSync(_dir, fs.R_OK | fs.W_OK);
 
-          shepherd.log(`komodod datadir ${_dir} exists`);
+          shepherd.log(`komodod datadir ${_dir} exists`, 'native.confd');
         } catch (e) {
-          shepherd.log(`komodod datadir ${_dir} access err: ${e}`);
-          shepherd.log(`attempting to create komodod datadir ${_dir}`);
+          shepherd.log(`komodod datadir ${_dir} access err: ${e}`, 'native.confd');
+          shepherd.log(`attempting to create komodod datadir ${_dir}`, 'native.confd');
 
           fs.mkdirSync(_dir);
 
           if (fs.existsSync(_dir)) {
-            shepherd.log(`created komodod datadir folder at ${_dir}`);
+            shepherd.log(`created komodod datadir folder at ${_dir}`, 'native.confd');
           } else {
-            shepherd.log(`unable to create komodod datadir folder at ${_dir}`);
+            shepherd.log(`unable to create komodod datadir folder at ${_dir}`, 'native.confd');
           }
         }
       }
@@ -154,20 +154,20 @@ module.exports = (shepherd) => {
           const _confFileAccess = _fs.accessSync(kmdDebugLogLocation, fs.R_OK | fs.W_OK);
 
           if (_confFileAccess) {
-            shepherd.log(`error accessing ${kmdDebugLogLocation}`);
-            shepherd.writeLog(`error accessing ${kmdDebugLogLocation}`);
+            shepherd.log(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
+            shepherd.writeLog(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
           } else {
             try {
               fs.unlinkSync(kmdDebugLogLocation);
-              shepherd.log(`truncate ${kmdDebugLogLocation}`);
+              shepherd.log(`truncate ${kmdDebugLogLocation}`, 'native.debug');
               shepherd.writeLog(`truncate ${kmdDebugLogLocation}`);
             } catch (e) {
-              shepherd.log('cant unlink debug.log');
+              shepherd.log('cant unlink debug.log', 'native.debug');
             }
           }
         } catch (e) {
-          shepherd.log(`komodod debug.log access err: ${e}`);
-          shepherd.writeLog(`komodod debug.log access err: ${e}`);
+          shepherd.log(`komodod debug.log access err: ${e}`, 'native.debug');
+          shepherd.writeLog(`komodod debug.log access err: ${e}`, 'native.debug');
         }
       }
 
@@ -204,12 +204,12 @@ module.exports = (shepherd) => {
               _customParam = _customParam + ' -datadir=' + shepherd.appConfig.native.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
             }
 
-            shepherd.log(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
+            shepherd.log(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
             shepherd.writeLog(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
 
             const isChain = data.ac_name.match(/^[A-Z]*$/);
             const coindACParam = isChain ? ` -ac_name=${data.ac_name} ` : '';
-            shepherd.log(`daemon param ${data.ac_custom_param}`);
+            shepherd.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
 
             shepherd.coindInstanceRegistry[data.ac_name] = true;
             if (!shepherd.kmdMainPassiveMode) {
@@ -221,10 +221,10 @@ module.exports = (shepherd) => {
 
               try {
                 fs.accessSync(_daemonLogName, fs.R_OK | fs.W_OK);
-                shepherd.log(`created ${_daemonLogName}`);
+                shepherd.log(`created ${_daemonLogName}`, 'native.debug');
                 fs.unlinkSync(_daemonLogName);
               } catch (e) {
-                shepherd.log(`error accessing ${_daemonLogName}, doesnt exist or another proc is already running`);
+                shepherd.log(`error accessing ${_daemonLogName}, doesnt exist or another proc is already running`, 'native.process');
               }
 
               if (!shepherd.appConfig.native.stopNativeDaemonsOnQuit) {
@@ -245,12 +245,12 @@ module.exports = (shepherd) => {
                 let _daemonChildProc = execFile(`${shepherd.komododBin}`, _arg, {
                   maxBuffer: 1024 * 1000000, // 1000 mb
                 }, (error, stdout, stderr) => {
-                  shepherd.writeLog(`stdout: ${stdout}`);
-                  shepherd.writeLog(`stderr: ${stderr}`);
+                  shepherd.writeLog(`stdout: ${stdout}`, 'native.debug');
+                  shepherd.writeLog(`stderr: ${stderr}`, 'native.debug');
 
                   if (error !== null) {
-                    shepherd.log(`exec error: ${error}`);
-                    shepherd.writeLog(`exec error: ${error}`);
+                    shepherd.log(`exec error: ${error}`, 'native.debug');
+                    shepherd.writeLog(`exec error: ${error}`, 'native.debug');
 
                     // TODO: check other edge cases
                     if (error.toString().indexOf('using -reindex') > -1) {
@@ -263,6 +263,7 @@ module.exports = (shepherd) => {
                   }
                 });
 
+                // TODO: logger add verbose native output
                 _daemonChildProc.stdout.on('data', (data) => {
                   // shepherd.log(`${_daemonName} stdout: \n${data}`);
                 }).pipe(logStream);
@@ -281,9 +282,9 @@ module.exports = (shepherd) => {
                   fs.appendFile(_daemonLogName, _errMsg, (err) => {
                     if (err) {
                       shepherd.writeLog(_errMsg);
-                      shepherd.log(_errMsg);
+                      shepherd.log(_errMsg, 'native.debug');
                     }
-                    shepherd.log(_errMsg);
+                    shepherd.log(_errMsg, 'native.debug');
                   });
                 });
               }
@@ -292,12 +293,12 @@ module.exports = (shepherd) => {
             if (shepherd.kmdMainPassiveMode) {
               shepherd.coindInstanceRegistry[data.ac_name] = true;
             }
-            shepherd.log(`port ${_port} (${data.ac_name}) is already in use`);
+            shepherd.log(`port ${_port} (${data.ac_name}) is already in use`, 'native.process');
             shepherd.writeLog(`port ${_port} (${data.ac_name}) is already in use`);
           }
         });
       } catch(e) {
-        shepherd.log(`failed to start komodod err: ${e}`);
+        shepherd.log(`failed to start komodod err: ${e}`, 'native.process');
         shepherd.writeLog(`failed to start komodod err: ${e}`);
       }
     }
@@ -306,29 +307,29 @@ module.exports = (shepherd) => {
     if (flock === 'chipsd') {
       let kmdDebugLogLocation = `${shepherd.chipsDir}/debug.log`;
 
-      shepherd.log('chipsd flock selected...');
-      shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`);
-      shepherd.writeLog('chipsd flock selected...');
-      shepherd.writeLog(`selected data: ${data}`);
+      shepherd.log('chipsd flock selected...', 'native.confd');
+      shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`, 'native.confd');
+      shepherd.writeLog('chipsd flock selected...', 'native.confd');
+      shepherd.writeLog(`selected data: ${data}`, 'native.confd');
 
       // truncate debug.log
       try {
         const _confFileAccess = _fs.accessSync(kmdDebugLogLocation, fs.R_OK | fs.W_OK);
 
         if (_confFileAccess) {
-          shepherd.log(`error accessing ${kmdDebugLogLocation}`);
+          shepherd.log(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
           shepherd.writeLog(`error accessing ${kmdDebugLogLocation}`);
         } else {
           try {
             fs.unlinkSync(kmdDebugLogLocation);
-            shepherd.log(`truncate ${kmdDebugLogLocation}`);
+            shepherd.log(`truncate ${kmdDebugLogLocation}`, 'native.debug');
             shepherd.writeLog(`truncate ${kmdDebugLogLocation}`);
           } catch (e) {
-            shepherd.log('cant unlink debug.log');
+            shepherd.log('cant unlink debug.log', 'native.debug');
           }
         }
       } catch(e) {
-        shepherd.log(`chipsd debug.log access err: ${e}`);
+        shepherd.log(`chipsd debug.log access err: ${e}`, 'native.debug');
         shepherd.writeLog(`chipsd debug.log access err: ${e}`);
       }
 
@@ -357,10 +358,10 @@ module.exports = (shepherd) => {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}${data.ac_custom_param_value}`;
             }
 
-            shepherd.log(`exec ${shepherd.chipsBin} ${_customParam}`);
+            shepherd.log(`exec ${shepherd.chipsBin} ${_customParam}`, 'native.process');
             shepherd.writeLog(`exec ${shepherd.chipsBin} ${_customParam}`);
 
-            shepherd.log(`daemon param ${data.ac_custom_param}`);
+            shepherd.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
 
             shepherd.coindInstanceRegistry.CHIPS = true;
             let _arg = `${_customParam}`;
@@ -371,6 +372,7 @@ module.exports = (shepherd) => {
               execFile(`${shepherd.chipsBin}`, _arg, {
                 maxBuffer: 1024 * 1000000, // 1000 mb
               }, (error, stdout, stderr) => {
+                // TODO: verbose
                 shepherd.writeLog(`stdout: ${stdout}`);
                 shepherd.writeLog(`stderr: ${stderr}`);
 
@@ -395,7 +397,7 @@ module.exports = (shepherd) => {
                 shepherd.writeLog(`stderr: ${stderr}`);
 
                 if (error !== null) {
-                  shepherd.log(`exec error: ${error}`);
+                  shepherd.log(`exec error: ${error}`, 'native.process');
                   shepherd.writeLog(`exec error: ${error}`);
 
                   if (error.toString().indexOf('using -reindex') > -1) {
@@ -411,7 +413,7 @@ module.exports = (shepherd) => {
           }
         });
       } catch(e) {
-        shepherd.log(`failed to start chipsd err: ${e}`);
+        shepherd.log(`failed to start chipsd err: ${e}`, 'native.process');
         shepherd.writeLog(`failed to start chipsd err: ${e}`);
       }
     }
@@ -419,35 +421,35 @@ module.exports = (shepherd) => {
     if (flock === 'zcashd') { // TODO: fix(?)
       let kmdDebugLogLocation = `${shepherd.zcashDir}/debug.log`;
 
-      shepherd.log('zcashd flock selected...');
-      shepherd.log(`selected data: ${data}`);
-      shepherd.writeLog('zcashd flock selected...');
-      shepherd.writeLog(`selected data: ${data}`);
+      shepherd.log('zcashd flock selected...', 'native.confd');
+      shepherd.log(`selected data: ${data}`, 'native.confd');
+      shepherd.writeLog('zcashd flock selected...', 'native.confd');
+      shepherd.writeLog(`selected data: ${data}`, 'native.confd');
     }
 
     if (flock === 'coind') {
       const _osHome = os.platform === 'win32' ? process.env.APPDATA : process.env.HOME;
       let coindDebugLogLocation = `${_osHome}/.${shepherd.nativeCoindList[coind.toLowerCase()].bin.toLowerCase()}/debug.log`;
 
-      shepherd.log(`coind ${coind} flock selected...`);
-      shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`);
-      shepherd.writeLog(`coind ${coind} flock selected...`);
-      shepherd.writeLog(`selected data: ${data}`);
+      shepherd.log(`coind ${coind} flock selected...`, 'native.confd');
+      shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`, 'native.confd');
+      shepherd.writeLog(`coind ${coind} flock selected...`, 'native.confd');
+      shepherd.writeLog(`selected data: ${data}`, 'native.confd');
 
       // truncate debug.log
       try {
         _fs.access(coindDebugLogLocation, fs.constants.R_OK, (err) => {
           if (err) {
-            shepherd.log(`error accessing ${coindDebugLogLocation}`);
+            shepherd.log(`error accessing ${coindDebugLogLocation}`, 'native.debug');
             shepherd.writeLog(`error accessing ${coindDebugLogLocation}`);
           } else {
-            shepherd.log(`truncate ${coindDebugLogLocation}`);
+            shepherd.log(`truncate ${coindDebugLogLocation}`, 'native.debug');
             shepherd.writeLog(`truncate ${coindDebugLogLocation}`);
             fs.unlink(coindDebugLogLocation);
           }
         });
        } catch (e) {
-         shepherd.log(`coind ${coind} debug.log access err: ${e}`);
+         shepherd.log(`coind ${coind} debug.log access err: ${e}`, 'native.debug');
          shepherd.writeLog(`coind ${coind} debug.log access err: ${e}`);
        }
 
@@ -460,7 +462,7 @@ module.exports = (shepherd) => {
         portscanner.checkPortStatus(_port, '127.0.0.1', (error, status) => {
           // Status is 'open' if currently in use or 'closed' if available
           if (status === 'closed') {
-            shepherd.log(`exec ${coindBin} ${data.ac_options.join(' ')}`);
+            shepherd.log(`exec ${coindBin} ${data.ac_options.join(' ')}`, 'native.process');
             shepherd.writeLog(`exec ${coindBin} ${data.ac_options.join(' ')}`);
 
             shepherd.coindInstanceRegistry[coind] = true;
@@ -473,17 +475,17 @@ module.exports = (shepherd) => {
               shepherd.writeLog(`stderr: ${stderr}`);
 
               if (error !== null) {
-                shepherd.log(`exec error: ${error}`);
+                shepherd.log(`exec error: ${error}`, 'native.process');
                 shepherd.writeLog(`exec error: ${error}`);
               }
             });
           } else {
-            shepherd.log(`port ${_port} (${coind}) is already in use`);
+            shepherd.log(`port ${_port} (${coind}) is already in use`, 'native.process');
             shepherd.writeLog(`port ${_port} (${coind}) is already in use`);
           }
         });
       } catch (e) {
-        shepherd.log(`failed to start ${coind} err: ${e}`);
+        shepherd.log(`failed to start ${coind} err: ${e}`, 'native.process');
         shepherd.writeLog(`failed to start ${coind} err: ${e}`);
       }
     }
@@ -494,7 +496,7 @@ module.exports = (shepherd) => {
     let nativeCoindDir;
     let DaemonConfPath;
 
-    shepherd.log(flock);
+    shepherd.log(flock, 'native.confd');
     shepherd.writeLog(`setconf ${flock}`);
 
     switch (_platform) {
@@ -546,7 +548,7 @@ module.exports = (shepherd) => {
         }
     }
 
-    shepherd.log(DaemonConfPath);
+    shepherd.log(DaemonConfPath, 'native.confd');
     shepherd.writeLog(`setconf ${DaemonConfPath}`);
 
     const CheckFileExists = () => {
@@ -555,12 +557,12 @@ module.exports = (shepherd) => {
         const confFileExist = fs.ensureFileSync(DaemonConfPath);
 
         if (confFileExist) {
-          shepherd.log(result);
+          shepherd.log(result, 'native.confd');
           shepherd.writeLog(`setconf ${result}`);
 
           resolve(result);
         } else {
-          shepherd.log('conf file doesnt exist');
+          shepherd.log('conf file doesnt exist', 'native.confd');
           resolve('conf file doesnt exist');
         }
       });
@@ -571,7 +573,7 @@ module.exports = (shepherd) => {
         const result = 'Conf file permissions updated to Read/Write';
 
         fsnode.chmodSync(DaemonConfPath, '0666');
-        shepherd.log(result);
+        shepherd.log(result, 'native.confd');
         shepherd.writeLog(`setconf ${result}`);
 
         resolve(result);
@@ -595,7 +597,7 @@ module.exports = (shepherd) => {
               return shepherd.log(err);
 
             fsnode.chmodSync(DaemonConfPath, '0666');
-            shepherd.writeLog(`setconf ${result}`);
+            shepherd.writeLog(`setconf ${result}`, 'native.confd');
             shepherd.log(result);
             resolve(result);
           });
@@ -613,21 +615,21 @@ module.exports = (shepherd) => {
               const result = 'checking rpcuser...';
 
               if (status[0].hasOwnProperty('rpcuser')) {
-                shepherd.log('rpcuser: OK');
+                shepherd.log('rpcuser: OK', 'native.confd');
                 shepherd.writeLog('rpcuser: OK');
               } else {
                 const randomstring = md5((Math.random() * Math.random() * 999).toString());
 
-                shepherd.log('rpcuser: NOT FOUND');
+                shepherd.log('rpcuser: NOT FOUND', 'native.confd');
                 shepherd.writeLog('rpcuser: NOT FOUND');
 
                 fs.appendFile(DaemonConfPath, `\nrpcuser=user${randomstring.substring(0, 16)}`, (err) => {
                   if (err) {
                     shepherd.writeLog(`append daemon conf err: ${err}`);
-                    shepherd.log(`append daemon conf err: ${err}`);
+                    shepherd.log(`append daemon conf err: ${err}`, 'native.confd');
                   }
                   // throw err;
-                  shepherd.log('rpcuser: ADDED');
+                  shepherd.log('rpcuser: ADDED', 'native.confd');
                   shepherd.writeLog('rpcuser: ADDED');
                 });
               }
@@ -641,7 +643,7 @@ module.exports = (shepherd) => {
               const result = 'checking rpcpassword...';
 
               if (status[0].hasOwnProperty('rpcpassword')) {
-                shepherd.log('rpcpassword: OK');
+                shepherd.log('rpcpassword: OK', 'native.confd');
                 shepherd.writeLog('rpcpassword: OK');
               } else {
                 const randomstring = md5((Math.random() * Math.random() * 999).toString());
@@ -652,9 +654,9 @@ module.exports = (shepherd) => {
                 fs.appendFile(DaemonConfPath, `\nrpcpassword=${randomstring}`, (err) => {
                   if (err) {
                     shepherd.writeLog(`append daemon conf err: ${err}`);
-                    shepherd.log(`append daemon conf err: ${err}`);
+                    shepherd.log(`append daemon conf err: ${err}`, 'native.confd');
                   }
-                  shepherd.log('rpcpassword: ADDED');
+                  shepherd.log('rpcpassword: ADDED', 'native.confd');
                   shepherd.writeLog('rpcpassword: ADDED');
                 });
               }
@@ -669,18 +671,18 @@ module.exports = (shepherd) => {
 
               if (flock === 'komodod') {
                 if (status[0].hasOwnProperty('rpcport')) {
-                  shepherd.log('rpcport: OK');
+                  shepherd.log('rpcport: OK', 'native.confd');
                   shepherd.writeLog('rpcport: OK');
                 } else {
-                  shepherd.log('rpcport: NOT FOUND');
+                  shepherd.log('rpcport: NOT FOUND', 'native.confd');
                   shepherd.writeLog('rpcport: NOT FOUND');
 
                   fs.appendFile(DaemonConfPath, '\nrpcport=7771', (err) => {
                     if (err) {
                       shepherd.writeLog(`append daemon conf err: ${err}`);
-                      shepherd.log(`append daemon conf err: ${err}`);
+                      shepherd.log(`append daemon conf err: ${err}`, 'native.confd');
                     }
-                    shepherd.log('rpcport: ADDED');
+                    shepherd.log('rpcport: ADDED', 'native.confd');
                     shepherd.writeLog('rpcport: ADDED');
                   });
                 }
@@ -695,7 +697,7 @@ module.exports = (shepherd) => {
               const result = 'checking server...';
 
               if (status[0].hasOwnProperty('server')) {
-                shepherd.log('server: OK');
+                shepherd.log('server: OK', 'native.confd');
                 shepherd.writeLog('server: OK');
               } else {
                 shepherd.log('server: NOT FOUND');
@@ -703,11 +705,11 @@ module.exports = (shepherd) => {
 
                 fs.appendFile(DaemonConfPath, '\nserver=1', (err) => {
                   if (err) {
-                    shepherd.writeLog(`append daemon conf err: ${err}`);
+                    shepherd.writeLog(`append daemon conf err: ${err}`, 'native.confd');
                     shepherd.log(`append daemon conf err: ${err}`);
                   }
                   // throw err;
-                  shepherd.log('server: ADDED');
+                  shepherd.log('server: ADDED', 'native.confd');
                   shepherd.writeLog('server: ADDED');
                 });
               }
@@ -723,7 +725,7 @@ module.exports = (shepherd) => {
               if (flock === 'chipsd' ||
                   flock === 'komodod') {
                 if (status[0].hasOwnProperty('addnode')) {
-                  shepherd.log('addnode: OK');
+                  shepherd.log('addnode: OK', 'native.confd');
                   shepherd.writeLog('addnode: OK');
                 } else {
                   let nodesList;
@@ -749,13 +751,13 @@ module.exports = (shepherd) => {
                     '\naddnode=144.76.94.3';
                   }
 
-                  shepherd.log('addnode: NOT FOUND');
+                  shepherd.log('addnode: NOT FOUND', 'native.confd');
                   fs.appendFile(DaemonConfPath, nodesList, (err) => {
                     if (err) {
                       shepherd.writeLog(`append daemon conf err: ${err}`);
-                      shepherd.log(`append daemon conf err: ${err}`);
+                      shepherd.log(`append daemon conf err: ${err}`, 'native.confd');
                     }
-                    shepherd.log('addnode: ADDED');
+                    shepherd.log('addnode: ADDED', 'native.confd');
                     shepherd.writeLog('addnode: ADDED');
                   });
                 }
@@ -776,7 +778,7 @@ module.exports = (shepherd) => {
           .then(addnode);
         });
 
-        shepherd.log(result);
+        shepherd.log(result, 'native.confd');
         shepherd.writeLog(`checkconf addnode ${result}`);
 
         resolve(result);
@@ -798,8 +800,8 @@ module.exports = (shepherd) => {
   shepherd.post('/herd', (req, res) => {
     if (shepherd.checkToken(req.body.token)) {
       const _body = req.body;
-      shepherd.log('herd req.body =>');
-      shepherd.log(_body);
+      shepherd.log('herd req.body =>', 'native.confd');
+      shepherd.log(_body, 'native.confd');
 
       if (_body.options &&
           !shepherd.kmdMainPassiveMode) {
@@ -814,7 +816,7 @@ module.exports = (shepherd) => {
               if (status === 'open' &&
                   shepherd.appConfig.native.stopNativeDaemonsOnQuit) {
                 if (!skipError) {
-                  shepherd.log(`komodod service start error at port ${_port}, reason: port is closed`);
+                  shepherd.log(`komodod service start error at port ${_port}, reason: port is closed`, 'native.process');
                   shepherd.writeLog(`komodod service start error at port ${_port}, reason: port is closed`);
                   shepherd.io.emit('service', {
                     komodod: {
@@ -830,7 +832,7 @@ module.exports = (shepherd) => {
                   res.status(500);
                   res.end(JSON.stringify(obj));
                 } else {
-                  shepherd.log(`komodod service start success at port ${_port}`);
+                  shepherd.log(`komodod service start success at port ${_port}`, 'native.process');
                   shepherd.writeLog(`komodod service start success at port ${_port}`);
                 }
               } else {
@@ -844,7 +846,7 @@ module.exports = (shepherd) => {
 
                   res.end(JSON.stringify(obj));
                 } else {
-                  shepherd.log(`komodod service start error at port ${_port}, reason: unknown`);
+                  shepherd.log(`komodod service start error at port ${_port}, reason: unknown`, 'native.process');
                   shepherd.writeLog(`komodod service start error at port ${_port}, reason: unknown`);
                 }
               }
@@ -896,8 +898,8 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       const _body = req.body;
 
-      shepherd.log('setconf req.body =>');
-      shepherd.log(_body);
+      shepherd.log('setconf req.body =>', 'native.confd');
+      shepherd.log(_body, 'native.confd');
 
       if (os.platform() === 'win32' &&
           _body.chain == 'komodod') {
@@ -929,13 +931,13 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       const _body = req.body;
 
-      shepherd.log('getconf req.body =>');
-      shepherd.log(_body);
+      shepherd.log('getconf req.body =>', 'native.confd');
+      shepherd.log(_body, 'native.confd');
 
       const confpath = getConf(_body.chain, _body.coind);
 
-      shepherd.log(`getconf path is: ${confpath}`);
-      shepherd.writeLog(`getconf path is: ${confpath}`);
+      shepherd.log(`getconf path is: ${confpath}`, 'native.confd');
+      shepherd.writeLog(`getconf path is: ${confpath}`, 'native.confd');
 
       const obj = {
         msg: 'success',
@@ -957,19 +959,19 @@ module.exports = (shepherd) => {
     // check if kmd conf exists
     _fs.access(isChips ? `${shepherd.chipsDir}/chips.conf` : `${shepherd.komodoDir}/komodo.conf`, fs.constants.R_OK, (err) => {
       if (err) {
-        shepherd.log(isChips ? 'creating chips conf' : 'creating komodo conf');
+        shepherd.log(isChips ? 'creating chips conf' : 'creating komodo conf', 'native.confd');
         shepherd.writeLog(isChips ? `creating chips conf in ${shepherd.chipsDir}/chips.conf` : `creating komodo conf in ${shepherd.komodoDir}/komodo.conf`);
         setConf(isChips ? 'chipsd' : 'komodod');
       } else {
         const _confSize = fs.lstatSync(isChips ? `${shepherd.chipsDir}/chips.conf` : `${shepherd.komodoDir}/komodo.conf`);
 
         if (_confSize.size === 0) {
-          shepherd.log(isChips ? 'err: chips conf file is empty, creating chips conf' : 'err: komodo conf file is empty, creating komodo conf');
+          shepherd.log(isChips ? 'err: chips conf file is empty, creating chips conf' : 'err: komodo conf file is empty, creating komodo conf', 'native.confd');
           shepherd.writeLog(isChips ? `creating chips conf in ${shepherd.chipsDir}/chips.conf` : `creating komodo conf in ${shepherd.komodoDir}/komodo.conf`);
           setConf(isChips ? 'chipsd' : 'komodod');
         } else {
           shepherd.writeLog(isChips ? 'chips conf exists' : 'komodo conf exists');
-          shepherd.log(isChips ? 'chips conf exists' : 'komodo conf exists');
+          shepherd.log(isChips ? 'chips conf exists' : 'komodo conf exists', 'native.confd');
         }
       }
     });

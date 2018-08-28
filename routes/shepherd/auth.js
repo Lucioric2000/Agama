@@ -74,8 +74,8 @@ module.exports = (shepherd) => {
       pubHex,
     };
 
-    shepherd.log(`pub key for ${coin} is set`);
-    shepherd.log(shepherd.staking[coin]);
+    shepherd.log(`pub key for ${coin} is set`, 'pubkey');
+    shepherd.log(shepherd.staking[coin], 'pubkey');
   };
 
   shepherd.getPubkeys = () => {

@@ -46,12 +46,10 @@ module.exports = (shepherd) => {
       txfee: coin === 'btc' ? 'calculated' : shepherd.electrumServers[coin].txfee,
     };
 
-    // shepherd.log(`default ${coin} electrum server ${shepherd.electrumServers[coin].address + ':' + shepherd.electrumServers[coin].port}`, true);
-
     if (randomServer) {
-      shepherd.log(`random ${coin} electrum server ${randomServer.ip + ':' + randomServer.port}`, true);
+      shepherd.log(`random ${coin} electrum server ${randomServer.ip + ':' + randomServer.port}`, 'spv.coin');
     } else {
-      shepherd.log(`${coin} doesnt have any backup electrum servers`, true);
+      shepherd.log(`${coin} doesnt have any backup electrum servers`, 'spv.coin');
     }
 
     if (Object.keys(shepherd.electrumKeys).length > 0) {
@@ -142,14 +140,14 @@ module.exports = (shepherd) => {
       if (!shepherd.electrumServers[key] ||
           (shepherd.electrumServers[key] &&
           !shepherd.electrumServers[key].serverList)) {
-        shepherd.log(`disable ${key}, coin config check not passed`, true);
+        shepherd.log(`disable ${key}, coin config check not passed`, 'spv.coin');
         delete shepherd.electrumServers[key];
       } else {
         _totalCoins++;
       }
     }
 
-    shepherd.log(`total supported spv coins ${_totalCoins}`);
+    shepherd.log(`total supported spv coins ${_totalCoins}`, 'spv.coin');
   };
 
   return shepherd;

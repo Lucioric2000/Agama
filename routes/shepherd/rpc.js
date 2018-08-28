@@ -50,10 +50,10 @@ module.exports = (shepherd) => {
             shepherd.rpcConf[chain === 'komodod' ? 'KMD' : chain] = parsedRpcConfig;
           }
         } else {
-          shepherd.log(`${_confLocation} is empty`);
+          shepherd.log(`${_confLocation} is empty`, 'native.confd');
         }
       } else {
-        shepherd.log(`${_confLocation} doesnt exist`);
+        shepherd.log(`${_confLocation} doesnt exist`, 'native.confd');
       }
     }
   }
@@ -115,11 +115,11 @@ module.exports = (shepherd) => {
             }
 
             exec(`"${_coindCliBin}" ${_arg}`, (error, stdout, stderr) => {
-              // shepherd.log(`stdout: ${stdout}`);
-              // shepherd.log(`stderr: ${stderr}`);
+              // shepherd.log(`stdout: ${stdout}`, 'native.debug');
+              // shepherd.log(`stderr: ${stderr}`, 'native.debug');
 
               if (error !== null) {
-                shepherd.log(`exec error: ${error}`);
+                shepherd.log(`exec error: ${error}`, 'native.cli');
               }
 
               let responseObj;
@@ -130,9 +130,9 @@ module.exports = (shepherd) => {
 
                 if (_chain !== 'komodod' &&
                     stderr.indexOf(`error creating`) > -1) {
-                  shepherd.log(`replace error creating (gen${_chain})`);
+                  shepherd.log(`replace error creating (gen${_chain})`, 'native.debug');
                   stderr = stderr.replace(`error creating (gen${_chain})`, '');
-                  shepherd.log(stderr);
+                  shepherd.log(stderr, 'native.debug');
                 }
 
                 if ((stderr.indexOf('{') > -1 && stderr.indexOf('}') > -1) ||
@@ -164,9 +164,9 @@ module.exports = (shepherd) => {
 
                 if (_chain !== 'komodod' &&
                     stdout.indexOf(`error creating`) > -1) {
-                  shepherd.log(`replace error creating (gen${_chain})`);
+                  shepherd.log(`replace error creating (gen${_chain})`, 'native.debug');
                   stdout = stdout.replace(`error creating (gen${_chain})`, '');
-                  shepherd.log(stdout);
+                  shepherd.log(stdout, 'native.debug');
                 }
 
                 if ((stdout.indexOf('{') > -1 && stdout.indexOf('}') > -1) ||
@@ -303,8 +303,8 @@ module.exports = (shepherd) => {
 
           _arg = _arg.trim().split(' ');
           execFile(_coindCliBin, _arg, (error, stdout, stderr) => {
-            shepherd.log(`stdout: ${stdout}`);
-            shepherd.log(`stderr: ${stderr}`);
+            shepherd.log(`stdout: ${stdout}`, 'native.debug');
+            shepherd.log(`stderr: ${stderr}`, 'native.debug');
 
             if (error !== null) {
               shepherd.log(`exec error: ${error}`);

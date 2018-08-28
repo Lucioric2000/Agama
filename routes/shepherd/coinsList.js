@@ -11,12 +11,12 @@ module.exports = (shepherd) => {
 
           if (_coinsList[i].spvMode.checked) {
             shepherd.addElectrumCoin(_coin[0]);
-            shepherd.log(`add spv coin ${_coin[0]} from file`);
+            shepherd.log(`add spv coin ${_coin[0]} from file`, 'spv.coins');
           }
         }
       }
     } catch (e) {
-      shepherd.log(e, true);
+      shepherd.log(e, 'spv.coins');
     }
   }
 

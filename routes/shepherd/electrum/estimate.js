@@ -7,7 +7,7 @@ module.exports = (shepherd) => {
       ecl.blockchainEstimatefee(req.query.blocks)
       .then((json) => {
         ecl.close();
-        shepherd.log('electrum estimatefee ==>', true);
+        shepherd.log(`electrum estimatefee ${json}`, 'spv.estimatefee');
 
         const successObj = {
           msg: 'success',

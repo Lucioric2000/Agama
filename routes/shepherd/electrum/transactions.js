@@ -35,7 +35,7 @@ module.exports = (shepherd) => {
       const isKv = config.kv;
       const _maxlength = isKv ? 10 : config.maxlength;
 
-      shepherd.log('electrum listtransactions ==>', true);
+      shepherd.log('electrum listtransactions ==>', 'spv.listtransactions');
 
       if (!config.full ||
           ecl.insight) {
@@ -43,7 +43,7 @@ module.exports = (shepherd) => {
         ecl.blockchainAddressGetHistory(_address)
         .then((json) => {
           ecl.close();
-          shepherd.log(json, true);
+          shepherd.log(json, 'spv.listtransactions');
 
           json = shepherd.sortTransactions(json, 'timestamp');
 
@@ -71,7 +71,7 @@ module.exports = (shepherd) => {
                 json = shepherd.sortTransactions(json);
                 json = json.length > MAX_TX ? json.slice(0, MAX_TX) : json;
 
-                shepherd.log(json.length, true);
+                shepherd.log(json.length, 'spv.listtransactions');
                 let index = 0;
 
                 // callback hell, use await?
@@ -80,23 +80,29 @@ module.exports = (shepherd) => {
                   .then((blockInfo) => {
                     if (blockInfo &&
                         blockInfo.timestamp) {
-                      shepherd.getTransaction(transaction['tx_hash'], network, ecl)
+                      shepherd.getTransaction(transaction.tx_hash, network, ecl)
                       .then((_rawtxJSON) => {
-                        shepherd.log('electrum gettransaction ==>', true);
-                        shepherd.log((index + ' | ' + (_rawtxJSON.length - 1)), true);
-                        // shepherd.log(_rawtxJSON, true);
+                        shepherd.log('electrum gettransaction ==>', 'spv.listtransactions');
+                        shepherd.log((index + ' | ' + (_rawtxJSON.length - 1)), 'spv.listtransactions');
+                        // shepherd.log(_rawtxJSON, 'spv.listtransactions');
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
-                        const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                        let decodedTx;
+
+                        if (shepherd.getTransactionDecoded(transaction.tx_hash, network)) {
+                          decodedTx = shepherd.getTransactionDecoded(transaction.tx_hash, network);
+                        } else {
+                          decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                        }
 
                         let txInputs = [];
                         let opreturn = false;
 
-                        shepherd.log(`decodedtx network ${network}`, true);
+                        shepherd.log(`decodedtx network ${network}`, 'spv.listtransactions');
 
-                        shepherd.log('decodedtx =>', true);
-                        // shepherd.log(decodedTx.outputs, true);
+                        shepherd.log('decodedtx =>', 'spv.listtransactions');
+                        // shepherd.log(decodedTx.outputs, 'spv.listtransactions');
 
                         let index2 = 0;
 
@@ -127,7 +133,7 @@ module.exports = (shepherd) => {
 
                               if (index2 === decodedTx.inputs.length ||
                                   index2 === shepherd.appConfig.spv.maxVinParseLimit) {
-                                shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, true);
+                                shepherd.log(`tx history decode inputs ${decodedTx.inputs.length} | ${index2} => main callback`, 'spv.listtransactions');
                                 const _parsedTx = {
                                   network: decodedTx.network,
                                   format: decodedTx.format,
@@ -201,7 +207,7 @@ module.exports = (shepherd) => {
                                 }
 
                                 callback();
-                                shepherd.log(`tx history main loop ${json.length} | ${index}`, true);
+                                shepherd.log(`tx history main loop ${json.length} | ${index}`, 'spv.listtransactions');
                               } else {
                                 callback2();
                               }
@@ -213,7 +219,7 @@ module.exports = (shepherd) => {
                                 const decodedVinVout = shepherd.electrumJSTxDecoder(rawInput, network, _network);
 
                                 if (decodedVinVout) {
-                                  shepherd.log(decodedVinVout.outputs[_decodedInput.n], true);
+                                  shepherd.log(decodedVinVout.outputs[_decodedInput.n], 'spv.listtransactions');
                                   txInputs.push(decodedVinVout.outputs[_decodedInput.n]);
                                 }
                                 checkLoop();
@@ -328,13 +334,13 @@ module.exports = (shepherd) => {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
       const ecl = shepherd.ecl(network);
 
-      shepherd.log('electrum gettransaction =>', true);
+      shepherd.log('electrum gettransaction =>', 'spv.gettransaction');
 
       ecl.connect();
       ecl.blockchainTransactionGet(req.query.txid)
       .then((json) => {
         ecl.close();
-        shepherd.log(json, true);
+        shepherd.log(json, 'spv.gettransaction');
 
         const successObj = {
           msg: 'success',

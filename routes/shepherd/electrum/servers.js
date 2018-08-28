@@ -58,7 +58,7 @@ module.exports = (shepherd) => {
           }
         }
       } catch (e) {
-        shepherd.log(e, true);
+        shepherd.log(e, 'spv.serverList');
       }
     }
   };
@@ -67,17 +67,17 @@ module.exports = (shepherd) => {
     if (fs.existsSync(`${shepherd.agamaDir}/electrumServers.json`)) {
       const localElectrumServersList = fs.readFileSync(`${shepherd.agamaDir}/electrumServers.json`, 'utf8');
 
-      shepherd.log('electrum servers list set from local file');
+      shepherd.log('electrum servers list set from local file', 'spv.serverList');
       shepherd.writeLog('electrum servers list set from local file');
 
       try {
         shepherd.electrumServers = JSON.parse(localElectrumServersList);
         shepherd.mergeLocalKvElectrumServers();
       } catch (e) {
-        shepherd.log(e, true);
+        shepherd.log(e, 'spv.serverList');
       }
     } else {
-      shepherd.log('local electrum servers list file is not found!');
+      shepherd.log('local electrum servers list file is not found!', 'spv.serverList');
       shepherd.writeLog('local lectrum servers list file is not found!');
 
       shepherd.saveElectrumServersList();
@@ -100,7 +100,7 @@ module.exports = (shepherd) => {
             fsnode.chmodSync(electrumServersListFileName, '0666');
 
             setTimeout(() => {
-              shepherd.log(result);
+              shepherd.log(result, 'spv.serverList');
               shepherd.writeLog(result);
               resolve(result);
             }, 1000);
@@ -118,13 +118,13 @@ module.exports = (shepherd) => {
                         .replace(/{/g, '{\n')
                         .replace(/}/g, '\n}'), 'utf8', (err) => {
               if (err)
-                return shepherd.log(err);
+                return shepherd.log(err, 'spv.serverList');
             });
 
             fsnode.chmodSync(electrumServersListFileName, '0666');
             setTimeout(() => {
-              shepherd.log(result);
-              shepherd.log(`electrumServers.json file is created successfully at: ${shepherd.agamaDir}`);
+              shepherd.log(result, 'spv.serverList');
+              shepherd.log(`electrumServers.json file is created successfully at: ${shepherd.agamaDir}`, 'spv.serverList');
               shepherd.writeLog(`electrumServers.json file is created successfully at: ${shepherd.agamaDir}`);
               resolve(result);
             }, 2000);
@@ -149,7 +149,7 @@ module.exports = (shepherd) => {
             fsnode.chmodSync(kvElectrumServersListFileName, '0666');
 
             setTimeout(() => {
-              shepherd.log(result);
+              shepherd.log(result, 'spv.serverList');
               shepherd.writeLog(result);
               resolve(result);
             }, 1000);
@@ -167,13 +167,13 @@ module.exports = (shepherd) => {
                         .replace(/{/g, '{\n')
                         .replace(/}/g, '\n}'), 'utf8', (err) => {
               if (err)
-                return shepherd.log(err);
+                return shepherd.log(err, 'spv.serverList');
             });
 
             fsnode.chmodSync(kvElectrumServersListFileName, '0666');
             setTimeout(() => {
-              shepherd.log(result);
-              shepherd.log(`kvElectrumServersCache.json file is created successfully at: ${shepherd.agamaDir}`);
+              shepherd.log(result, 'spv.serverList');
+              shepherd.log(`kvElectrumServersCache.json file is created successfully at: ${shepherd.agamaDir}`, 'spv.serverList');
               shepherd.writeLog(`kvElectrumServersCache.json file is created successfully at: ${shepherd.agamaDir}`);
               resolve(result);
             }, 2000);
@@ -204,12 +204,12 @@ module.exports = (shepherd) => {
             const _kvElectrumItem = JSON.parse(txhistory.result[i].opreturn.kvDecoded.content.body);
             _kvElectrum = deepmerge(_kvElectrum, _kvElectrumItem);
           } catch (e) {
-            shepherd.log(`kv electrum servers parse error ${e}`, true);
+            shepherd.log(`kv electrum servers parse error ${e}`, 'spv.serverList');
             // shepherd.log(txhistory.result[i].opreturn.kvDecoded.content.body);
           }
         }
 
-        shepherd.log(`kv electrum servers, got ${Object.keys(_kvElectrum).length} records`, true);
+        shepherd.log(`kv electrum servers, got ${Object.keys(_kvElectrum).length} records`, 'spv.serverList');
 
         for (let key in _ticker) {
           _kvElectrum[_ticker[key]] = _kvElectrum[key];

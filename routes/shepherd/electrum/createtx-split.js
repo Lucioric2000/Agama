@@ -26,8 +26,8 @@ module.exports = (shepherd) => {
         tx = new bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
       }
 
-      shepherd.log('buildSignedTx', true);
-      shepherd.log(`buildSignedTx pub key ${key.getAddress().toString()}`, true);
+      shepherd.log('buildSignedTx', 'spv.createrawtx');
+      shepherd.log(`buildSignedTx pub key ${key.getAddress().toString()}`, 'spv.createrawtx');
 
       for (let i = 0; i < utxo.length; i++) {
         tx.addInput(utxo[i].txid, utxo[i].vout);
@@ -53,7 +53,7 @@ module.exports = (shepherd) => {
             shepherd.getNetworkData(network)
           );
         } else {
-          shepherd.log(`change ${change}`, true);
+          shepherd.log(`change ${change}`, 'spv.createrawtx');
           tx.addOutput(changeAddress, Number(change));
         }
       }
@@ -62,7 +62,7 @@ module.exports = (shepherd) => {
           network === 'KMD') {
         const _locktime = Math.floor(Date.now() / 1000) - 777;
         tx.setLockTime(_locktime);
-        shepherd.log(`kmd tx locktime set to ${_locktime}`, true);
+        shepherd.log(`kmd tx locktime set to ${_locktime}`, 'spv.createrawtx');
       }
 
       for (let i = 0; i < utxo.length; i++) {

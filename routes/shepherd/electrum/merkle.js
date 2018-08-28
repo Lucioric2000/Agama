@@ -11,10 +11,10 @@ module.exports = (shepherd) => {
     let hash = txid;
     let serialized;
 
-    shepherd.log(`getMerkleRoot txid ${txid}`, true);
-    shepherd.log(`getMerkleRoot pos ${pos}`, true);
-    shepherd.log('getMerkleRoot proof', true);
-    shepherd.log(`getMerkleRoot ${proof}`, true);
+    shepherd.log(`getMerkleRoot txid ${txid}`, 'spv.merkle');
+    shepherd.log(`getMerkleRoot pos ${pos}`, 'spv.merkle');
+    shepherd.log('getMerkleRoot proof', 'spv.merkle');
+    shepherd.log(`getMerkleRoot ${proof}`, 'spv.merkle');
 
     for (i = 0; i < proof.length; i++) {
       const _hashBuff = new Buffer(hash, 'hex');
@@ -51,8 +51,8 @@ module.exports = (shepherd) => {
     let ecl = shepherd.ecl(network, { ip: _mainServer[0], port: _mainServer[1], proto: _mainServer[2] });
 
     return new Promise((resolve, reject) => {
-      shepherd.log(`main server: ${mainServer}`, true);
-      shepherd.log(`verification server: ${randomServer}`, true);
+      shepherd.log(`main server: ${mainServer}`, 'spv.merkle');
+      shepherd.log(`verification server: ${randomServer}`, 'spv.merkle');
 
       ecl.connect();
       ecl.blockchainTransactionGetMerkle(txid, height)
@@ -60,12 +60,12 @@ module.exports = (shepherd) => {
         if (merkleData &&
             merkleData.merkle &&
             merkleData.pos) {
-          shepherd.log('electrum getmerkle =>', true);
-          shepherd.log(merkleData, true);
+          shepherd.log('electrum getmerkle =>', 'spv.merkle');
+          shepherd.log(merkleData, 'spv.merkle');
           ecl.close();
 
           const _res = shepherd.getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
-          shepherd.log(_res, true);
+          shepherd.log(_res, 'spv.merkle');
 
           ecl = shepherd.ecl(network, { ip: _randomServer[0], port: _randomServer[1], proto: _randomServer[2] });
           // ecl = new shepherd.electrumJSCore(_randomServer[1], _randomServer[0], randomServer[2]);
@@ -76,9 +76,9 @@ module.exports = (shepherd) => {
             if (blockInfo &&
                 blockInfo.merkle_root) {
               ecl.close();
-              shepherd.log('blockinfo =>', true);
-              shepherd.log(blockInfo, true);
-              shepherd.log(blockInfo.merkle_root, true);
+              shepherd.log('blockinfo =>', 'spv.merkle');
+              shepherd.log(blockInfo, 'spv.merkle');
+              shepherd.log(blockInfo.merkle_root, 'spv.merkle');
 
               if (blockInfo &&
                   blockInfo.merkle_root) {
@@ -107,9 +107,9 @@ module.exports = (shepherd) => {
   shepherd.verifyMerkleByCoin = (coin, txid, height) => {
     const _serverList = shepherd.electrumCoins[coin].serverList;
 
-    shepherd.log(`verifyMerkleByCoin`, true);
-    shepherd.log(shepherd.electrumCoins[coin].server, true);
-    shepherd.log(shepherd.electrumCoins[coin].serverList, true);
+    shepherd.log('verifyMerkleByCoin', 'spv.merkle');
+    shepherd.log(shepherd.electrumCoins[coin].server, 'spv.merkle');
+    shepherd.log(shepherd.electrumCoins[coin].serverList, 'spv.merkle');
 
     return new Promise((resolve, reject) => {
       if (_serverList !== 'none') {

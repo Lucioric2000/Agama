@@ -42,9 +42,9 @@ module.exports = (shepherd) => {
         _checkList.verifyingKeySize = true;
       }
 
-      shepherd.log('zcashparams exist');
+      shepherd.log('zcashparams exist', 'native.zcparams');
     } else {
-      shepherd.log('zcashparams doesnt exist');
+      shepherd.log('zcashparams doesnt exist', 'native.zcparams');
     }
 
     if (!_checkList.rootDir ||
@@ -61,7 +61,7 @@ module.exports = (shepherd) => {
   shepherd.zcashParamsExistPromise = () => {
     return new Promise((resolve, reject) => {
       const _verify = shepherd.zcashParamsExist();
-      resolve(_verify);
+      resolve(_verify, 'native.zcparams');
     });
   };
 
@@ -108,7 +108,7 @@ module.exports = (shepherd) => {
         .then(() => {
           const checkZcashParams = shepherd.zcashParamsExist();
 
-          shepherd.log(`${key} dl done`);
+          shepherd.log(`${key} dl done`, 'native.zcparams');
 
           if (checkZcashParams.error) {
             shepherd.io.emit('zcparams', {
@@ -129,7 +129,7 @@ module.exports = (shepherd) => {
                 status: 'done',
               },
             });
-            shepherd.log(`file ${key} succesfully downloaded`);
+            shepherd.log(`file ${key} succesfully downloaded`, 'native.zcparams');
           }
         });
       }

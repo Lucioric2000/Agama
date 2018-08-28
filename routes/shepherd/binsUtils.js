@@ -18,11 +18,11 @@ module.exports = (shepherd) => {
         _fs.stat(_bins[i], (err, stat) => {
           if (!err) {
             if (parseInt(stat.mode.toString(8), 10) !== 100775) {
-              shepherd.log(`${_bins[i]} fix permissions`);
+              shepherd.log(`${_bins[i]} fix permissions`, 'native.confd');
               fsnode.chmodSync(_bins[i], '0775');
             }
           } else {
-            shepherd.log(`error: ${_bins[i]} not found`);
+            shepherd.log(`error: ${_bins[i]} not found`, 'native.confd');
           }
         });
       }
@@ -50,22 +50,22 @@ module.exports = (shepherd) => {
       if (stdout.indexOf(processName) > -1) {
         const pkillCmd = osPlatform === 'win32' ? `taskkill /f /im ${processName}.exe` : `pkill -15 ${processName}`;
 
-        shepherd.log(`found another ${processName} process(es)`);
+        shepherd.log(`found another ${processName} process(es)`, 'native.process');
         shepherd.writeLog(`found another ${processName} process(es)`);
 
         shepherd.exec(pkillCmd, (error, stdout, stderr) => {
-          shepherd.log(`${pkillCmd} is issued`);
+          shepherd.log(`${pkillCmd} is issued`, 'native.process');
           shepherd.writeLog(`${pkillCmd} is issued`);
 
           if (error !== null) {
-            shepherd.log(`${pkillCmd} exec error: ${error}`);
+            shepherd.log(`${pkillCmd} exec error: ${error}`, 'native.process');
             shepherd.writeLog(`${pkillCmd} exec error: ${error}`);
           };
         });
       }
 
       if (error !== null) {
-        shepherd.log(`${processGrep} exec error: ${error}`);
+        shepherd.log(`${processGrep} exec error: ${error}`, 'native.process');
         shepherd.writeLog(`${processGrep} exec error: ${error}`);
       };
     });

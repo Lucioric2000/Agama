@@ -19,7 +19,7 @@ module.exports = (shepherd) => {
       try {
         _fs.access(_walletDatLocation, fs.constants.R_OK, (err) => {
           if (err) {
-            shepherd.log(`error reading ${_walletDatLocation}`);
+            shepherd.log(`error reading ${_walletDatLocation}`, 'native.wallet.dat');
             successObj = {
               msg: 'error',
               result: `error reading ${_walletDatLocation}`,
@@ -30,7 +30,7 @@ module.exports = (shepherd) => {
             shepherd.log(`reading ${_walletDatLocation}`);
             fs.readFile(_walletDatLocation, (err, data) => {
               if (err) {
-                shepherd.log(`read wallet.dat err: ${err}`);
+                shepherd.log(`read wallet.dat err: ${err}`, 'native.wallet.dat');
                 successObj = {
                   msg: 'error',
                   result: `error reading ${_walletDatLocation}`,
@@ -43,7 +43,7 @@ module.exports = (shepherd) => {
                 privateKeys = dataHexStr.match(re);
 
                 if (!privateKeys) {
-                  shepherd.log('wallet is encrypted?');
+                  shepherd.log('wallet is encrypted?', 'native.wallet.dat');
 
                   successObj = {
                     msg: 'error',
@@ -55,7 +55,7 @@ module.exports = (shepherd) => {
                   let _keys = [];
                   privateKeys = privateKeys.map(x => x.replace('\x30\x81\xD3\x02\x01\x01\x04\x20', ''));
                   privateKeys = privateKeys.filter((v, i, a) => a.indexOf(v) === i);
-                  shepherd.log(`found ${privateKeys.length} keys`);
+                  shepherd.log(`found ${privateKeys.length} keys`, 'native.wallet.dat');
 
                   for (let i = 0; i < privateKeys.length; i++) {
                     const privateKey = new Buffer(Buffer.from(privateKeys[i], 'latin1').toString('hex'), 'hex');

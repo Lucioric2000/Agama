@@ -15,7 +15,6 @@ shepherd.coindStdout = {};
 shepherd.guiLog = {};
 shepherd.rpcConf = {};
 shepherd.appRuntimeLog = [];
-shepherd.appRuntimeSPVLog = [];
 shepherd.lockDownAddCoin = false;
 shepherd._isWatchOnly = false;
 

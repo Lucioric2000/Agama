@@ -57,13 +57,13 @@ module.exports = (shepherd) => {
       shepherd.remoteFileSize('https://github.com/pbca26/dl-test/raw/master/patch.zip', (err, remotePatchSize) => {
         // verify that remote file is matching to DL'ed file
         const localPatchSize = fs.statSync(`${rootLocation}patch.zip`).size;
-        shepherd.log('compare dl file size');
+        shepherd.log('compare dl file size', 'update.patch');
 
         if (localPatchSize === remotePatchSize) {
           const zip = new AdmZip(`${rootLocation}patch.zip`);
 
-          shepherd.log('patch succesfully downloaded');
-          shepherd.log('extracting contents');
+          shepherd.log('patch succesfully downloaded', 'update.patch');
+          shepherd.log('extracting contents', 'update.patch');
 
           if (shepherd.appConfig.dev) {
             if (!fs.existsSync(`${rootLocation}/patch`)) {
@@ -88,7 +88,7 @@ module.exports = (shepherd) => {
               message: 'size mismatch',
             },
           });
-          shepherd.log('patch file size doesnt match remote!');
+          shepherd.log('patch file size doesnt match remote!', 'update.patch');
         }
       });
     });

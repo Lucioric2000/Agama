@@ -43,9 +43,9 @@ module.exports = (shepherd) => {
 
           _arg.push('stop');
           execFile(`${_coindQuitCmd}`, _arg, (error, stdout, stderr) => {
-            shepherd.log(`stdout: ${stdout}`);
-            shepherd.log(`stderr: ${stderr}`);
-            shepherd.log(`send stop sig to ${key}`);
+            shepherd.log(`stdout: ${stdout}`, 'native.debug');
+            shepherd.log(`stderr: ${stderr}`, 'native.debug');
+            shepherd.log(`send stop sig to ${key}`, 'native.process');
 
             if (stdout.indexOf('EOF reached') > -1 ||
                 stderr.indexOf('EOF reached') > -1 ||
@@ -69,7 +69,7 @@ module.exports = (shepherd) => {
             }, 100);
 
             if (error !== null) {
-              shepherd.log(`exec error: ${error}`);
+              shepherd.log(`exec error: ${error}`, 'native.process');
             }
 
             setTimeout(() => {
@@ -109,9 +109,9 @@ module.exports = (shepherd) => {
 
       _arg.push('stop');
       execFile(`${_coindQuitCmd}`, _arg, (error, stdout, stderr) => {
-        shepherd.log(`stdout: ${stdout}`);
-        shepherd.log(`stderr: ${stderr}`);
-        shepherd.log(`send stop sig to ${_chain ? _chain : 'komodo'}`);
+        shepherd.log(`stdout: ${stdout}`, 'native.debug');
+        shepherd.log(`stderr: ${stderr}`, 'native.debug');
+        shepherd.log(`send stop sig to ${_chain ? _chain : 'komodo'}`, 'native.process');
 
         if (stdout.indexOf('EOF reached') > -1 ||
             stderr.indexOf('EOF reached') > -1 ||

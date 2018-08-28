@@ -12,21 +12,21 @@ module.exports = (shepherd) => {
     let timestampDiffMinutes = timestampDiff / 60;
     let interest = 0;
 
-    shepherd.log(`${height} vs ${KOMODO_ENDOFERA}`, true);
-    shepherd.log(`${locktime} vs ${LOCKTIME_THRESHOLD}`, true);
+    shepherd.log(`${height} vs ${KOMODO_ENDOFERA}`, 'spv.interest');
+    shepherd.log(`${locktime} vs ${LOCKTIME_THRESHOLD}`, 'spv.interest');
 
     if (height < KOMODO_ENDOFERA &&
         locktime >= LOCKTIME_THRESHOLD) {
-      shepherd.log('kmdCalcInterest =>', true);
-      shepherd.log(`locktime ${locktime}`, true);
-      shepherd.log(`minutes converted ${timestampDiffMinutes}`, true);
-      shepherd.log(`passed ${hoursPassed}h ${minutesPassed}m ${secondsPassed}s`, true);
+      shepherd.log('kmdCalcInterest =>', 'spv.interest');
+      shepherd.log(`locktime ${locktime}`, 'spv.interest');
+      shepherd.log(`minutes converted ${timestampDiffMinutes}`, 'spv.interest');
+      shepherd.log(`passed ${hoursPassed}h ${minutesPassed}m ${secondsPassed}s`, 'spv.interest');
 
       // calc interest
       if (timestampDiffMinutes >= 60) {
         if (height >= 1000000 &&
             timestampDiffMinutes > 31 * 24 * 60) {
-          shepherd.log('kmd new interest conditions');
+          shepherd.log('kmd new interest conditions', 'spv.interest');
           timestampDiffMinutes = 31 * 24 * 60;
         } else {
           if (timestampDiffMinutes > 365 * 24 * 60) {
@@ -41,7 +41,7 @@ module.exports = (shepherd) => {
         }
 
         interest = ((Number(value) * 0.00000001) / 10512000) * timestampDiffMinutes;
-        shepherd.log(`interest ${interest}`, true);
+        shepherd.log(`interest ${interest}`, 'spv.interest');
       }
     }
 

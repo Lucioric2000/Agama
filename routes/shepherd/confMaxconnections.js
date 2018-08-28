@@ -6,16 +6,16 @@ module.exports = (shepherd) => {
     return new Promise((resolve, reject) => {
       fs.readFile(`${shepherd.komodoDir}/komodo.conf`, 'utf8', (err, data) => {
         if (err) {
-          shepherd.log('kmd conf maxconnections param read failed');
+          shepherd.log('kmd conf maxconnections param read failed', 'native.confd');
           resolve('unset');
         } else {
           const _maxcon = data.match(/maxconnections=\s*(.*)/);
 
           if (!_maxcon) {
-            shepherd.log('kmd conf maxconnections param is unset');
+            shepherd.log('kmd conf maxconnections param is unset', 'native.confd');
             resolve(false);
           } else {
-            shepherd.log(`kmd conf maxconnections param is already set to ${_maxcon[1]}`);
+            shepherd.log(`kmd conf maxconnections param is already set to ${_maxcon[1]}`, 'native.confd');
             resolve(_maxcon[1]);
           }
         }
@@ -29,7 +29,7 @@ module.exports = (shepherd) => {
         const _maxconVal = limit ? 1 : 10;
 
         if (err) {
-          shepherd.log(`error reading ${shepherd.komodoDir}/komodo.conf`);
+          shepherd.log(`error reading ${shepherd.komodoDir}/komodo.conf`, 'native.confd');
           resolve(false);
         } else {
           if (data.indexOf('maxconnections=') > -1) {
@@ -42,10 +42,10 @@ module.exports = (shepherd) => {
 
           fs.writeFile(`${shepherd.komodoDir}/komodo.conf`, data, (err) => {
             if (err) {
-              shepherd.log(`error writing ${shepherd.komodoDir}/komodo.conf maxconnections=${_maxconVal}`);
+              shepherd.log(`error writing ${shepherd.komodoDir}/komodo.conf maxconnections=${_maxconVal}`, 'native.confd');
               resolve(false);
             } else {
-              shepherd.log(`kmd conf maxconnections is set to ${_maxconVal}`);
+              shepherd.log(`kmd conf maxconnections is set to ${_maxconVal}`, 'native.confd');
               resolve(true);
             }
           });

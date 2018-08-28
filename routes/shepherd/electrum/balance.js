@@ -6,7 +6,7 @@ module.exports = (shepherd) => {
       const network = req.query.network || shepherd.findNetworkObj(req.query.coin);
       const ecl = shepherd.ecl(network);
 
-      shepherd.log('electrum getbalance =>', true);
+      shepherd.log('electrum getbalance =>', 'spv.getbalance');
 
       ecl.connect();
       ecl.blockchainAddressGetBalance(req.query.address)
@@ -24,15 +24,15 @@ module.exports = (shepherd) => {
                 let _utxo = [];
 
                 for (let i = 0; i < utxoList.length; i++) {
-                  shepherd.log(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`, true);
+                  shepherd.log(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`, 'spv.getbalance');
 
                   if (Number(utxoList[i].value) * 0.00000001 >= 10) {
                     _utxo.push(utxoList[i]);
                   }
                 }
 
-                shepherd.log('filtered utxo list =>', true);
-                shepherd.log(_utxo, true);
+                shepherd.log('filtered utxo list =>', 'spv.getbalance');
+                shepherd.log(_utxo, 'spv.getbalance');
 
                 if (_utxo &&
                     _utxo.length) {
@@ -42,9 +42,9 @@ module.exports = (shepherd) => {
                     return new Promise((resolve, reject) => {
                       shepherd.getTransaction(_utxoItem['tx_hash'], network, ecl)
                       .then((_rawtxJSON) => {
-                        shepherd.log('electrum gettransaction ==>', true);
-                        shepherd.log((index + ' | ' + (_rawtxJSON.length - 1)), true);
-                        shepherd.log(_rawtxJSON, true);
+                        shepherd.log('electrum gettransaction ==>', 'spv.getbalance');
+                        shepherd.log((index + ' | ' + (_rawtxJSON.length - 1)), 'spv.getbalance');
+                        shepherd.log(_rawtxJSON, 'spv.getbalance');
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
@@ -61,8 +61,8 @@ module.exports = (shepherd) => {
                           interestTotal += shepherd.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
                         }
 
-                        shepherd.log('decoded tx =>', true);
-                        shepherd.log(decodedTx, true);
+                        shepherd.log('decoded tx =>', 'spv.getbalance');
+                        shepherd.log(decodedTx, 'spv.getbalance');
 
                         resolve(true);
                       });
@@ -128,8 +128,8 @@ module.exports = (shepherd) => {
             });
           } else {
             ecl.close();
-            shepherd.log('electrum getbalance ==>', true);
-            shepherd.log(json, true);
+            shepherd.log('electrum getbalance ==>', 'spv.getbalance');
+            shepherd.log(json, 'spv.getbalance');
 
             const successObj = {
               msg: 'success',
