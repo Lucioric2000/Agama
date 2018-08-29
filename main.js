@@ -62,7 +62,7 @@ let _argv = {};
 for (let i = 0; i < process.argv.length; i++) {
   if (process.argv[i].indexOf('nogui') > -1) {
   	_argv.nogui = true;
-    shepherd.log('enable nogui mode');
+    shepherd.log('enable nogui mode', 'init');
   }
 
   if (process.argv[i].indexOf('=') > -1) {
@@ -74,8 +74,8 @@ for (let i = 0; i < process.argv.length; i++) {
   	_argv = {};
   } else {
   	shepherd.argv = _argv;
-  	shepherd.log('arguments');
-  	shepherd.log(_argv);
+  	shepherd.log('arguments', 'init');
+  	shepherd.log(_argv, 'init');
   }
 }
 
@@ -94,18 +94,18 @@ shepherd.writeLog(`os_type: ${os.type()}`);
 
 if (process.argv.indexOf('devmode') > -1 ||
 		process.argv.indexOf('nogui') > -1) {
-	shepherd.log(`app init ${appSessionHash}`);
+	shepherd.log(`app init ${appSessionHash}`, 'init');
 }
 
-shepherd.log(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`);
-shepherd.log('sys info:');
-shepherd.log(`totalmem_readable: ${formatBytes(os.totalmem())}`);
-shepherd.log(`arch: ${os.arch()}`);
-shepherd.log(`cpu: ${os.cpus()[0].model}`);
-shepherd.log(`cpu_cores: ${os.cpus().length}`);
-shepherd.log(`platform: ${osPlatform}`);
-shepherd.log(`os_release: ${os.release()}`);
-shepherd.log(`os_type: ${os.type()}`);
+shepherd.log(`app info: ${appBasicInfo.name} ${appBasicInfo.version}`, 'init');
+shepherd.log('sys info:', 'init');
+shepherd.log(`totalmem_readable: ${formatBytes(os.totalmem())}`, 'init');
+shepherd.log(`arch: ${os.arch()}`, 'init');
+shepherd.log(`cpu: ${os.cpus()[0].model}`, 'init');
+shepherd.log(`cpu_cores: ${os.cpus().length}`, 'init');
+shepherd.log(`platform: ${osPlatform}`, 'init');
+shepherd.log(`os_release: ${os.release()}`, 'init');
+shepherd.log(`os_type: ${os.type()}`, 'init');
 
 appConfig['daemonOutput'] = false; // shadow setting
 
@@ -113,7 +113,7 @@ let __defaultAppSettings = require('./routes/appConfig.js').config;
 __defaultAppSettings['daemonOutput'] = false; // shadow setting
 const _defaultAppSettings = __defaultAppSettings;
 
-shepherd.log(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`);
+shepherd.log(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`, 'init');
 shepherd.writeLog(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`);
 
 shepherd.setConfKMD();
@@ -151,8 +151,8 @@ process.once('loaded', () => {
 // silent errors
 if (!appConfig.dev) {
 	process.on('uncaughtException', (err) => {
-	  shepherd.log(`${(new Date).toUTCString()} uncaughtException: ${err.message}`);
-	  shepherd.log(err.stack);
+	  shepherd.log(`${(new Date).toUTCString()} uncaughtException: ${err.message}`, 'exception');
+	  shepherd.log(err.stack, 'exception');
 	});
 }
 
@@ -221,8 +221,8 @@ if (!_argv.nogui || (_argv.nogui && _argv.nogui === '1')) {
 	app.on('ready', () => createWindow('open', process.argv.indexOf('dexonly') > -1 ? true : null));
 } else {
 	server.listen(appConfig.agamaPort, () => {
-		shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
-		shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
+		shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
+		shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 		// start sockets.io
 		io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
 	});
@@ -287,7 +287,7 @@ function createWindow(status, hideLoadingWindow) {
 			// Status is 'open' if currently in use or 'closed' if available
 			if (status === 'closed') {
 				server.listen(appConfig.agamaPort, () => {
-					shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
+					shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 					shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
 					// start sockets.io
 					io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
@@ -376,11 +376,11 @@ function createWindow(status, hideLoadingWindow) {
 
 				willQuitApp = true;
 				server.listen(appConfig.agamaPort + 1, () => {
-					shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`);
+					shepherd.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`, 'init');
 					shepherd.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`);
 				});
 				mainWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html` : `file://${__dirname}/gui/startup/agama-instance-error.html`);
-				shepherd.log('another agama app is already running');
+				shepherd.log('another agama app is already running', 'init');
 			}
 
 		  mainWindow.webContents.on('did-finish-load', () => {
@@ -421,14 +421,14 @@ function createWindow(status, hideLoadingWindow) {
 
 				const CloseDaemons = () => {
 					return new Promise((resolve, reject) => {
-						shepherd.log('Closing Main Window...');
+						shepherd.log('Closing Main Window...', 'quit');
 						shepherd.writeLog('exiting app...');
 
 						shepherd.quitKomodod(appConfig.native.cliStopTimeout);
 
 						const result = 'Closing daemons: done';
 
-						shepherd.log(result);
+						shepherd.log(result, 'quit');
 						shepherd.writeLog(result);
 						resolve(result);
 					});
@@ -438,9 +438,9 @@ function createWindow(status, hideLoadingWindow) {
 					return new Promise((resolve, reject) => {
 						const result = 'Hiding Main Window: done';
 
-						shepherd.log('Exiting App...');
+						shepherd.log('Exiting App...', 'quit');
 						mainWindow = null;
-						shepherd.log(result);
+						shepherd.log(result, 'quit');
 						resolve(result);
 					});
 				}
@@ -457,7 +457,7 @@ function createWindow(status, hideLoadingWindow) {
 						const result = 'Quiting App: done';
 
 						app.quit();
-						shepherd.log(result);
+						shepherd.log(result, 'quit');
 						resolve(result);
 					});
 				}
@@ -509,7 +509,7 @@ app.on('window-all-closed', () => {
 // Emitted before the application starts closing its windows.
 // Calling event.preventDefault() will prevent the default behaviour, which is terminating the application.
 app.on('before-quit', (event) => {
-	shepherd.log('before-quit');
+	shepherd.log('before-quit', 'quit');
 	if (process.argv.indexOf('dexonly') > -1) {
 		shepherd.killRogueProcess('marketmaker');
 	}
@@ -520,7 +520,7 @@ app.on('before-quit', (event) => {
 app.on('will-quit', (event) => {
 	if (!forceQuitApp) {
 		// loading window is still open
-		shepherd.log('will-quit while loading window active');
+		shepherd.log('will-quit while loading window active', 'quit');
 		// event.preventDefault();
 	}
 });
@@ -529,7 +529,7 @@ app.on('will-quit', (event) => {
 // Calling event.preventDefault() will prevent the default behaviour, which is terminating the application.
 app.on('quit', (event) => {
 	if (!forceQuitApp) {
-		shepherd.log('quit while loading window active');
+		shepherd.log('quit while loading window active', 'quit');
 		// event.preventDefault();
 	}
 });
