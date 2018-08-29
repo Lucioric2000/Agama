@@ -1,4 +1,5 @@
 module.exports = (shepherd) => {
+  // TODO: loop through vins/vouts
   shepherd.get('/electrum/decoderawtx', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const _network = shepherd.getNetworkData(req.query.network);

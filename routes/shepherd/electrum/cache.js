@@ -131,7 +131,7 @@ module.exports = (shepherd) => {
       return shepherd.electrumCache[network].txDecoded[txid];
     } else {
       if (data) {
-        shepherd.electrumCache[coin].txDecoded[txid] = data;
+        shepherd.electrumCache[network].txDecoded[txid] = data;
       } else {
         return false;
       }

@@ -94,6 +94,7 @@ module.exports = (shepherd) => {
                           decodedTx = shepherd.getTransactionDecoded(transaction.tx_hash, network);
                         } else {
                           decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                          shepherd.getTransactionDecoded(transaction.tx_hash, network, decodedTx);
                         }
 
                         let txInputs = [];

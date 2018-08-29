@@ -42,7 +42,14 @@ module.exports = (shepherd) => {
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
-                        const decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                        let decodedTx;
+
+                        if (shepherd.getTransactionDecoded(_utxoItem.tx_hash, network)) {
+                          decodedTx = shepherd.getTransactionDecoded(_utxoItem.tx_hash, network);
+                        } else {
+                          decodedTx = shepherd.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                          shepherd.getTransactionDecoded(_utxoItem.tx_hash, network, decodedTx);
+                        }
 
                         // shepherd.log('decoded tx =>', true);
                         // shepherd.log(decodedTx, true);

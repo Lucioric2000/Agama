@@ -24,7 +24,7 @@ module.exports = (shepherd) => {
                 let _utxo = [];
 
                 for (let i = 0; i < utxoList.length; i++) {
-                  shepherd.log(`utxo ${utxoList[i]['tx_hash']} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`, 'spv.getbalance');
+                  shepherd.log(`utxo ${utxoList[i].tx_hash} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`, 'spv.getbalance');
 
                   if (Number(utxoList[i].value) * 0.00000001 >= 10) {
                     _utxo.push(utxoList[i]);
@@ -40,7 +40,7 @@ module.exports = (shepherd) => {
 
                   Promise.all(_utxo.map((_utxoItem, index) => {
                     return new Promise((resolve, reject) => {
-                      shepherd.getTransaction(_utxoItem['tx_hash'], network, ecl)
+                      shepherd.getTransaction(_utxoItem.tx_hash, network, ecl)
                       .then((_rawtxJSON) => {
                         shepherd.log('electrum gettransaction ==>', 'spv.getbalance');
                         shepherd.log((index + ' | ' + (_rawtxJSON.length - 1)), 'spv.getbalance');
@@ -48,12 +48,19 @@ module.exports = (shepherd) => {
 
                         // decode tx
                         const _network = shepherd.getNetworkData(network);
-                        const decodedTx = shepherd.electrumJSTxDecoder(
-                          _rawtxJSON,
-                          network,
-                          _network,
-                          shepherd.electrumServers[network].proto === 'insight'
-                        );
+                        let decodedTx;
+
+                        if (shepherd.getTransactionDecoded(_utxoItem.tx_hash, network)) {
+                          decodedTx = shepherd.getTransactionDecoded(_utxoItem.tx_hash, network);
+                        } else {
+                          decodedTx = shepherd.electrumJSTxDecoder(
+                            _rawtxJSON,
+                            network,
+                            _network,
+                            shepherd.electrumServers[network].proto === 'insight'
+                          );
+                          shepherd.getTransactionDecoded(_utxoItem.tx_hash, network, decodedTx);
+                        }
 
                         if (decodedTx &&
                             decodedTx.format &&

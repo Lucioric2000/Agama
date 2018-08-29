@@ -120,7 +120,14 @@ module.exports = (shepherd) => {
             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
               ecl.blockchainTransactionGet(_decodedInput.txid)
               .then((rawInput) => {
-                const decodedVinVout = shepherd.electrumJSTxDecoder(rawInput, network, _network);
+                let decodedVinVout;
+
+                if (shepherd.getTransactionDecoded(_decodedInput.txid, network)) {
+                  decodedTx = shepherd.getTransactionDecoded(_decodedInput.txid, network);
+                } else {
+                  decodedTx = shepherd.electrumJSTxDecoder(rawInput, network, _network);
+                  shepherd.getTransactionDecoded(_decodedInput.txid, network, decodedTx)
+                }
 
                 shepherd.log('electrum raw input tx ==>', 'elections.decodeTx');
 
