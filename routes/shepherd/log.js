@@ -38,12 +38,46 @@ module.exports = (shepherd) => {
 
   shepherd.get('/log/runtime', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const successObj = {
-        msg: 'success',
-        result: shepherd.appRuntimeLog,
-      };
+      let _res = JSON.parse(JSON.stringify(shepherd.appRuntimeLog));
+      let _searchTerm = req.query.term;
+      let _logType = req.query.type;
 
-      res.end(JSON.stringify(successObj));
+      if (_logType) {
+        _res = _res.filter(req.query.typeExact ? item => item.type === _logType : item => item.type.indexOf(_logType) > -1);
+      }
+
+      if (_searchTerm) {
+        let _searchRes = [];
+
+        for (let i = 0; i < _res.length; i++) {
+          if (JSON.stringify(_res[i].msg).indexOf(_searchTerm) > -1) {
+            _searchRes.push(_res[i]);
+          }
+        }
+
+        if (_searchRes.length) {
+          const successObj = {
+            msg: 'success',
+            result: _searchRes,
+          };
+
+          res.end(JSON.stringify(successObj));
+        } else {
+          const successObj = {
+            msg: 'success',
+            result: 'can\'t find any matching for ' + _searchTerm,
+          };
+
+          res.end(JSON.stringify(successObj));
+        }
+      } else {
+        const successObj = {
+          msg: 'success',
+          result: _res,
+        };
+
+        res.end(JSON.stringify(successObj));
+      }
     } else {
       const errorObj = {
         msg: 'error',
@@ -154,7 +188,7 @@ module.exports = (shepherd) => {
 
   shepherd.printDirs = () => {
     shepherd.log(`agama dir: ${shepherd.agamaDir}`, 'env');
-    shepherd.log('--------------------------')
+    shepherd.log('--------------------------', 'env')
     shepherd.log(`komodo dir: ${shepherd.komododBin}`, 'env');
     shepherd.log(`komodo bin: ${shepherd.komodoDir}`, 'env');
     shepherd.writeLog(`agama dir: ${shepherd.agamaDir}`);
