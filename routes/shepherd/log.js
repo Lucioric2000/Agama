@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const Promise = require('bluebird');
+const { secondsToString } = require('agama-wallet-lib/src/time');
 
 module.exports = (shepherd) => {
   shepherd.log = (msg, type) => {
@@ -76,6 +77,36 @@ module.exports = (shepherd) => {
           result: _res,
         };
 
+        res.end(JSON.stringify(retObj));
+      }
+    } else {
+      const retObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(retObj));
+    }
+  });
+
+  shepherd.get('/log/runtime/dump', (req, res, next) => {
+    if (shepherd.checkToken(req.query.token)) {
+      const _log = JSON.parse(JSON.stringify(shepherd.appRuntimeLog));
+      const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
+
+      const err = fs.writeFileSync(`${shepherd.agamaDir}/shepherd/log/log-${_time}.json`, JSON.stringify(_log), 'utf8');
+
+      if (err) {
+        const retObj = {
+          msg: 'error',
+          result: 'can\'t create a file',
+        };
+        res.end(JSON.stringify(retObj));
+      } else {
+        const retObj = {
+          msg: 'success',
+          result: `${shepherd.agamaDir}/shepherd/log/log-${_time}.json`,
+        };
         res.end(JSON.stringify(retObj));
       }
     } else {
