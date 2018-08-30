@@ -46,26 +46,23 @@ module.exports = (shepherd) => {
         shepherd.log('agama/shepherd folder already exists', 'init');
       }
 
-      if (!fs.existsSync(`${shepherd.agamaDir}/shepherd/pin`)) {
-        fs.mkdirSync(`${shepherd.agamaDir}/shepherd/pin`);
+      const _subFolders = [
+        'pin',
+        'csv',
+        'log',
+      ];
 
-        if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin`)) {
-          shepherd.log(`created pin folder at ${shepherd.agamaDir}/shepherd/pin`, 'init');
-          shepherd.writeLog(`create pin folder at ${shepherd.agamaDir}/shepherd/pin`);
+      for (let i = 0; i < _subFolders.length; i++) {
+        if (!fs.existsSync(`${shepherd.agamaDir}/shepherd/${_subFolders[i]}`)) {
+          fs.mkdirSync(`${shepherd.agamaDir}/shepherd/${_subFolders[i]}`);
+
+          if (fs.existsSync(`${shepherd.agamaDir}/shepherd/${_subFolders[i]}`)) {
+            shepherd.log(`created ${_subFolders[i]} folder at ${shepherd.agamaDir}/shepherd/${_subFolders[i]}`, 'init');
+            shepherd.writeLog(`create ${_subFolders[i]} folder at ${shepherd.agamaDir}/shepherd/${_subFolders[i]}`);
+          }
+        } else {
+          shepherd.log(`shepherd/${_subFolders[i]} folder already exists`, 'init');
         }
-      } else {
-        shepherd.log('shepherd/pin folder already exists', 'init');
-      }
-
-      if (!fs.existsSync(`${shepherd.agamaDir}/shepherd/csv`)) {
-        fs.mkdirSync(`${shepherd.agamaDir}/shepherd/csv`);
-
-        if (fs.existsSync(`${shepherd.agamaDir}/shepherd/csv`)) {
-          shepherd.log(`created csv folder at ${shepherd.agamaDir}/shepherd/csv`, 'init');
-          shepherd.writeLog(`create csv folder at ${shepherd.agamaDir}/shepherd/csv`);
-        }
-      } else {
-        shepherd.log('shepherd/csv folder already exists', 'init');
       }
 
       if (!fs.existsSync(shepherd.zcashParamsDir)) {
