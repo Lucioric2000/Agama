@@ -195,12 +195,12 @@ module.exports = (shepherd) => {
         .then((listunspent) => {
           shepherd.log('electrum listunspent ==>', 'spv.listunspent');
 
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: listunspent,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         });
       } else {
         shepherd.listunspent(ecl, req.query.address, network)
@@ -208,21 +208,21 @@ module.exports = (shepherd) => {
           ecl.close();
           shepherd.log('electrum listunspent ==>', 'spv.listunspent');
 
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: listunspent,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         });
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

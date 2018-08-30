@@ -824,13 +824,13 @@ module.exports = (shepherd) => {
                     },
                   });
 
-                  const obj = {
+                  const retObj = {
                     msg: 'error',
                     result: `error starting ${_body.herd} ${_acName} daemon. Port ${_port} is already taken!`,
                   };
 
                   res.status(500);
-                  res.end(JSON.stringify(obj));
+                  res.end(JSON.stringify(retObj));
                 } else {
                   shepherd.log(`komodod service start success at port ${_port}`, 'native.process');
                   shepherd.writeLog(`komodod service start success at port ${_port}`);
@@ -839,12 +839,12 @@ module.exports = (shepherd) => {
                 if (!skipError) {
                   herder(_body.herd, _body.options);
 
-                  const obj = {
+                  const retObj = {
                     msg: 'success',
                     result: 'result',
                   };
 
-                  res.end(JSON.stringify(obj));
+                  res.end(JSON.stringify(retObj));
                 } else {
                   shepherd.log(`komodod service start error at port ${_port}, reason: unknown`, 'native.process');
                   shepherd.writeLog(`komodod service start error at port ${_port}, reason: unknown`);
@@ -863,31 +863,31 @@ module.exports = (shepherd) => {
         } else {
           herder(_body.herd, _body.options, _body.coind);
 
-          const obj = {
+          const retObj = {
             msg: 'success',
             result: 'result',
           };
 
-          res.end(JSON.stringify(obj));
+          res.end(JSON.stringify(retObj));
         }
       } else {
         // (?)
         herder(_body.herd, _body.options);
 
-        const obj = {
+        const retObj = {
           msg: 'success',
           result: 'result',
         };
 
-        res.end(JSON.stringify(obj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -908,19 +908,19 @@ module.exports = (shepherd) => {
         shepherd.setConf(_body.chain);
       }
 
-      const obj = {
+      const retObj = {
         msg: 'success',
         result: 'result',
       };
 
-      res.end(JSON.stringify(obj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -939,19 +939,19 @@ module.exports = (shepherd) => {
       shepherd.log(`getconf path is: ${confpath}`, 'native.confd');
       shepherd.writeLog(`getconf path is: ${confpath}`, 'native.confd');
 
-      const obj = {
+      const retObj = {
         msg: 'success',
         result: confpath,
       };
 
-      res.end(JSON.stringify(obj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

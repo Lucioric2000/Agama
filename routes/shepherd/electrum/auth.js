@@ -11,19 +11,19 @@ module.exports = (shepherd) => {
 
       // shepherd.log(JSON.stringify(shepherd.electrumKeys, null, '\t'), true);
 
-      const successObj = {
+      const retObj = {
         msg: _wifError ? 'error' : 'success',
         result: 'true',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -89,19 +89,19 @@ module.exports = (shepherd) => {
       shepherd.electrumCoins.auth = false;
       shepherd.electrumKeys = {};
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'true',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -112,19 +112,19 @@ module.exports = (shepherd) => {
       };
       shepherd.electrumKeys = {};
 
-      const obj = {
+      const retObj = {
         msg: 'success',
         result: 'result',
       };
 
       res.end(JSON.stringify(obj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

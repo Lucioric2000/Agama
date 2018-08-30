@@ -191,12 +191,12 @@ module.exports = (shepherd) => {
                     private: newAddressArray[1],
                   };
 
-                  const returnObj = {
+                  const retObj = {
                     msg: 'success',
                     result: _returnObj,
                   };
 
-                  res.end(JSON.stringify(returnObj));
+                  res.end(JSON.stringify(retObj));
                 });
               } else {
                 _returnObj.addresses = {
@@ -204,12 +204,12 @@ module.exports = (shepherd) => {
                   private: newAddressArray[1],
                 };
 
-                const returnObj = {
+                const retObj = {
                   msg: 'success',
                   result: _returnObj,
                 };
 
-                res.end(JSON.stringify(returnObj));
+                res.end(JSON.stringify(retObj));
               }
             }
 
@@ -217,12 +217,12 @@ module.exports = (shepherd) => {
             .then((__json) => {
               if (__json === 'Work queue depth exceeded' ||
                   !__json) {
-                const returnObj = {
+                const retObj = {
                   msg: 'success',
                   result: _returnObj,
                 };
 
-                res.end(JSON.stringify(returnObj));
+                res.end(JSON.stringify(retObj));
               } else {
                 _returnObj.listunspent = JSON.parse(__json);
 
@@ -238,12 +238,12 @@ module.exports = (shepherd) => {
               private: {},
             };
 
-            const returnObj = {
+            const retObj = {
               msg: 'success',
               result: _returnObj,
             };
 
-            res.end(JSON.stringify(returnObj));
+            res.end(JSON.stringify(retObj));
           }
         })
       }
@@ -320,12 +320,12 @@ module.exports = (shepherd) => {
         getAddressesNative(_coin);
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

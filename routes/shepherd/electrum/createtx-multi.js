@@ -220,12 +220,12 @@ module.exports = (shepherd) => {
           const _maxSpend = shepherd.maxSpendBalance(utxoListFormatted);
 
           if (value > _maxSpend) {
-            const successObj = {
+            const retObj = {
               msg: 'error',
               result: `Spend value is too large. Max available amount is ${Number((_maxSpend * 0.00000001.toFixed(8)))}`,
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           } else {
             shepherd.log(`maxspend ${_maxSpend} (${_maxSpend * 0.00000001})`, 'spv.createrawtx');
             shepherd.log(`value ${value}`, 'spv.createrawtx');
@@ -259,12 +259,12 @@ module.exports = (shepherd) => {
 
             if (!inputs &&
                 !outputs) {
-              const successObj = {
+              const retObj = {
                 msg: 'error',
                 result: 'Can\'t find best fit utxo. Try lower amount.',
               };
 
-              res.end(JSON.stringify(successObj));
+              res.end(JSON.stringify(retObj));
             } else {
               let vinSum = 0;
               let voutSum = 0;
@@ -332,7 +332,7 @@ module.exports = (shepherd) => {
 
               if (!push ||
                   push === 'false') {
-                const successObj = {
+                const retObj = {
                   msg: 'success',
                   result: {
                     utxoSet: inputs,
@@ -350,7 +350,7 @@ module.exports = (shepherd) => {
                   },
                 };
 
-                res.end(JSON.stringify(successObj));
+                res.end(JSON.stringify(retObj));
               } else {
                 const ecl = new shepherd.electrumJSCore(
                   shepherd.electrumServers[network].port,
@@ -380,50 +380,50 @@ module.exports = (shepherd) => {
 
                   if (txid &&
                       txid.indexOf('bad-txns-inputs-spent') > -1) {
-                    const successObj = {
+                    const retObj = {
                       msg: 'error',
                       result: 'Bad transaction inputs spent',
                       raw: _rawObj,
                     };
 
-                    res.end(JSON.stringify(successObj));
+                    res.end(JSON.stringify(retObj));
                   } else {
                     if (txid &&
                         txid.length === 64) {
                       if (txid.indexOf('bad-txns-in-belowout') > -1) {
-                        const successObj = {
+                        const retObj = {
                           msg: 'error',
                           result: 'Bad transaction inputs spent',
                           raw: _rawObj,
                         };
 
-                        res.end(JSON.stringify(successObj));
+                        res.end(JSON.stringify(retObj));
                       } else {
-                        const successObj = {
+                        const retObj = {
                           msg: 'success',
                           result: _rawObj,
                         };
 
-                        res.end(JSON.stringify(successObj));
+                        res.end(JSON.stringify(retObj));
                       }
                     } else {
                       if (txid &&
                           txid.indexOf('bad-txns-in-belowout') > -1) {
-                        const successObj = {
+                        const retObj = {
                           msg: 'error',
                           result: 'Bad transaction inputs spent',
                           raw: _rawObj,
                         };
 
-                        res.end(JSON.stringify(successObj));
+                        res.end(JSON.stringify(retObj));
                       } else {
-                        const successObj = {
+                        const retObj = {
                           msg: 'error',
                           result: 'Can\'t broadcast transaction',
                           raw: _rawObj,
                         };
 
-                        res.end(JSON.stringify(successObj));
+                        res.end(JSON.stringify(retObj));
                       }
                     }
                   }
@@ -432,21 +432,21 @@ module.exports = (shepherd) => {
             }
           }
         } else {
-          const successObj = {
+          const retObj = {
             msg: 'error',
             result: utxoList,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

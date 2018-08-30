@@ -41,12 +41,12 @@ module.exports = (shepherd) => {
         if (passwdStrength(_pin) < 29) {
           shepherd.log('seed storage weak pin!', 'pin');
 
-          const returnObj = {
+          const retObj = {
             msg: 'error',
             result: false,
           };
 
-          res.end(JSON.stringify(returnObj));
+          res.end(JSON.stringify(retObj));
         } else {
           const _customPinFilenameTest = /^[0-9a-zA-Z-_]+$/g;
 
@@ -57,29 +57,29 @@ module.exports = (shepherd) => {
                 if (err) {
                   shepherd.log('error writing pin file', 'pin');
 
-                  const returnObj = {
+                  const retObj = {
                     msg: 'error',
                     result: 'error writing pin file',
                   };
 
-                  res.end(JSON.stringify(returnObj));
+                  res.end(JSON.stringify(retObj));
                 } else {
-                  const returnObj = {
+                  const retObj = {
                     msg: 'success',
                     result: pubkey,
                   };
 
-                  res.end(JSON.stringify(returnObj));
+                  res.end(JSON.stringify(retObj));
                 }
               });
             });
           } else {
-            const returnObj = {
+            const retObj = {
               msg: 'error',
               result: 'pin file name can only contain alphanumeric characters, dash "-" and underscore "_"',
             };
 
-            res.end(JSON.stringify(returnObj));
+            res.end(JSON.stringify(retObj));
           }
         }
       } else {
@@ -87,7 +87,7 @@ module.exports = (shepherd) => {
           'key',
           'string'
         ];
-        let errorObj = {
+        let retObj = {
           msg: 'error',
           result: '',
         };
@@ -99,16 +99,16 @@ module.exports = (shepherd) => {
           }
         }
 
-        errorObj.result = `missing param ${_errorParamsList.join(', ')}`;
-        res.end(JSON.stringify(errorObj));
+        retObj.result = `missing param ${_errorParamsList.join(', ')}`;
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -122,16 +122,15 @@ module.exports = (shepherd) => {
         if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin/${_pubkey}.pin`)) {
           fs.readFile(`${shepherd.agamaDir}/shepherd/pin/${_pubkey}.pin`, 'utf8', async(err, data) => {
             if (err) {
-              const errorObj = {
+              const retObj = {
                 msg: 'error',
                 result: err,
               };
 
-              res.end(JSON.stringify(errorObj));
+              res.end(JSON.stringify(retObj));
             } else {
               const decryptedKey = aes256.decrypt(_key, data);
               const _regexTest = decryptedKey.match(/^[0-9a-zA-Z ]+$/g);
-              let returnObj;
 
               if (_regexTest) { // re-encrypt with a new method
                 encrypt(decryptedKey, _key)
@@ -142,12 +141,12 @@ module.exports = (shepherd) => {
                     if (err) {
                       shepherd.log(`error re-encrypt pin file ${_pubkey}`, 'pin');
                     } else {
-                      returnObj = {
+                      const retObj = {
                         msg: 'success',
                         result: decryptedKey,
                       };
 
-                      res.end(JSON.stringify(returnObj));
+                      res.end(JSON.stringify(retObj));
                     }
                   });
                 });
@@ -156,17 +155,17 @@ module.exports = (shepherd) => {
                 .then((decryptedKey) => {
                   shepherd.log(`pin ${_pubkey} decrypted`, 'pin');
 
-                  returnObj = {
+                  const retObj = {
                     msg: 'success',
                     result: decryptedKey,
                   };
 
-                  res.end(JSON.stringify(returnObj));
+                  res.end(JSON.stringify(retObj));
                 })
                 .catch((err) => {
                   shepherd.log(`pin ${_pubkey} decrypt err ${err}`, 'pin');
 
-                  returnObj = {
+                  const retObj = {
                     msg: 'error',
                     result: 'wrong key',
                   };
@@ -177,28 +176,28 @@ module.exports = (shepherd) => {
             }
           });
         } else {
-          const errorObj = {
+          const retObj = {
             msg: 'error',
             result: `file ${req.query.pubkey}.pin doesnt exist`,
           };
 
-          res.end(JSON.stringify(errorObj));
+          res.end(JSON.stringify(retObj));
         }
       } else {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'missing key or pubkey param',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -215,36 +214,36 @@ module.exports = (shepherd) => {
           }
 
           if (!items.length) {
-            const errorObj = {
+            const retObj = {
               msg: 'error',
               result: 'no pins',
             };
 
-            res.end(JSON.stringify(errorObj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: _pins,
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           }
         });
       } else {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'pin folder doesn\'t exist',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -256,22 +255,22 @@ module.exports = (shepherd) => {
         if (fs.existsSync(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`)) {
           fs.readFile(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`, 'utf8', (err, data) => {
             if (err) {
-              const errorObj = {
+              const retObj = {
                 msg: 'error',
                 result: err,
               };
 
-              res.end(JSON.stringify(errorObj));
+              res.end(JSON.stringify(retObj));
             } else {
               if (req.body.delete) {
                 fs.unlinkSync(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`);
 
-                const returnObj = {
+                const retObj = {
                   msg: 'success',
                   result: `${pubkey}.pin is removed`,
                 };
 
-                res.end(JSON.stringify(returnObj));
+                res.end(JSON.stringify(retObj));
               } else {
                 const pubkeynew = req.body.pubkeynew;
                 const _customPinFilenameTest = /^[0-9a-zA-Z-_]+$/g;
@@ -282,65 +281,65 @@ module.exports = (shepherd) => {
                       if (err) {
                         shepherd.log('error writing pin file', 'pin');
 
-                        const returnObj = {
+                        const retObj = {
                           msg: 'error',
                           result: 'error writing pin file',
                         };
 
-                        res.end(JSON.stringify(returnObj));
+                        res.end(JSON.stringify(retObj));
                       } else {
                         fs.unlinkSync(`${shepherd.agamaDir}/shepherd/pin/${pubkey}.pin`);
 
-                        const returnObj = {
+                        const retObj = {
                           msg: 'success',
                           result: pubkeynew,
                         };
 
-                        res.end(JSON.stringify(returnObj));
+                        res.end(JSON.stringify(retObj));
                       }
                     });
                   } else {
-                    const returnObj = {
+                    const retObj = {
                       msg: 'error',
                       result: 'pin file name can only contain alphanumeric characters, dash "-" and underscore "_"',
                     };
 
-                    res.end(JSON.stringify(returnObj));
+                    res.end(JSON.stringify(retObj));
                   }
                 } else {
-                  const returnObj = {
+                  const retObj = {
                     msg: 'error',
                     result: 'missing param pubkeynew',
                   };
 
-                  res.end(JSON.stringify(returnObj));
+                  res.end(JSON.stringify(retObj));
                 }
               }
             }
           });
         } else {
-          const errorObj = {
+          const retObj = {
             msg: 'error',
             result: `file ${pubkey}.pin doesnt exist`,
           };
 
-          res.end(JSON.stringify(errorObj));
+          res.end(JSON.stringify(retObj));
         }
       } else {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'missing pubkey param',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

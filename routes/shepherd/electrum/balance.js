@@ -78,7 +78,7 @@ module.exports = (shepherd) => {
                   .then(promiseResult => {
                     ecl.close();
 
-                    const successObj = {
+                    const retObj = {
                       msg: 'success',
                       result: {
                         balance: Number((0.00000001 * json.confirmed).toFixed(8)),
@@ -92,12 +92,12 @@ module.exports = (shepherd) => {
                       },
                     };
 
-                    res.end(JSON.stringify(successObj));
+                    res.end(JSON.stringify(retObj));
                   });
                 } else {
                   ecl.close();
 
-                  const successObj = {
+                  const retObj = {
                     msg: 'success',
                     result: {
                       balance: Number((0.00000001 * json.confirmed).toFixed(8)),
@@ -111,12 +111,12 @@ module.exports = (shepherd) => {
                     },
                   };
 
-                  res.end(JSON.stringify(successObj));
+                  res.end(JSON.stringify(retObj));
                 }
               } else {
                 ecl.close();
 
-                const successObj = {
+                const retObj = {
                   msg: 'success',
                   result: {
                     balance: Number((0.00000001 * json.confirmed).toFixed(8)),
@@ -130,7 +130,7 @@ module.exports = (shepherd) => {
                   },
                 };
 
-                res.end(JSON.stringify(successObj));
+                res.end(JSON.stringify(retObj));
               }
             });
           } else {
@@ -138,7 +138,7 @@ module.exports = (shepherd) => {
             shepherd.log('electrum getbalance ==>', 'spv.getbalance');
             shepherd.log(json, 'spv.getbalance');
 
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: {
                 balance: Number((0.00000001 * json.confirmed).toFixed(8)),
@@ -148,27 +148,27 @@ module.exports = (shepherd) => {
               },
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           }
         } else {
           ecl.close();
 
-          const successObj = {
+          const retObj = {
             msg: 'error',
             result: shepherd.CONNECTION_ERROR_OR_INCOMPLETE_DATA,
             electrumres: json,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

@@ -68,19 +68,19 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       shepherd.electrumKeys[req.query.coin].pub = req.query.pub;
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'true',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -88,19 +88,19 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       const result = shepherd.addElectrumCoin(req.query.coin);
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -117,19 +117,19 @@ module.exports = (shepherd) => {
         }
       }
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: _electrumCoins,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
       const errorObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

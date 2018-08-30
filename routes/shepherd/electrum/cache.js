@@ -81,19 +81,19 @@ module.exports = (shepherd) => {
       shepherd.electrumCache = {};
       shepherd.saveLocalSPVCache();
 
-      const returnObj = {
+      const retObj = {
         msg: 'success',
         result: 'spv cache is removed',
       };
 
-      res.end(JSON.stringify(returnObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

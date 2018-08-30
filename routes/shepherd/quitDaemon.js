@@ -120,39 +120,39 @@ module.exports = (shepherd) => {
             stderr.indexOf('connect to server: unknown (code -1)') > -1) {
           delete shepherd.coindInstanceRegistry[_chain ? _chain : 'komodod'];
 
-          const obj = {
+          const retObj = {
             msg: 'success',
             result: 'result',
           };
 
-          res.end(JSON.stringify(obj));
+          res.end(JSON.stringify(retObj));
         } else {
           if (stdout.indexOf('Komodo server stopping') > -1) {
             delete shepherd.coindInstanceRegistry[_chain ? _chain : 'komodod'];
 
-            const obj = {
+            const retObj = {
               msg: 'success',
               result: 'result',
             };
 
-            res.end(JSON.stringify(obj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const obj = {
+            const retObj = {
               msg: 'error',
               result: 'result',
             };
 
-            res.end(JSON.stringify(obj));
+            res.end(JSON.stringify(retObj));
           }
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -167,12 +167,12 @@ module.exports = (shepherd) => {
           shepherd.removePubkey(_chain.toLowerCase());
         }
 
-        const obj = {
+        const retObj = {
           msg: 'success',
           result: 'result',
         };
 
-        res.end(JSON.stringify(obj));
+        res.end(JSON.stringify(retObj));
       } else {
         delete shepherd.electrumCoins[_chain.toLowerCase()];
 
@@ -181,20 +181,20 @@ module.exports = (shepherd) => {
           shepherd.electrumKeys = {};
         }
 
-        const obj = {
+        const retObj = {
           msg: 'success',
           result: 'result',
         };
 
-        res.end(JSON.stringify(obj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

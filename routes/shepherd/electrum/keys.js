@@ -78,21 +78,21 @@ module.exports = (shepherd) => {
         pub: key.getAddress(),
       };
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: {
           keys,
         },
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -100,21 +100,21 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       let keys = shepherd.seedToWif(req.body.seed, req.body.network.toLowerCase(), req.body.iguana);
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: {
           keys,
         },
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -122,21 +122,21 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       let keys = shepherd.seedToWif(req.query.seed, req.query.network.toLowerCase(), req.query.iguana);
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: {
           keys,
         },
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -200,12 +200,12 @@ module.exports = (shepherd) => {
   };
 
   shepherd.get('/electrum/keys/validateaddress', (req, res, next) => {
-    const successObj = {
+    const retObj = {
       msg: 'success',
       result: shepherd.addressVersionCheck(req.query.network, req.query.address),
     };
 
-    res.end(JSON.stringify(successObj));
+    res.end(JSON.stringify(retObj));
   });
 
   shepherd.post('/electrum/keys', (req, res, next) => {
@@ -262,19 +262,19 @@ module.exports = (shepherd) => {
         _electrumKeys = shepherd.electrumKeys;
       }
 
-      const successObj = {
+      const retObj = {
         msg: _wifError ? 'error' : 'success',
         result: _wifError ? false : (_matchingKeyPairs === _totalKeys ? _electrumKeys : false),
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -315,19 +315,19 @@ module.exports = (shepherd) => {
         }
       }
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: _matchingKey ? _matchingKey : 'address is not found',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

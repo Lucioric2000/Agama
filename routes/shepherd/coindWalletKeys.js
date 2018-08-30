@@ -20,23 +20,23 @@ module.exports = (shepherd) => {
         _fs.access(_walletDatLocation, fs.constants.R_OK, (err) => {
           if (err) {
             shepherd.log(`error reading ${_walletDatLocation}`, 'native.wallet.dat');
-            successObj = {
+            retObj = {
               msg: 'error',
               result: `error reading ${_walletDatLocation}`,
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           } else {
             shepherd.log(`reading ${_walletDatLocation}`);
             fs.readFile(_walletDatLocation, (err, data) => {
               if (err) {
                 shepherd.log(`read wallet.dat err: ${err}`, 'native.wallet.dat');
-                successObj = {
+                retObj = {
                   msg: 'error',
                   result: `error reading ${_walletDatLocation}`,
                 };
 
-                res.end(JSON.stringify(successObj));
+                res.end(JSON.stringify(retObj));
               } else {
                 const re = /\x30\x81\xD3\x02\x01\x01\x04\x20(.{32})/gm;
                 const dataHexStr = data.toString('latin1');
@@ -45,12 +45,12 @@ module.exports = (shepherd) => {
                 if (!privateKeys) {
                   shepherd.log('wallet is encrypted?', 'native.wallet.dat');
 
-                  successObj = {
+                  retObj = {
                     msg: 'error',
                     result: 'wallet is encrypted?',
                   };
 
-                  res.end(JSON.stringify(successObj));
+                  res.end(JSON.stringify(retObj));
                 } else {
                   let _keys = [];
                   privateKeys = privateKeys.map(x => x.replace('\x30\x81\xD3\x02\x01\x01\x04\x20', ''));
@@ -78,32 +78,32 @@ module.exports = (shepherd) => {
                     }
                   }
 
-                  successObj = {
+                  retObj = {
                     msg: 'success',
                     result: _keys,
                   };
 
-                  res.end(JSON.stringify(successObj));
+                  res.end(JSON.stringify(retObj));
                 }
               }
             });
           }
         });
       } catch (e) {
-        successObj = {
+        retObj = {
           msg: 'error',
           result: `error reading ${_walletDatLocation}`,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

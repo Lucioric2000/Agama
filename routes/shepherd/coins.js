@@ -5,7 +5,7 @@ module.exports = (shepherd) => {
    */
   shepherd.get('/InstantDEX/allcoins', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      let successObj;
+      let retObj;
       let nativeCoindList = [];
       let electrumCoinsList = [];
 
@@ -19,20 +19,20 @@ module.exports = (shepherd) => {
         nativeCoindList.push(key === 'komodod' ? 'KMD' : key);
       }
 
-      successObj = {
+      retObj = {
         native: nativeCoindList,
         spv: electrumCoinsList,
         total: Object.keys(shepherd.electrumCoins).length - 1 + Object.keys(nativeCoindList).length,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

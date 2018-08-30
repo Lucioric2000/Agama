@@ -168,29 +168,29 @@ module.exports = (shepherd) => {
   shepherd.post('/appconf', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
       if (!req.body.payload) {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'no payload provided',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       } else {
         shepherd.saveLocalAppConf(req.body.payload);
 
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: 'config saved',
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -202,19 +202,19 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       shepherd.saveLocalAppConf(shepherd.defaultAppConfig);
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'config saved',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -227,12 +227,12 @@ module.exports = (shepherd) => {
       const obj = shepherd.loadLocalConfig();
       res.send(obj);
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

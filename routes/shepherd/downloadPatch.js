@@ -12,21 +12,21 @@ module.exports = (shepherd) => {
    */
   shepherd.get('/update/patch', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'dl started',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
 
       shepherd.updateAgama();
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -122,14 +122,14 @@ module.exports = (shepherd) => {
           }
 
           if (remoteVersion[0] === localVersion[0]) {
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: 'latest',
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: 'update',
               version: {
@@ -138,22 +138,24 @@ module.exports = (shepherd) => {
               },
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           }
         } else {
-          res.end({
+          const retObj = {
             msg: 'error',
             result: 'error getting update',
-          });
+          };
+
+          res.end(JSON.stringify(retObj));
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -168,19 +170,19 @@ module.exports = (shepherd) => {
       const zip = new AdmZip(`${dlLocation}patch.zip`);
       zip.extractAllTo(/*target path*/ `${dlLocation}/patch/unpack`, /*overwrite*/true);
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'unpack started',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

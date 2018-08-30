@@ -84,29 +84,30 @@ module.exports = (shepherd) => {
               shepherd.log('unable to retrieve BTC fees / recommended', 'spv.btcFees');
             }
 
-            res.end(JSON.stringify({
+            const retObj = {
               msg: 'success',
               result: btcFees,
-            }));
+            };
+            res.end(JSON.stringify(retObj));
           });
         });
       } else {
         shepherd.log('btcfees, use cache', 'spv.btcFees');
 
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: btcFees,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

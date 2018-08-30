@@ -18,12 +18,12 @@ module.exports = (shepherd) => {
         res.end(JSON.stringify(txhistory));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -47,10 +47,11 @@ module.exports = (shepherd) => {
 
           json = shepherd.sortTransactions(json, 'timestamp');
 
-          resolve({
+          const retObj = {
             msg: 'success',
             result: json,
-          });
+          };
+          resolve(retObj);
         });
       } else {
         // !expensive call!
@@ -201,10 +202,11 @@ module.exports = (shepherd) => {
                                     _rawtx = _kvTx;
                                   }
 
-                                  resolve({
+                                  const retObj = {
                                     msg: 'success',
                                     result: _rawtx,
-                                  });
+                                  };
+                                  resolve(retObj);
                                 }
 
                                 callback();
@@ -261,10 +263,11 @@ module.exports = (shepherd) => {
                               _rawtx = _kvTx;
                             }
 
-                            resolve({
+                            const retObj = {
                               msg: 'success',
                               result: _rawtx,
-                            });
+                            };
+                            resolve();
                           } else {
                             callback();
                           }
@@ -300,10 +303,11 @@ module.exports = (shepherd) => {
                           _rawtx = _kvTx;
                         }
 
-                        resolve({
+                        const retObj = {
                           msg: 'success',
                           result: _rawtx,
-                        });
+                        };
+                        resolve(retObj);
                       } else {
                         callback();
                       }
@@ -313,17 +317,19 @@ module.exports = (shepherd) => {
               } else {
                 ecl.close();
 
-                resolve({
+                const retObj = {
                   msg: 'success',
                   result: [],
-                });
+                };
+                resolve(retObj);
               }
             });
           } else {
-            resolve({
+            const retObj = {
               msg: 'error',
               result: 'cant get current height',
-            });
+            };
+            resolve(retObj);
           }
         });
       }
@@ -343,20 +349,20 @@ module.exports = (shepherd) => {
         ecl.close();
         shepherd.log(json, 'spv.gettransaction');
 
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: json,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

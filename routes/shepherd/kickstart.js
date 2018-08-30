@@ -12,12 +12,12 @@ module.exports = (shepherd) => {
       const _keepWallet = req.query.keepwallet;
 
       if (!_coin) {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'no coin name provided',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       } else {
         const _location = path.join(_coin === 'KMD' ? shepherd.komodoDir : `${shepherd.komodoDir}/${_coin}`);
 
@@ -33,20 +33,20 @@ module.exports = (shepherd) => {
           }
         }
 
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: `${_coin} native is kicked`,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

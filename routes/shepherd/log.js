@@ -56,35 +56,35 @@ module.exports = (shepherd) => {
         }
 
         if (_searchRes.length) {
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: _searchRes,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         } else {
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: 'can\'t find any matching for ' + _searchTerm,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         }
       } else {
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: _res,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -125,20 +125,20 @@ module.exports = (shepherd) => {
           shepherd.writeLog('error writing gui log file');
         }
 
-        const returnObj = {
+        const retObj = {
           msg: 'success',
           result: 'gui log entry is added',
         };
 
-        res.end(JSON.stringify(returnObj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -153,36 +153,36 @@ module.exports = (shepherd) => {
       if (fs.existsSync(`${shepherd.agamaDir}/shepherd/agamalog.${logExt}`)) {
         fs.readFile(`${shepherd.agamaDir}/shepherd/agamalog.${logExt}`, 'utf8', (err, data) => {
           if (err) {
-            const errorObj = {
+            const retObj = {
               msg: 'error',
               result: err,
             };
 
-            res.end(JSON.stringify(errorObj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: data ? JSON.parse(data) : '',
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           }
         });
       } else {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: `agama.${logExt} doesnt exist`,
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

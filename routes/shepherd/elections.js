@@ -18,19 +18,19 @@ module.exports = (shepherd) => {
 
   shepherd.post('/elections/status', (req, res, next) => {
     if (shepherd.checkToken(req.body.token)) {
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: shepherd.elections.pub ? shepherd.elections.pub : 'unauth',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -73,19 +73,19 @@ module.exports = (shepherd) => {
         };
       }
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: shepherd.elections.pub,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -93,19 +93,19 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.body.token)) {
       shepherd.elections = {};
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: true,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -383,29 +383,29 @@ module.exports = (shepherd) => {
           .then(promiseResult => {
             ecl.close();
 
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: _rawtx,
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           });
         } else {
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: [],
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

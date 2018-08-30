@@ -67,31 +67,31 @@ module.exports = (shepherd) => {
           _electrumServers[key] = shepherd.electrumServers[key];
         }
 
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: {
             servers: _electrumServers,
           },
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       } else {
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: {
             servers: shepherd.electrumServers,
           },
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -116,19 +116,19 @@ module.exports = (shepherd) => {
 
       // shepherd.log(JSON.stringify(shepherd.electrumCoins[req.query.coin], null, '\t'), true);
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: true,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -150,24 +150,24 @@ module.exports = (shepherd) => {
         if (serverData &&
             typeof serverData === 'string' &&
             serverData.indexOf('Electrum') > -1) {
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: true,
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         } else if (
           serverData &&
           typeof serverData === 'object'
         ) {
           for (let i = 0; i < serverData.length; i++) {
             if (serverData[i].indexOf('Electrum') > -1) {
-              const successObj = {
+              const retObj = {
                 msg: 'success',
                 result: true,
               };
 
-              res.end(JSON.stringify(successObj));
+              res.end(JSON.stringify(retObj));
 
               break;
               return true;
@@ -190,12 +190,12 @@ module.exports = (shepherd) => {
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

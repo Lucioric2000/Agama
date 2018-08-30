@@ -65,19 +65,19 @@ module.exports = (shepherd) => {
   shepherd.post('/cli', (req, res, next) => {
     if (shepherd.checkToken(req.body.payload.token)) {
       if (!req.body.payload) {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'no payload provided',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       } else if (!req.body.payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'wrong cli string format',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       } else {
         const _mode = req.body.payload.mode === 'passthru' ? 'passthru' : 'default';
         const _chain = req.body.payload.chain === 'KMD' ? null : req.body.payload.chain;
@@ -122,7 +122,7 @@ module.exports = (shepherd) => {
                 shepherd.log(`exec error: ${error}`, 'native.cli');
               }
 
-              let responseObj;
+              let retObj;
 
               if (stderr) {
                 let _res;
@@ -150,11 +150,11 @@ module.exports = (shepherd) => {
                 }
 
                 if (_error) {
-                  responseObj = {
+                  retObj = {
                     error: _error,
                   };
                 } else {
-                  responseObj = {
+                  retObj = {
                     result: _res,
                   };
                 }
@@ -184,17 +184,17 @@ module.exports = (shepherd) => {
                 }
 
                 if (_error) {
-                  responseObj = {
+                  retObj = {
                     error: _error,
                   };
                 } else {
-                  responseObj = {
+                  retObj = {
                     result: _res,
                   };
                 }
               }
 
-              res.end(JSON.stringify(responseObj));
+              res.end(JSON.stringify(retObj));
               // shepherd.killRogueProcess('komodo-cli');
             });
           } else {
@@ -212,7 +212,7 @@ module.exports = (shepherd) => {
 
                 shepherd.readDebugLog(coindDebugLogLocation, 1)
                 .then((result) => {
-                  const _obj = {
+                  const retObj = {
                     msg: 'success',
                     result: result,
                   };
@@ -220,20 +220,21 @@ module.exports = (shepherd) => {
                   // shepherd.log('bitcoinrpc debug ====>');
                   // console.log(result);
 
-                  res.end(JSON.stringify(_obj));
+                  res.end(JSON.stringify(retObj));
                 }, (result) => {
-                  const _obj = {
+                  const retObj = {
                     error: result,
                     result: 'error',
                   };
 
-                  res.end(JSON.stringify(_obj));
+                  res.end(JSON.stringify(retObj));
                 });
               } else {
-                res.end({
+                const retObj = {
                   error: 'bitcoinrpc debug error',
                   result: 'error',
-                });
+                };
+                res.end(retObj);
                 // console.log('bitcoinrpc debug error');
               }
             } else {
@@ -274,13 +275,14 @@ module.exports = (shepherd) => {
                       response.statusCode === 200) {
                     res.end(body);
                   } else {
-                    res.end(body ? body : JSON.stringify({
+                    const retObj = {
                       result: 'error',
                       error: {
                         code: -777,
                         message: `unable to call method ${_cmd} at port ${shepherd.rpcConf[req.body.payload.chain].port}`,
                       },
-                    }));
+                    };
+                    res.end(body ? body : JSON.stringify(retObj));
                   }
                 });
               }
@@ -310,32 +312,32 @@ module.exports = (shepherd) => {
               shepherd.log(`exec error: ${error}`);
             }
 
-            let responseObj;
+            let retObj;
 
             if (stderr) {
-              responseObj = {
+              retObj = {
                 msg: 'error',
                 result: stderr,
               };
             } else {
-              responseObj = {
+              retObj = {
                 msg: 'success',
                 result: stdout,
               };
             }
 
-            res.end(JSON.stringify(responseObj));
+            res.end(JSON.stringify(retObj));
             shepherd.killRogueProcess('komodo-cli');
           });
         }
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

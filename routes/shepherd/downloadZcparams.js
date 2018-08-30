@@ -76,12 +76,12 @@ module.exports = (shepherd) => {
       const dlLocation = shepherd.zcashParamsDir;
       const dlOption = req.query.dloption;
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'zcash params dl started',
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
 
       for (let key in shepherd.zcashParamsDownloadLinks[dlOption]) {
         shepherd.downloadFile({
@@ -134,12 +134,12 @@ module.exports = (shepherd) => {
         });
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

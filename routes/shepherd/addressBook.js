@@ -14,28 +14,28 @@ module.exports = (shepherd) => {
         if (err) {
           shepherd.log('error writing address book file', 'addressBook');
 
-          const returnObj = {
+          const retObj = {
             msg: 'error',
             result: 'error writing address book file',
           };
 
-          res.end(JSON.stringify(returnObj));
+          res.end(JSON.stringify(retObj));
         } else {
-          const returnObj = {
+          const retObj = {
             msg: 'success',
             result: 'address book is updated',
           };
 
-          res.end(JSON.stringify(returnObj));
+          res.end(JSON.stringify(retObj));
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -44,36 +44,36 @@ module.exports = (shepherd) => {
       if (fs.existsSync(`${shepherd.agamaDir}/shepherd/addressBook.json`)) {
         fs.readFile(`${shepherd.agamaDir}/shepherd/addressBook.json`, 'utf8', (err, data) => {
           if (err) {
-            const errorObj = {
+            const retObj = {
               msg: 'error',
               result: err,
             };
 
-            res.end(JSON.stringify(errorObj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const returnObj = {
+            const retObj = {
               msg: 'success',
               result: JSON.parse(data),
             };
 
-            res.end(JSON.stringify(returnObj));
+            res.end(JSON.stringify(retObj));
           }
         });
       } else {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'address book doesn\'t exist',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

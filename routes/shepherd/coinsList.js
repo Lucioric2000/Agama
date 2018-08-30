@@ -29,36 +29,36 @@ module.exports = (shepherd) => {
       if (fs.existsSync(`${shepherd.agamaDir}/shepherd/coinslist.json`)) {
         fs.readFile(`${shepherd.agamaDir}/shepherd/coinslist.json`, 'utf8', (err, data) => {
           if (err) {
-            const errorObj = {
+            const retObj = {
               msg: 'error',
               result: err,
             };
 
-            res.end(JSON.stringify(errorObj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: data ? JSON.parse(data) : '',
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           }
         });
       } else {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'coin list doesn\'t exist',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -71,33 +71,33 @@ module.exports = (shepherd) => {
       const _payload = req.body.payload;
 
       if (!_payload) {
-        const errorObj = {
+        const retObj = {
           msg: 'error',
           result: 'no payload provided',
         };
 
-        res.end(JSON.stringify(errorObj));
+        res.end(JSON.stringify(retObj));
       } else {
         fs.writeFile(`${shepherd.agamaDir}/shepherd/coinslist.json`, JSON.stringify(_payload), (err) => {
           if (err) {
-            const errorObj = {
+            const retObj = {
               msg: 'error',
               result: err,
             };
 
-            res.end(JSON.stringify(errorObj));
+            res.end(JSON.stringify(retObj));
           } else {
-            const successObj = {
+            const retObj = {
               msg: 'success',
               result: 'done',
             };
 
-            res.end(JSON.stringify(successObj));
+            res.end(JSON.stringify(retObj));
           }
         });
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };

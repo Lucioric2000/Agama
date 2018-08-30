@@ -79,19 +79,19 @@ module.exports = (shepherd) => {
 
       const rawtx = tx.build().toHex();
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: rawtx,
       };
 
-      res.end(JSON.stringify(successObj));
+      res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

@@ -145,22 +145,22 @@ module.exports = (shepherd) => {
 
       shepherd.verifyMerkleByCoin(_coin, _txid, _height)
       .then((verifyMerkleRes) => {
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: {
             merkleProof: verifyMerkleRes,
           },
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

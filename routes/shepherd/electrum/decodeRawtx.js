@@ -11,7 +11,7 @@ module.exports = (shepherd) => {
 
       if (req.query.parseonly ||
           decodedTx.inputs[0].txid === '0000000000000000000000000000000000000000000000000000000000000000') {
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: {
             network: decodedTx.network,
@@ -21,9 +21,9 @@ module.exports = (shepherd) => {
           },
         };
 
-        shepherd.log(successObj.result, 'spv.decoderawtx');
+        shepherd.log(retObj.result, 'spv.decoderawtx');
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       } else {
         const ecl = shepherd.ecl(req.query.network);
 
@@ -38,7 +38,7 @@ module.exports = (shepherd) => {
 
           const decodedVin = shepherd.electrumJSTxDecoder(json, req.query.network, _network);
 
-          const successObj = {
+          const retObj = {
             msg: 'success',
             result: {
               network: decodedTx.network,
@@ -48,16 +48,16 @@ module.exports = (shepherd) => {
             },
           };
 
-          res.end(JSON.stringify(successObj));
+          res.end(JSON.stringify(retObj));
         });
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

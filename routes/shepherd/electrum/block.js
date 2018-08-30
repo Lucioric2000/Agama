@@ -5,20 +5,20 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       shepherd.electrumGetBlockInfo(req.query.height, req.query.network)
       .then((json) => {
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: json,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -42,20 +42,20 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       shepherd.electrumGetCurrentBlock(req.query.network)
       .then((json) => {
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: json,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

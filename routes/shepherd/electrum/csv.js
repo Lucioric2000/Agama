@@ -30,27 +30,29 @@ module.exports = (shepherd) => {
           const err = fs.writeFileSync(`${shepherd.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-${req.query.address}-${_time}.csv`, _csv.join('\r\n'), 'utf8');
 
           if (err) {
-            res.end(JSON.stringify({
+            const retObj = {
               msg: 'error',
               result: 'can\'t create a file',
-            }));
+            };
+            res.end(JSON.stringify(retObj));
           } else {
-            res.end(JSON.stringify({
+            const retObj = {
               msg: 'success',
               result: `${shepherd.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-${req.query.address}-${_time}.csv`,
-            }));
+            };
+            res.end(JSON.stringify(retObj));
           }
         } else {
           res.end(JSON.stringify(txhistory));
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -101,33 +103,36 @@ module.exports = (shepherd) => {
             const err = fs.writeFileSync(`${shepherd.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-native-all-${_time}.csv`, _csv.join('\r\n'), 'utf8');
 
             if (err) {
-              res.end(JSON.stringify({
+              const retObj = {
                 msg: 'error',
                 result: 'can\'t create a file',
-              }));
+              };
+              res.end(JSON.stringify(retObj));
             } else {
-              res.end(JSON.stringify({
+              const retObj = {
                 msg: 'success',
                 result: `${shepherd.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-native-all-${_time}.csv`,
-              }));
+              };
+              res.end(JSON.stringify(retObj));
             }
           } else {
-            res.end(JSON.stringify({
+            const retObj = {
               msg: 'error',
               result: 'general error or empty transactions list',
-            }));
+            };
+            res.end(JSON.stringify(retObj));
           }
         } catch (e) {
           shepherd.log(`csv ${_coin} native txhistory error ${e}`, 'spv.csv');
         }
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

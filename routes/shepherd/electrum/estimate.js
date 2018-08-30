@@ -9,20 +9,20 @@ module.exports = (shepherd) => {
         ecl.close();
         shepherd.log(`electrum estimatefee ${json}`, 'spv.estimatefee');
 
-        const successObj = {
+        const retObj = {
           msg: 'success',
           result: json,
         };
 
-        res.end(JSON.stringify(successObj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

@@ -44,14 +44,14 @@ module.exports = (shepherd) => {
 
       shepherd.readDebugLog(`${_location}/debug.log`, _lastNLines)
       .then((result) => {
-        const _obj = {
+        const retObj = {
           msg: 'success',
           result: result,
         };
 
-        res.end(JSON.stringify(_obj));
+        res.end(JSON.stringify(retObj));
       }, (result) => {
-        const _obj = {
+        const retObj = {
           msg: 'error',
           result: result,
         };
@@ -59,12 +59,12 @@ module.exports = (shepherd) => {
         res.end(JSON.stringify(_obj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
@@ -75,27 +75,27 @@ module.exports = (shepherd) => {
 
       shepherd.readDebugLog(_daemonLogName, 'all')
       .then((result) => {
-        const _obj = {
+        const retObj = {
           msg: 'success',
           result: result,
         };
 
-        res.end(JSON.stringify(_obj));
+        res.end(JSON.stringify(retObj));
       }, (result) => {
-        const _obj = {
+        const retObj = {
           msg: 'error',
           result: result,
         };
 
-        res.end(JSON.stringify(_obj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
