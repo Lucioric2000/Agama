@@ -14,7 +14,7 @@ module.exports = (shepherd) => {
       })
       .then((txhistory) => {
         const _coin = req.query.coin || req.query.network;
-        const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
+        const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '_').replace(/:/g, '-');
 
         shepherd.log(`csv ${_coin} txhistory length ${txhistory.result.length}`, 'spv.csv');
 
@@ -59,7 +59,7 @@ module.exports = (shepherd) => {
   shepherd.get('/native/listtransactions/csv', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
       const _coin = req.query.coin;
-      const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
+      const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '_').replace(/:/g, '-');
 
       const _payload = {
         mode: null,

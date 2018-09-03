@@ -117,7 +117,7 @@ module.exports = (shepherd) => {
         result: 'result',
       };
 
-      res.end(JSON.stringify(obj));
+      res.end(JSON.stringify(retObj));
     } else {
       const retObj = {
         msg: 'error',
