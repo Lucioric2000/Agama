@@ -39,8 +39,8 @@ const assetChainPorts = {
   DSEC: 11557,
   MGNX: 48402,
   CALL: 19609,
-  PIRATE: 111,
-  CCL: 63133,
+  PIRATE: 45453,
+  CCL: 20849,
 };
 
 module.exports = assetChainPorts;
