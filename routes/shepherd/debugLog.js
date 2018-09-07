@@ -56,7 +56,7 @@ module.exports = (shepherd) => {
           result: result,
         };
 
-        res.end(JSON.stringify(_obj));
+        res.end(JSON.stringify(retObj));
       });
     } else {
       const retObj = {
