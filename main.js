@@ -21,6 +21,7 @@ const fs = require('fs-extra');
 const Promise = require('bluebird');
 const arch = require('arch');
 const bip39 = require('bip39');
+const chainParams = require('./routes/chainParams');
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -107,6 +108,7 @@ shepherd.log(`platform: ${osPlatform}`, 'init');
 shepherd.log(`os_release: ${os.release()}`, 'init');
 shepherd.log(`os_type: ${os.type()}`, 'init');
 
+// deprecated(?)
 appConfig['daemonOutput'] = false; // shadow setting
 
 let __defaultAppSettings = require('./routes/appConfig.js').config;
@@ -313,6 +315,7 @@ function createWindow(status, hideLoadingWindow) {
 
 				// load our index.html (i.e. Agama GUI)
 				shepherd.writeLog('show agama gui');
+				// TODO: refactor into an obj
 				mainWindow.appConfig = appConfig;
 				mainWindow.appConfigSchema = shepherd.appConfigSchema;
 				mainWindow.arch = localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch();
@@ -355,6 +358,7 @@ function createWindow(status, hideLoadingWindow) {
 				mainWindow.kvEncode = shepherd.kvEncode;
 				mainWindow.kvDecode = shepherd.kvDecode;
 				mainWindow.electrumServers = shepherd.electrumServers;
+				mainWindow.chainParams = chainParams;
 
 			  for (let i = 0; i < process.argv.length; i++) {
 			    if (process.argv[i].indexOf('nvote') > -1) {
