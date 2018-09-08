@@ -414,8 +414,9 @@ function createWindow(status, hideLoadingWindow) {
 				}
 			});
 
-			// DEVTOOLS - only for dev purposes - ca333
-			// mainWindow.webContents.openDevTools()
+			if (appConfig.dev) {
+				mainWindow.webContents.openDevTools();
+			}
 
 			function appExit() {
 				if (shepherd.appConfig.spv &&
