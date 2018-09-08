@@ -60,7 +60,7 @@
     "sha256": "^0.2.0",
     "socket.io": "^2.1.1",
     "tx-decoder": "git://github.com/pbca26/tx-decoder.git",
-    "webpack": "^4.17.1",
+    "webpack": "^3.0.0",
     "wif": "^2.0.6"
   }
 }
