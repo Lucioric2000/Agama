@@ -37,7 +37,7 @@ const assetChainPorts = {
   PRLPAY: 9679,
   ZILLA: 10041,
   DSEC: 11557,
-  MGNX: 48402,
+  MGNX: 20731,
   CALL: 19609,
   PIRATE: 45453,
   CCL: 20849,
