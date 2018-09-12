@@ -111,13 +111,13 @@ const chainParams = {
 		addnode: '185.148.147.30',
 	},
 	MGNX: {
-		ac_supply: 12465001,
+		ac_supply: 12465003,
 		ac_staked: 90,
 		ac_reward: 2000000000,
 		ac_halving: 525960,
 		ac_cc: 2,
 		ac_end: 2629800,
-		addnode: '45.76.32.178',
+		addnode: '142.93.27.180',
 		genproclimit: true,
   },
 	CALL: {
