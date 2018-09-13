@@ -154,7 +154,7 @@ const appConfig = {
       proxy: {
         display: true,
         displayName: 'Use proxy',
-        // info: 'Use remote http proxy to reduce data usage (gzip compression).',
+        info: 'Enable specialized electrum proxy service',
         type: 'boolean',
       },
       socketTimeout: {
