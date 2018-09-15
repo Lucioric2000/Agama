@@ -315,57 +315,60 @@ function createWindow(status, hideLoadingWindow) {
 
 				// load our index.html (i.e. Agama GUI)
 				shepherd.writeLog('show agama gui');
-				// TODO: refactor into an obj
-				mainWindow.appConfig = appConfig;
-				mainWindow.appConfigSchema = shepherd.appConfigSchema;
-				mainWindow.arch = localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch();
-				mainWindow.appBasicInfo = appBasicInfo;
-				mainWindow.appSessionHash = appSessionHash;
-				mainWindow.assetChainPorts = require('./routes/ports.js');
-				mainWindow.agamaIcon = agamaIcon;
-				mainWindow.testLocation = shepherd.testLocation;
-				mainWindow.kmdMainPassiveMode = shepherd.kmdMainPassiveMode;
-				mainWindow.getAppRuntimeLog = shepherd.getAppRuntimeLog;
-				// mainWindow.nativeCoindList = nativeCoindList;
-				mainWindow.zcashParamsExist = _zcashParamsExist;
-				mainWindow.zcashParamsExistPromise = shepherd.zcashParamsExistPromise;
-				mainWindow.zcashParamsDownloadLinks = shepherd.zcashParamsDownloadLinks;
-				mainWindow.isWindows = os.platform() === 'win32' ? true : false; // obsolete(?)
-				mainWindow.appExit = appExit;
-				mainWindow.getMaxconKMDConf = shepherd.getMaxconKMDConf;
-				mainWindow.setMaxconKMDConf = shepherd.setMaxconKMDConf;
-				mainWindow.getMMCacheData = shepherd.getMMCacheData;
-				mainWindow.activeSection = 'wallets';
-				mainWindow.argv = process.argv;
-				mainWindow.getAssetChainPorts = shepherd.getAssetChainPorts;
-				mainWindow.spvFees = _spvFees;
-				mainWindow.startSPV = shepherd.startSPV;
-				mainWindow.startKMDNative = shepherd.startKMDNative;
-				mainWindow.addressVersionCheck = shepherd.addressVersionCheck;
-				mainWindow.getCoinByPub = shepherd.getCoinByPub;
-				mainWindow.resetSettings = () => { shepherd.saveLocalAppConf(__defaultAppSettings) };
-				mainWindow.createSeed = {
-					triggered: false,
-					firstLoginPH: null,
-					secondaryLoginPH: null,
-				};
-				mainWindow.checkStringEntropy = shepherd.checkStringEntropy;
-				mainWindow.pinAccess = false;
-				mainWindow.bip39 = bip39;
-				mainWindow.isWatchOnly = shepherd.isWatchOnly;
-				mainWindow.setPubkey = shepherd.setPubkey;
-				mainWindow.getPubkeys = shepherd.getPubkeys;
-				mainWindow.kvEncode = shepherd.kvEncode;
-				mainWindow.kvDecode = shepherd.kvDecode;
-				mainWindow.electrumServers = shepherd.electrumServers;
-				mainWindow.chainParams = chainParams;
 
-			  for (let i = 0; i < process.argv.length; i++) {
-			    if (process.argv[i].indexOf('nvote') > -1) {
-			      console.log('enable notary node elections ui');
-			      mainWindow.nnVoteChain = 'VOTE2018';
-			    }
-			  }
+				const _assetChainPorts = require('./routes/ports.js');
+				let _global = {
+					appConfig,
+					appConfigSchema: shepherd.appConfigSchema,
+					arch: localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch(),
+					appBasicInfo,
+					appSessionHash,
+					assetChainPorts: _assetChainPorts,
+					agamaIcon,
+					testLocation: shepherd.testLocation,
+					kmdMainPassiveMode: shepherd.kmdMainPassiveMode,
+					getAppRuntimeLog: shepherd.getAppRuntimeLog,
+					//nativeCoindList,
+					zcashParamsExist: _zcashParamsExist,
+					zcashParamsExistPromise: shepherd.zcashParamsExistPromise,
+					zcashParamsDownloadLinks: shepherd.zcashParamsDownloadLinks,
+					isWindows: os.platform() === 'win32' ? true : false, // obsolete(?)
+					appExit,
+					getMaxconKMDConf: shepherd.getMaxconKMDConf,
+					setMaxconKMDConf: shepherd.setMaxconKMDConf,
+					getMMCacheData: shepherd.getMMCacheData,
+					activeSection: 'wallets', // temp deprecated
+					argv: process.argv,
+					getAssetChainPorts: shepherd.getAssetChainPorts,
+					spvFees: _spvFees,
+					startSPV: shepherd.startSPV,
+					startKMDNative: shepherd.startKMDNative,
+					addressVersionCheck: shepherd.addressVersionCheck,
+					getCoinByPub: shepherd.getCoinByPub,
+					resetSettings: () => { shepherd.saveLocalAppConf(__defaultAppSettings) },
+					createSeed: {
+						triggered: false,
+						firstLoginPH: null,
+						secondaryLoginPH: null,
+					},
+					checkStringEntropy: shepherd.checkStringEntropy,
+					pinAccess: false,
+					bip39,
+					isWatchOnly: shepherd.isWatchOnly,
+					setPubkey: shepherd.setPubkey,
+					getPubkeys: shepherd.getPubkeys,
+					kvEncode: shepherd.kvEncode,
+					kvDecode: shepherd.kvDecode,
+					electrumServers: shepherd.electrumServers,
+					chainParams,
+				};
+				global.app = _global;
+				  /*for (let i = 0; i < process.argv.length; i++) {
+				    if (process.argv[i].indexOf('nvote') > -1) {
+				      console.log('enable notary node elections ui');
+				      mainWindow.nnVoteChain = 'VOTE2018';
+				    }
+				  }*/
 			} else {
 				mainWindow = new BrowserWindow({
 					width: 500,

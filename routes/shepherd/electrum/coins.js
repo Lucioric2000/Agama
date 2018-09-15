@@ -124,7 +124,7 @@ module.exports = (shepherd) => {
 
       res.end(JSON.stringify(retObj));
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
