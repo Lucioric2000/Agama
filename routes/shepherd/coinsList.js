@@ -102,7 +102,7 @@ module.exports = (shepherd) => {
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 
