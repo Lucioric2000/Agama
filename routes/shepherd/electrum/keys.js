@@ -160,7 +160,6 @@ module.exports = (shepherd) => {
     try {
       const _b58check = shepherd.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
       let _coin = [];
-      let returnObj;
 
       for (let key in shepherd.electrumJSNetworks) {
         if (_b58check.version === shepherd.electrumJSNetworks[key].pubKeyHash &&

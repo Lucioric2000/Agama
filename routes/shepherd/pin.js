@@ -170,7 +170,7 @@ module.exports = (shepherd) => {
                     result: 'wrong key',
                   };
 
-                  res.end(JSON.stringify(returnObj));
+                  res.end(JSON.stringify(retObj));
                 });
               }
             }
