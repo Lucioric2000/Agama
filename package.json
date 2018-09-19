@@ -27,8 +27,8 @@
     "electron": "2.0.8"
   },
   "dependencies": {
-    "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
     "adm-zip": "^0.4.7",
+    "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
     "arch": "^2.1.0",
     "async": "^2.6.0",
     "bigi": "^1.4.2",
@@ -45,8 +45,8 @@
     "express": "^4.14.0",
     "fix-path": "^2.1.0",
     "fs-extra": "^7.0.0",
-    "hoek": "^5.0.4",
     "graceful-fs": "^4.1.11",
+    "hoek": "^5.0.4",
     "iocane": "^1.0.0",
     "js-sha256": "^0.7.1",
     "marketmaker": "git://github.com/pbca26/marketmaker",
