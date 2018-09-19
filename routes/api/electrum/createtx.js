@@ -706,12 +706,61 @@ module.exports = (api) => {
         api.log('electrum pushtx ==>', 'spv.pushtx');
         api.log(json, 'spv.pushtx');
 
-        const retObj = {
-          msg: 'success',
-          result: json,
-        };
+        if (json &&
+            JSON.stringify(json).indexOf('fee not met') > -1) {
+          const retObj = {
+            msg: 'error',
+            result: 'Missing fee',
+          };
 
-        res.end(JSON.stringify(retObj));
+          res.end(JSON.stringify(retObj));
+        } else if (
+          json &&
+          json.indexOf('bad-txns-inputs-spent') > -1
+        ) {
+          const retObj = {
+            msg: 'error',
+            result: 'Bad transaction inputs spent',
+          };
+
+          res.end(JSON.stringify(retObj));
+        } else if (
+          json &&
+          json.length === 64
+        ) {
+          if (json.indexOf('bad-txns-in-belowout') > -1) {
+            const retObj = {
+              msg: 'error',
+              result: 'Bad transaction inputs spent',
+            };
+
+            res.end(JSON.stringify(retObj));
+          } else {
+            const retObj = {
+              msg: 'success',
+              result: json,
+            };
+
+            res.end(JSON.stringify(retObj));
+          }
+        } else if (
+          json &&
+          json.indexOf('bad-txns-in-belowout') > -1
+        ) {
+          const retObj = {
+            msg: 'error',
+            result: 'Bad transaction inputs spent',
+          };
+
+          res.end(JSON.stringify(retObj));
+        } else {
+          const retObj = {
+            msg: 'error',
+            result: 'Can\'t broadcast transaction',
+          };
+
+          res.end(JSON.stringify(retObj));
+        }
       });
     } else {
       const retObj = {
