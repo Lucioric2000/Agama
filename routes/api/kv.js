@@ -64,13 +64,13 @@ const KV_MAX_CONTENT_SIZE = 4096;
 module.exports = (api) => {
   api.kvEncode = (data) => {
     let kvBuf = [
-      new Buffer(KV_HEADER_SIZE[0]),
-      new Buffer(KV_HEADER_SIZE[1]),
-      new Buffer(KV_HEADER_SIZE[2]),
-      new Buffer(KV_CONTENT_HEADER_SIZE[0]),
-      new Buffer(KV_CONTENT_HEADER_SIZE[1]),
-      new Buffer(KV_CONTENT_HEADER_SIZE[2]),
-      new Buffer(data.content.body.length)
+      Buffer.alloc(KV_HEADER_SIZE[0]),
+      Buffer.alloc(KV_HEADER_SIZE[1]),
+      Buffer.alloc(KV_HEADER_SIZE[2]),
+      Buffer.alloc(KV_CONTENT_HEADER_SIZE[0]),
+      Buffer.alloc(KV_CONTENT_HEADER_SIZE[1]),
+      Buffer.alloc(KV_CONTENT_HEADER_SIZE[2]),
+      Buffer.alloc(data.content.body.length)
     ];
 
     kvBuf[0].write(KV_VERSION.current);
@@ -150,9 +150,9 @@ module.exports = (api) => {
 
   api.get('/electrum/kv/test', (req, res, next) => {
     api.kvEncode({
-      tag: 'test',
+      tag: 'trollbox',
       content: {
-        title: 'This is a test kv',
+        title: 'Anonymous troll',
         version: 1,
         body: 'test test test test',
       },
