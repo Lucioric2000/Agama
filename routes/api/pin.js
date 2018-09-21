@@ -53,7 +53,7 @@ module.exports = (api) => {
           if (_customPinFilenameTest.test(pubkey)) {
             encrypt(req.body.string, _pin)
             .then((encryptedString) => {
-              fs.writeFile(`${api.agamaDir}/api/pin/${pubkey}.pin`, encryptedString, (err) => {
+              fs.writeFile(`${api.agamaDir}/shepherd/pin/${pubkey}.pin`, encryptedString, (err) => {
                 if (err) {
                   api.log('error writing pin file', 'pin');
 
