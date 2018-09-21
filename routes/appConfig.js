@@ -40,7 +40,7 @@ const appConfig = {
       listtransactionsMaxLength: 300,
       csvListtransactionsMaxLength: 1000,
     },
-    coinControl: false,
+    // coinControl: false,
     // darkmode: false,
   },
   schema: {
@@ -238,7 +238,7 @@ const appConfig = {
         type: 'number',
       },
     },
-    coinControl: {
+    /*coinControl: {
       display: true,
       displayName: 'Coin control',
       info: 'Advanced coin control e.g. UTXO management, split/merge. <br/>Warning: only for experienced users!',
