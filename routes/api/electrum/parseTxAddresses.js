@@ -96,10 +96,13 @@ module.exports = (api) => {
       // vin + change, break into two tx
 
       // send to self
-      if (isSelfSend.inputs && isSelfSend.outputs) {
+      if (isSelfSend.inputs &&
+          isSelfSend.outputs) {
         result = {
           type: 'self',
           amount: Number(_sum.inputs - _sum.outputs).toFixed(8),
+          amountIn: Number(_sum.inputs).toFixed(8),
+          amountOut: Number(_sum.outputs).toFixed(8),
           address: targetAddress,
           timestamp: tx.timestamp,
           txid: tx.format.txid,
@@ -118,6 +121,8 @@ module.exports = (api) => {
         result = [{ // reorder since tx sort by default is from newest to oldest
           type: 'sent',
           amount: Number(_sum.inputs.toFixed(8)),
+          amountIn: Number(_sum.inputs).toFixed(8),
+          amountOut: Number(_sum.outputs).toFixed(8),
           address: _addresses.outputs[0],
           timestamp: tx.timestamp,
           txid: tx.format.txid,
@@ -127,6 +132,8 @@ module.exports = (api) => {
         }, {
           type: 'received',
           amount: Number(_sum.outputs.toFixed(8)),
+          amountIn: Number(_sum.inputs).toFixed(8),
+          amountOut: Number(_sum.outputs).toFixed(8),
           address: targetAddress,
           timestamp: tx.timestamp,
           txid: tx.format.txid,
@@ -144,10 +151,15 @@ module.exports = (api) => {
           }
         }
       }
-    } else if (_sum.inputs === 0 && _sum.outputs > 0) {
+    } else if (
+      _sum.inputs === 0 &&
+      _sum.outputs > 0
+    ) {
       result = {
         type: 'received',
         amount: Number(_sum.outputs.toFixed(8)),
+        amountIn: Number(_sum.inputs).toFixed(8),
+        amountOut: Number(_sum.outputs).toFixed(8),
         address: targetAddress,
         timestamp: tx.timestamp,
         txid: tx.format.txid,
@@ -155,10 +167,15 @@ module.exports = (api) => {
         from: _addresses.inputs,
         to: _addresses.outputs,
       };
-    } else if (_sum.inputs > 0 && _sum.outputs === 0) {
+    } else if (
+      _sum.inputs > 0 &&
+      _sum.outputs === 0
+    ) {
       result = {
         type: 'sent',
         amount: Number(_sum.inputs.toFixed(8)),
+        amountIn: Number(_sum.inputs).toFixed(8),
+        amountOut: Number(_sum.outputs).toFixed(8),
         address: isSelfSend.inputs && isSelfSend.outputs ? targetAddress : _addresses.outputs[0],
         timestamp: tx.timestamp,
         txid: tx.format.txid,
