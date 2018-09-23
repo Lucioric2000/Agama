@@ -120,7 +120,7 @@ module.exports = (api) => {
       } else {
         result = [{ // reorder since tx sort by default is from newest to oldest
           type: 'sent',
-          amount: Number(_sum.inputs.toFixed(8)),
+          amount: Number(_sum.inputs).toFixed(8),
           amountIn: Number(_sum.inputs).toFixed(8),
           amountOut: Number(_sum.outputs).toFixed(8),
           address: _addresses.outputs[0],
@@ -131,7 +131,7 @@ module.exports = (api) => {
           to: _addresses.outputs,
         }, {
           type: 'received',
-          amount: Number(_sum.outputs.toFixed(8)),
+          amount: Number(_sum.outputs).toFixed(8),
           amountIn: Number(_sum.inputs).toFixed(8),
           amountOut: Number(_sum.outputs).toFixed(8),
           address: targetAddress,
@@ -157,7 +157,7 @@ module.exports = (api) => {
     ) {
       result = {
         type: 'received',
-        amount: Number(_sum.outputs.toFixed(8)),
+        amount: Number(_sum.outputs).toFixed(8),
         amountIn: Number(_sum.inputs).toFixed(8),
         amountOut: Number(_sum.outputs).toFixed(8),
         address: targetAddress,
@@ -173,7 +173,7 @@ module.exports = (api) => {
     ) {
       result = {
         type: 'sent',
-        amount: Number(_sum.inputs.toFixed(8)),
+        amount: Number(_sum.inputs).toFixed(8),
         amountIn: Number(_sum.inputs).toFixed(8),
         amountOut: Number(_sum.outputs).toFixed(8),
         address: isSelfSend.inputs && isSelfSend.outputs ? targetAddress : _addresses.outputs[0],
