@@ -96,6 +96,51 @@ module.exports = (api) => {
     }
   });
 
+  api.get('/electrum/pubkey/check', (req, res, next) => {
+    if (api.checkToken(req.query.token)) {
+      const address = api.pubkeyToAddress(req.query.pubkey, req.query.coin); 
+      
+      if (address) {
+        const retObj = {
+          msg: 'success',
+          result: {
+            pubkey: req.query.pubkey,
+            address,            
+          },
+        };
+
+        res.end(JSON.stringify(retObj));
+      } else {
+        const retObj = {
+          msg: 'error',
+          result: 'wrong pubkey or coin param',
+        };
+
+        res.end(JSON.stringify(retObj));
+      }
+    } else {
+      const retObj = {
+        msg: 'error',
+        result: 'unauthorized access',
+      };
+
+      res.end(JSON.stringify(retObj));
+    }
+  });
+
+  api.pubkeyToAddress = (pubkey, coin) => {
+    try {
+      const publicKey = new Buffer(pubkey, 'hex');
+      const publicKeyHash = bitcoin.crypto.hash160(publicKey);
+      const address = bitcoin.address.toBase58Check(publicKeyHash, api.electrumJSNetworks[coin].pubKeyHash);
+      api.log(`convert pubkey ${pubkey} -> ${address}`, 'pubkey');
+      return address;
+    } catch (e) {
+      api.log('convert pubkey error: ' + e);
+      return false;
+    }
+  };
+
   api.post('/electrum/seedtowif', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
       let keys = api.seedToWif(req.body.seed, req.body.network.toLowerCase(), req.body.iguana);
