@@ -40,6 +40,7 @@ const appConfig = {
       listtransactionsMaxLength: 300,
       csvListtransactionsMaxLength: 1000,
     },
+    pubkey: '',
     // coinControl: false,
     // darkmode: false,
   },
@@ -237,6 +238,12 @@ const appConfig = {
         info: 'Warning: keep this settings option within a sane range of values (default value: 1000).<br/>The higher the value the more time it will require to process transactions history.',
         type: 'number',
       },
+    },
+    pubkey: {
+      display: true,
+      displayName: 'Pubkey',
+      info: 'Append pubkey (-pubkey) to daemon launch params list',
+      type: 'string',
     },
     /*coinControl: {
       display: true,

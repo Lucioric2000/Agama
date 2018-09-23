@@ -361,6 +361,7 @@ function createWindow(status, hideLoadingWindow) {
 					kvDecode: api.kvDecode,
 					electrumServers: api.electrumServers,
 					chainParams,
+					pubkeyToAddress: api.pubkeyToAddress,
 				};
 				global.app = _global;
 				  /*for (let i = 0; i < process.argv.length; i++) {
