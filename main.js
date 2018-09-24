@@ -1,5 +1,4 @@
 // main proc for Agama
-// this app spawns iguana in background in nontech-mode
 
 const electron = require('electron');
 const app = electron.app;
@@ -8,7 +7,7 @@ const path = require('path');
 const url = require('url');
 const os = require('os');
 const { randomBytes } = require('crypto');
-const md5 = require('./routes/md5');
+const md5 = require('agama-wallet-lib/src/crypto/md5');
 const exec = require('child_process').exec;
 const { Menu } = require('electron');
 const portscanner = require('portscanner');
@@ -219,7 +218,8 @@ function forseCloseApp() {
 	app.quit();
 }
 
-if (!_argv.nogui || (_argv.nogui && _argv.nogui === '1')) {
+if (!_argv.nogui ||
+		(_argv.nogui && _argv.nogui === '1')) {
 	app.on('ready', () => createWindow('open', process.argv.indexOf('dexonly') > -1 ? true : null));
 } else {
 	server.listen(appConfig.agamaPort, () => {
@@ -303,11 +303,7 @@ function createWindow(status, hideLoadingWindow) {
 					show: false,
 				});
 
-				if (appConfig.dev) {
-					mainWindow.loadURL('http://127.0.0.1:3000');
-				} else {
-					mainWindow.loadURL(`file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
-				}
+				mainWindow.loadURL(appConfig.dev ? 'http://127.0.0.1:3000' : `file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
 
 				api.setIO(io); // pass sockets object to api router
 				api.setVar('appBasicInfo', appBasicInfo);
@@ -328,7 +324,7 @@ function createWindow(status, hideLoadingWindow) {
 					testLocation: api.testLocation,
 					kmdMainPassiveMode: api.kmdMainPassiveMode,
 					getAppRuntimeLog: api.getAppRuntimeLog,
-					//nativeCoindList,
+					// nativeCoindList,
 					zcashParamsExist: _zcashParamsExist,
 					zcashParamsExistPromise: api.zcashParamsExistPromise,
 					zcashParamsDownloadLinks: api.zcashParamsDownloadLinks,
@@ -409,11 +405,17 @@ function createWindow(status, hideLoadingWindow) {
 		  });*/
 
 			mainWindow.webContents.on('context-menu', (e, params) => { // context-menu returns params
-				const { selectionText, isEditable } = params; // params obj
+				const {
+					selectionText,
+					isEditable,
+				} = params; // params obj
 
 				if (isEditable) {
 					editMenu.popup(mainWindow);
-				} else if (selectionText && selectionText.trim() !== '') {
+				} else if (
+					selectionText &&
+					selectionText.trim() !== ''
+				) {
 					staticMenu.popup(mainWindow);
 				}
 			});
