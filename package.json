@@ -1,7 +1,7 @@
 {
   "name": "agama-app",
   "productName": "Agama",
-  "version": "0.2.40",
+  "version": "0.2.42",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -27,8 +27,8 @@
     "electron": "2.0.8"
   },
   "dependencies": {
-    "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
     "adm-zip": "^0.4.7",
+    "agama-wallet-lib": "git://github.com/pbca26/agama-wallet-lib#dev",
     "arch": "^2.1.0",
     "async": "^2.6.0",
     "bigi": "^1.4.2",
@@ -44,8 +44,9 @@
     "electron": "2.0.8",
     "express": "^4.14.0",
     "fix-path": "^2.1.0",
-    "fs-extra": "^4.0.2",
+    "fs-extra": "^7.0.0",
     "graceful-fs": "^4.1.11",
+    "hoek": "^5.0.4",
     "iocane": "^1.0.0",
     "js-sha256": "^0.7.1",
     "marketmaker": "git://github.com/pbca26/marketmaker",
@@ -53,10 +54,10 @@
     "passwd-strength": "git+https://github.com/pbca26/passwd-strength.git",
     "portscanner": "^2.1.1",
     "ps-node": "^0.1.5",
-    "remote-file-size": "^3.0.3",
-    "request": "^2.80.0",
+    "remote-file-size": "^3.0.5",
+    "request": "^2.88.0",
     "sha256": "^0.2.0",
-    "socket.io": "^1.7.3",
+    "socket.io": "^2.1.1",
     "tx-decoder": "git://github.com/pbca26/tx-decoder.git",
     "wif": "^2.0.6"
   }
