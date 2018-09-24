@@ -7,7 +7,7 @@ const os = require('os');
 const portscanner = require('portscanner');
 const execFile = require('child_process').execFile;
 const Promise = require('bluebird');
-const md5 = require('../md5.js');
+const md5 = require('agama-wallet-lib/src/crypto/md5');
 
 module.exports = (api) => {
   const getConf = (flock, coind) => {
