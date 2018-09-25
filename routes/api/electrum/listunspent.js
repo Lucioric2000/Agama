@@ -1,6 +1,8 @@
 // TODO: watchonly spendable switch
 
 const Promise = require('bluebird');
+const { checkTimestamp } = require('agama-wallet-lib/src/time');
+const UTXO_1MONTH_THRESHOLD_SECONDS = 2592000;
 
 module.exports = (api) => {
   api.listunspent = (ecl, address, network, full, verify) => {
@@ -76,6 +78,10 @@ module.exports = (api) => {
                               locktime: decodedTx.format.locktime,
                               interest: Number(interest.toFixed(8)),
                               interestSats: Math.floor(interest * 100000000),
+                              timeElapsedFromLocktime: Math.floor(Date.now() / 1000) - decodedTx.format.locktime * 1000,
+                              timeElapsedFromLocktimeInSeconds: checkTimestamp(decodedTx.format.locktime * 1000),
+                              timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - checkTimestamp(decodedTx.format.locktime * 1000),
+                              interestRulesCheckPass: !decodedTx.format.locktime || Number(decodedTx.format.locktime) === 0 || checkTimestamp(decodedTx.format.locktime * 1000) > UTXO_1MONTH_THRESHOLD_SECONDS ? false : true,
                               confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                               spendable: true,
                               verified: false,
