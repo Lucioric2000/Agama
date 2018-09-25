@@ -37,8 +37,13 @@ module.exports = (api) => {
                 if (_utxo &&
                     _utxo.length) {
                   let interestTotal = 0;
+                  let utxoIssues = false;
 
                   Promise.all(_utxo.map((_utxoItem, index) => {
+                    if (!_utxoItem.interestRulesCheckPass) {
+                      utxoIssues = true;
+                    }
+
                     return new Promise((resolve, reject) => {
                       api.getTransaction(_utxoItem.tx_hash, network, ecl)
                       .then((_rawtxJSON) => {
@@ -88,6 +93,7 @@ module.exports = (api) => {
                         balanceSats: json.confirmed,
                         interest: Number(interestTotal.toFixed(8)),
                         interestSats: Math.floor(interestTotal * 100000000),
+                        utxoIssues,
                         total: interestTotal > 0 ? Number((0.00000001 * json.confirmed + interestTotal).toFixed(8)) : 0,
                         totalSats: interestTotal > 0 ? json.confirmed + Math.floor(interestTotal * 100000000) : 0,
                       },
