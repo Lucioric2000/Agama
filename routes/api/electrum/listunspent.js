@@ -80,7 +80,7 @@ module.exports = (api) => {
                               interestSats: Math.floor(interest * 100000000),
                               timeElapsedFromLocktime: Math.floor(Date.now() / 1000) - decodedTx.format.locktime * 1000,
                               timeElapsedFromLocktimeInSeconds: checkTimestamp(decodedTx.format.locktime * 1000),
-                              timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - checkTimestamp(decodedTx.format.locktime * 1000),
+                              timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - checkTimestamp(decodedTx.format.locktime * 1000) > 0 ? UTXO_1MONTH_THRESHOLD_SECONDS - checkTimestamp(decodedTx.format.locktime * 1000) : 0,
                               interestRulesCheckPass: !decodedTx.format.locktime || Number(decodedTx.format.locktime) === 0 || checkTimestamp(decodedTx.format.locktime * 1000) > UTXO_1MONTH_THRESHOLD_SECONDS ? false : true,
                               confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                               spendable: true,
