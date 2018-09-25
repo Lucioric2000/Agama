@@ -238,7 +238,8 @@ module.exports = (api) => {
                     spawnErr
                   ],
                   detached: true,
-                }).unref();
+                })
+                .unref();
               } else {
                 let logStream = fs.createWriteStream(_daemonLogName, { flags: 'a' });
 
