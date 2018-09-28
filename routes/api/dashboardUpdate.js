@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const request = require('request');
+const chainParams = require('../chainParams');
 
 module.exports = (api) => {
   /*
@@ -40,14 +41,14 @@ module.exports = (api) => {
           'getinfo',
           'listtransactions',
           'z_gettotalbalance',
-          'z_getoperationstatus'
+          'z_getoperationstatus',
         ];
       }
 
       const getAddressesNative = (coin) => {
         const type = [
           'public',
-          'private'
+          'private',
         ];
 
         if (coin === 'CHIPS') {
@@ -186,17 +187,55 @@ module.exports = (api) => {
                   });
                 }))
                 .then(zresult => {
-                  _returnObj.addresses = {
-                    public: newAddressArray[0],
-                    private: newAddressArray[1],
-                  };
-
-                  const retObj = {
-                    msg: 'success',
-                    result: _returnObj,
-                  };
-
-                  res.end(JSON.stringify(retObj));
+                  // get z_listreceivedbyaddress history
+                  if (api.appConfig.native.zlistreceivedbyaddress ||
+                      (chainParams[coin] && chainParams[coin].ac_private)) {
+                    Promise.all(result[1].map((_address, index) => {
+                      return new Promise((resolve, reject) => {
+                        _bitcoinRPC(coin, 'z_listreceivedbyaddress', [_address])
+                        .then((__json) => {
+                          try {
+                            __json = JSON.parse(__json);
+                          } catch (e) {
+                            __json = { error: 'can\'t parse json' };
+                          }
+    
+                          if (__json &&
+                              __json.error) {
+                            resolve(0);
+                          } else {
+                            resolve(__json.result);
+                            newAddressArray[1][index].txs = __json.result
+                          }
+                        });
+                      });
+                    }))
+                    .then(zresultHistory => {
+                      _returnObj.addresses = {
+                        public: newAddressArray[0],
+                        private: newAddressArray[1],
+                      };
+    
+                      const retObj = {
+                        msg: 'success',
+                        result: _returnObj,
+                      };
+    
+                      res.end(JSON.stringify(retObj));
+                    });
+                  } else {
+                    _returnObj.addresses = {
+                      public: newAddressArray[0],
+                      private: newAddressArray[1],
+                    };
+  
+                    const retObj = {
+                      msg: 'success',
+                      result: _returnObj,
+                    };
+  
+                    res.end(JSON.stringify(retObj));
+                  }
                 });
               } else {
                 _returnObj.addresses = {
