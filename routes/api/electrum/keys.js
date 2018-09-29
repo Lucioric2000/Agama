@@ -197,12 +197,12 @@ module.exports = (api) => {
     }
   });
 
-  // TODO: zcash
   api.pubkeyToAddress = (pubkey, coin) => {
     try {
       const publicKey = new Buffer(pubkey, 'hex');
       const publicKeyHash = bitcoin.crypto.hash160(publicKey);
-      const address = bitcoin.address.toBase58Check(publicKeyHash, api.electrumJSNetworks[coin].pubKeyHash);
+      const _network = api.electrumJSNetworks[coin];
+      const address =  _network.isZcash ? bitcoinZcash.address.toBase58Check(publicKeyHash, api.electrumJSNetworks[coin].pubKeyHash) : bitcoin.address.toBase58Check(publicKeyHash, api.electrumJSNetworks[coin].pubKeyHash);
       api.log(`convert pubkey ${pubkey} -> ${address}`, 'pubkey');
       return address;
     } catch (e) {
