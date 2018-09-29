@@ -16,6 +16,7 @@ module.exports = (api) => {
     return {
       pub: key.getAddress(),
       priv: key.toWIF(),
+      fromWif: api.fromWif(wif, _network),
     };
   }
 
@@ -105,6 +106,7 @@ module.exports = (api) => {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
       pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
+      fromWif: api.fromWif(keyPair.toWIF(), _network),
     };
 
     let isWif = false;
@@ -121,6 +123,7 @@ module.exports = (api) => {
           priv: keyPair.toWIF(),
           pub: keyPair.getAddress(),
           pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
+          fromWif: api.fromWif(keyPair.toWIF(), _network),
         };
       } catch (e) {}
     }
@@ -141,6 +144,7 @@ module.exports = (api) => {
       keys = {
         priv: key.toWIF(),
         pub: key.getAddress(),
+        fromWif: api.fromWif(key.toWIF(), _network),
       };
 
       const retObj = {
