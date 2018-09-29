@@ -6,6 +6,7 @@ const bigi = require('bigi');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoin = require('bitcoinjs-lib');
 const bs58check = require('bs58check');
+const wif = require('wif');
 
 module.exports = (api) => {
   api.wifToWif = (wif, network) => {
@@ -17,6 +18,67 @@ module.exports = (api) => {
       priv: key.toWIF(),
     };
   }
+
+  // src: https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/ecpair.js#L62
+  api.fromWif = (string, network) => {
+    const decoded = wif.decode(string);
+    const version = decoded.version;
+
+    let key = network.isZcash ? bitcoinZcash.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true) : bitcoin.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true);
+    
+    if (!network) throw new Error('Unknown network version');
+    if (network.wifAlt && version !== network.wif && network.wifAlt.indexOf(version) === -1) throw new Error('Invalid network version');
+    if (!network.wifAlt && version !== network.wif) throw new Error('Invalid network version');
+  
+    const d = bigi.fromBuffer(decoded.privateKey);
+
+    const masterKP = new bitcoin.ECPair(d, null, {
+      compressed: !decoded.compressed,
+      network,
+    });
+    
+    if (network.wifAlt) {
+      let altKP = [];
+      
+      for (let i = 0; i < network.wifAlt.length; i++) {
+        let _network = JSON.parse(JSON.stringify(network));
+        _network.wif = network.wifAlt[i];
+
+        const _altKP = new network.isZcash ? bitcoinZcash.ECPair(d, null, {
+          compressed: !decoded.compressed,
+          network: _network,
+        }) : bitcoin.ECPair(d, null, {
+          compressed: !decoded.compressed,
+          network: _network,
+        });
+
+        altKP.push({
+          pub: _altKP.getAddress(),
+          priv: _altKP.toWIF(),
+          version: network.wifAlt[i],
+        });
+      }
+
+      return {
+        inputKey: decoded,
+        master: {
+          pub: masterKP.getAddress(),
+          priv: masterKP.toWIF(),
+          version: network.wif,
+        },
+        alt: altKP,
+      };
+    } else {
+      return {
+        inputKey: decoded,
+        master: {
+          pub: masterKP.getAddress(),
+          priv: masterKP.toWIF(),
+          version: network.wif,
+        },
+      };
+    }  
+  };
 
   api.seedToWif = (seed, network, iguana) => {
     let bytes;
@@ -38,9 +100,14 @@ module.exports = (api) => {
 
     const d = bigi.fromBuffer(bytes);
     let keyPair = api.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: api.getNetworkData(network) }) : new bitcoin.ECPair(d, null, { network: api.getNetworkData(network) });
+    let keyPairUnCompressed = api.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: api.getNetworkData(network), compressed: false }) : new bitcoin.ECPair(d, null, { network: api.getNetworkData(network), compressed: false });
     let keys = {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
+      uncompressed: {
+        pub: keyPairUnCompressed.getAddress(),
+        priv: keyPairUnCompressed.toWIF(),
+      },
       pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
     };
 
@@ -54,6 +121,7 @@ module.exports = (api) => {
     if (isWif) {
       try {
         keyPair = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(seed, api.getNetworkData(network), true) : bitcoin.ECPair.fromWIF(seed, api.getNetworkData(network), true);
+        keyPairUnCompressed = api.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: api.getNetworkData(network), compressed: false }) : new bitcoin.ECPair(d, null, { network: api.getNetworkData(network), compressed: false });
         keys = {
           priv: keyPair.toWIF(),
           pub: keyPair.getAddress(),
@@ -73,6 +141,7 @@ module.exports = (api) => {
   api.get('/electrum/wiftopub', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
       let key = api.isZcash(req.query.coin.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true) : bitcoin.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true);
+
       keys = {
         priv: key.toWIF(),
         pub: key.getAddress(),
