@@ -10,8 +10,8 @@ const wif = require('wif');
 
 module.exports = (api) => {
   api.wifToWif = (wif, network) => {
-    network = network.toLowerCase();
-    const key = api.isZcash(network) ? new bitcoinZcash.ECPair.fromWIF(wif, api.getNetworkData(network), true) : new bitcoin.ECPair.fromWIF(wif, api.getNetworkData(network), true);
+    const _network = api.getNetworkData(network.toLowerCase());
+    const key = _network.isZcash ? new bitcoinZcash.ECPair.fromWIF(wif, _network, true) : new bitcoin.ECPair.fromWIF(wif, _network, true);
 
     return {
       pub: key.getAddress(),
@@ -23,8 +23,6 @@ module.exports = (api) => {
   api.fromWif = (string, network) => {
     const decoded = wif.decode(string);
     const version = decoded.version;
-
-    let key = network.isZcash ? bitcoinZcash.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true) : bitcoin.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true);
     
     if (!network) throw new Error('Unknown network version');
     if (network.wifAlt && version !== network.wif && network.wifAlt.indexOf(version) === -1) throw new Error('Invalid network version');
@@ -32,7 +30,10 @@ module.exports = (api) => {
   
     const d = bigi.fromBuffer(decoded.privateKey);
 
-    const masterKP = new bitcoin.ECPair(d, null, {
+    const masterKP = network.isZcash ? new bitcoinZcash.ECPair(d, null, {
+      compressed: !decoded.compressed,
+      network,
+    }) : new bitcoin.ECPair(d, null, {
       compressed: !decoded.compressed,
       network,
     });
@@ -44,10 +45,10 @@ module.exports = (api) => {
         let _network = JSON.parse(JSON.stringify(network));
         _network.wif = network.wifAlt[i];
 
-        const _altKP = new network.isZcash ? bitcoinZcash.ECPair(d, null, {
+        const _altKP = network.isZcash ? new bitcoinZcash.ECPair(d, null, {
           compressed: !decoded.compressed,
           network: _network,
-        }) : bitcoin.ECPair(d, null, {
+        }) : new bitcoin.ECPair(d, null, {
           compressed: !decoded.compressed,
           network: _network,
         });
@@ -82,7 +83,6 @@ module.exports = (api) => {
 
   api.seedToWif = (seed, network, iguana) => {
     let bytes;
-    network = network.toLowerCase();
 
     // legacy seed edge case
     if (process.argv.indexOf('spvold=true') > -1) {
@@ -99,15 +99,11 @@ module.exports = (api) => {
     }
 
     const d = bigi.fromBuffer(bytes);
-    let keyPair = api.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: api.getNetworkData(network) }) : new bitcoin.ECPair(d, null, { network: api.getNetworkData(network) });
-    let keyPairUnCompressed = api.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: api.getNetworkData(network), compressed: false }) : new bitcoin.ECPair(d, null, { network: api.getNetworkData(network), compressed: false });
+    const _network = api.getNetworkData(network.toLowerCase());
+    let keyPair = _network.isZcash ? new bitcoinZcash.ECPair(d, null, { network: _network }) : new bitcoin.ECPair(d, null, { network: _network });
     let keys = {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
-      uncompressed: {
-        pub: keyPairUnCompressed.getAddress(),
-        priv: keyPairUnCompressed.toWIF(),
-      },
       pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
     };
 
@@ -120,8 +116,7 @@ module.exports = (api) => {
 
     if (isWif) {
       try {
-        keyPair = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(seed, api.getNetworkData(network), true) : bitcoin.ECPair.fromWIF(seed, api.getNetworkData(network), true);
-        keyPairUnCompressed = api.isZcash(network) ? new bitcoinZcash.ECPair(d, null, { network: api.getNetworkData(network), compressed: false }) : new bitcoin.ECPair(d, null, { network: api.getNetworkData(network), compressed: false });
+        keyPair = _network.isZcash ? new bitcoinZcash.ECPair.fromWIF(seed, _network, true) : new bitcoin.ECPair.fromWIF(seed, _network, true);
         keys = {
           priv: keyPair.toWIF(),
           pub: keyPair.getAddress(),
@@ -140,7 +135,8 @@ module.exports = (api) => {
 
   api.get('/electrum/wiftopub', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      let key = api.isZcash(req.query.coin.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true) : bitcoin.ECPair.fromWIF(req.query.wif, api.electrumJSNetworks[req.query.coin], true);
+      const _network = api.electrumJSNetworks[req.query.coin];
+      let key = _network.isZcash ? new bitcoinZcash.ECPair.fromWIF(req.query.wif, _network, true) : new bitcoin.ECPair.fromWIF(req.query.wif, _network, true);
 
       keys = {
         priv: key.toWIF(),
@@ -197,6 +193,7 @@ module.exports = (api) => {
     }
   });
 
+  // TODO: zcash
   api.pubkeyToAddress = (pubkey, coin) => {
     try {
       const publicKey = new Buffer(pubkey, 'hex');
@@ -254,7 +251,7 @@ module.exports = (api) => {
     }
   });
 
-  api.getCoinByPub = (address) => {
+  api.getCoinByPub = (address, coin) => {
     const _skipNetworks = [
       'btc',
       'crw',
@@ -272,7 +269,7 @@ module.exports = (api) => {
     ];
 
     try {
-      const _b58check = api.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
+      const _b58check = api.electrumJSNetworks[coin.toLowerCase()].isZcash ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
       let _coin = [];
 
       for (let key in api.electrumJSNetworks) {
@@ -299,7 +296,7 @@ module.exports = (api) => {
     const _network = api.getNetworkData(network.toLowerCase());
 
     try {
-      const _b58check = api.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
+      const _b58check = _network.isZcash ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);
 
       if (_b58check.version === _network.pubKeyHash ||
           _b58check.version === _network.scriptHash) {
@@ -340,9 +337,11 @@ module.exports = (api) => {
             isWif = true;
           } catch (e) {}
 
+          const _network = api.getNetworkData(key);
+          
           if (isWif) {
             try {
-              let key = api.isZcash(key) ? bitcoinZcash.ECPair.fromWIF(_seed, api.getNetworkData(key), true) : bitcoin.ECPair.fromWIF(_seed, api.getNetworkData(key), true);
+              let key = _network.isZcash ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
               priv = key.toWIF();
               pub = key.getAddress();
             } catch (e) {
@@ -350,7 +349,7 @@ module.exports = (api) => {
               break;
             }
           } else {
-            let _keys = api.seedToWif(_seed, api.findNetworkObj(key), req.body.iguana);
+            let _keys = api.seedToWif(_seed, _network, req.body.iguana);
             priv = _keys.priv;
             pub = _keys.pub;
           }
