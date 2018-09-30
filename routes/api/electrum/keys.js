@@ -100,7 +100,7 @@ module.exports = (api) => {
     }
 
     const d = bigi.fromBuffer(bytes);
-    const _network = api.getNetworkData(network.toLowerCase());
+    const _network = network.pubKeyHash ? network : api.getNetworkData(network.toLowerCase());
     let keyPair = _network.isZcash ? new bitcoinZcash.ECPair(d, null, { network: _network }) : new bitcoin.ECPair(d, null, { network: _network });
     let keys = {
       pub: keyPair.getAddress(),
