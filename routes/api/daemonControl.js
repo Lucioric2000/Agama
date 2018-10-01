@@ -204,11 +204,11 @@ module.exports = (api) => {
               _customParam = _customParam + ' -datadir=' + api.appConfig.native.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
             }
 
-            api.log(`exec ${api.komododBin} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
-            api.writeLog(`exec ${api.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
-
             const isChain = data.ac_name.match(/^[A-Z]*$/);
             const coindACParam = isChain ? ` -ac_name=${data.ac_name} ` : '';
+
+            api.log(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
+            api.writeLog(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`);
             api.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
 
             api.coindInstanceRegistry[data.ac_name] = true;
@@ -267,15 +267,18 @@ module.exports = (api) => {
                 // TODO: logger add verbose native output
                 _daemonChildProc.stdout.on('data', (data) => {
                   // api.log(`${_daemonName} stdout: \n${data}`);
-                }).pipe(logStream);
+                })
+                .pipe(logStream);
 
                 _daemonChildProc.stdout.on('error', (data) => {
                   // api.log(`${_daemonName} stdout: \n${data}`);
-                }).pipe(logStream);
+                })
+                .pipe(logStream);
 
                 _daemonChildProc.stderr.on('data', (data) => {
                   // api.error(`${_daemonName} stderr:\n${data}`);
-                }).pipe(logStream);
+                })
+                .pipe(logStream);
 
                 _daemonChildProc.on('exit', (exitCode) => {
                   const _errMsg = exitCode === 0 ? `${_daemonName} exited with code ${exitCode}` : `${_daemonName} exited with code ${exitCode}, crashed?`;
@@ -290,7 +293,7 @@ module.exports = (api) => {
                 });
               }
             }
-          } else {
+          } else { // deprecated(?)
             if (api.kmdMainPassiveMode) {
               api.coindInstanceRegistry[data.ac_name] = true;
             }
