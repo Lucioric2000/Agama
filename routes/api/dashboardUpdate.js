@@ -348,7 +348,32 @@ module.exports = (api) => {
                 !json) {
               _returnObj[_call] = { error: 'daemon is busy' };
             } else {
-              _returnObj[_call] = JSON.parse(json);
+              const _jsonParsed = JSON.parse(json);
+
+              if (api.appConfig.native.zgetoperationresult &&
+                _call === 'z_getoperationstatus' &&
+                _jsonParsed &&
+                _jsonParsed.result &&
+                _jsonParsed.result.length) {
+                api.log('found runtime z data, purge all', 'native');
+
+                _bitcoinRPC(
+                  _coin,
+                  'z_getoperationresult',
+                  []
+                )
+                .then((_json) => {
+                  const __jsonParsed = JSON.parse(_json);
+                  
+                  if (__jsonParsed &&
+                      __jsonParsed.result) {
+                    api.log('found runtime z data, purge success', 'native');
+                  } else {
+                    api.log('found runtime z data, purge error' + JSON.stringify(__jsonParsed.error), 'native');
+                  }
+                });
+              }
+              _returnObj[_call] = _jsonParsed;
             }
 
             resolve(json);
