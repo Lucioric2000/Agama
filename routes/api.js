@@ -122,6 +122,7 @@ api = require('./api/auth.js')(api);
 api = require('./api/coins.js')(api);
 api = require('./api/coindWalletKeys.js')(api);
 api = require('./api/addressBook.js')(api);
+api = require('./api/dice.js')(api);
 
 // elections
 api = require('./api/elections.js')(api);
