@@ -254,7 +254,13 @@ function createAppCloseWindow() {
   });
 }
 
-function createWindow(status, hideLoadingWindow) {
+async function createWindow(status, hideLoadingWindow) {
+	if (
+    	process.env.NODE_ENV === 'development' ||
+    	process.env.DEBUG_PROD === 'true'
+  	) {
+    	await installExtensions();
+  	}
 	if (process.argv.indexOf('spvcoins=all/add-all') > -1) {
 		api.startSPV('kmd');
 	}
@@ -567,3 +573,13 @@ function formatBytes(bytes, decimals) {
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
+
+const installExtensions = async () => {
+  const installer = require('electron-devtools-installer');
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+
+  return Promise.all(
+    extensions.map(name => installer.default(installer[name], forceDownload))
+  ).catch(console.log);
+};
