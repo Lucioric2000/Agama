@@ -1,5 +1,6 @@
 const async = require('async');
 const Promise = require('bluebird');
+const { hex2str } = require('agama-wallet-lib/src/crypto/utils');
 
 // TODO: add z -> pub, pub -> z flag for zcash forks
 
@@ -120,7 +121,7 @@ module.exports = (api) => {
                                   kvDecoded: api.kvDecode(decodedTx.outputs[i].scriptPubKey.asm.substr(10, decodedTx.outputs[i].scriptPubKey.asm.length), true),
                                 };
                               } else {
-                                opreturn = api.hex2str(decodedTx.outputs[i].scriptPubKey.hex);
+                                opreturn = hex2str(decodedTx.outputs[i].scriptPubKey.hex);
                               }
                             }
                           }

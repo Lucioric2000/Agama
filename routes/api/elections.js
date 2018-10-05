@@ -1,6 +1,7 @@
 const bs58check = require('bs58check');
 const bitcoin = require('bitcoinjs-lib');
 const Promise = require('bluebird');
+const { hex2str } = require('agama-wallet-lib/src/crypto/utils');
 
 module.exports = (api) => {
   api.elections = {};
@@ -212,7 +213,7 @@ module.exports = (api) => {
                       for (let i = 0; i < decodedTx.outputs.length; i++) {
                         if (decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') > -1) {
                           _opreturnFound = true;
-                          _region = api.hex2str(decodedTx.outputs[i].scriptPubKey.hex.substr(4, decodedTx.outputs[i].scriptPubKey.hex.length));
+                          _region = hex2str(decodedTx.outputs[i].scriptPubKey.hex.substr(4, decodedTx.outputs[i].scriptPubKey.hex.length));
                           api.log(`found opreturn tag ${_region}`, 'elections.listtransactions');
                           break;
                         }
