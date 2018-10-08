@@ -620,7 +620,7 @@ module.exports = (api) => {
                       res.end(JSON.stringify(retObj));
                     } else if (
                       txid &&
-                      txid.indexOf('bad-txns-inputs-spent') > -1
+                      JSON.stringify(txid).indexOf('bad-txns-inputs-spent') > -1
                     ) {
                       const retObj = {
                         msg: 'error',
@@ -633,7 +633,7 @@ module.exports = (api) => {
                       txid &&
                       txid.length === 64
                     ) {
-                      if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                      if (JSON.stringify(txid).indexOf('bad-txns-in-belowout') > -1) {
                         const retObj = {
                           msg: 'error',
                           result: 'Bad transaction inputs spent',
@@ -651,7 +651,7 @@ module.exports = (api) => {
                       }
                     } else if (
                       txid &&
-                      txid.indexOf('bad-txns-in-belowout') > -1
+                      JSON.stringify(txid).indexOf('bad-txns-in-belowout') > -1
                     ) {
                       const retObj = {
                         msg: 'error',
