@@ -70,7 +70,11 @@ module.exports = (api) => {
                         if (decodedTx &&
                             decodedTx.format &&
                             decodedTx.format.locktime > 0) {
-                          interestTotal += api.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
+                          interestTotal += api.kmdCalcInterest(
+                            decodedTx.format.locktime,
+                            _utxoItem.value,
+                            _utxoItem.height
+                          );
                           api.log(`interest ${interestTotal} for txid ${_utxoItem.tx_hash}`, 'interest');
                         }
 

@@ -1,6 +1,8 @@
 const request = require('request');
 const Promise = require('bluebird');
+const { getRandomIntInclusive } = require('agama-wallet-lib/src/utils');
 
+// TODO: reduce code
 // abstraction layer to communicate with electrum proxies
 
 const proxyServers = [{
@@ -10,13 +12,6 @@ const proxyServers = [{
   ip: '94.130.98.74',
   port: 80,
 }];
-
-const getRandomIntInclusive = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-
-  return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
-}
 
 // pick a random proxy server
 const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];

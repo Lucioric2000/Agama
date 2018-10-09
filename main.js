@@ -21,6 +21,7 @@ const Promise = require('bluebird');
 const arch = require('arch');
 const bip39 = require('bip39');
 const chainParams = require('./routes/chainParams');
+const { formatBytes } = require('agama-wallet-lib/src/utils');
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -551,29 +552,6 @@ app.on('quit', (event) => {
 	}
 });
 
-function formatBytes(bytes, decimals) {
-  if (bytes === 0) {
-    return '0 Bytes';
-  }
-
-  const k = 1000;
-	const dm = decimals + 1 || 3;
-	const sizes = [
-    'Bytes',
-    'KB',
-    'MB',
-    'GB',
-    'TB',
-    'PB',
-    'EB',
-    'ZB',
-    'YB'
-  ];
-	const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
-
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -581,5 +559,6 @@ const installExtensions = async () => {
 
   return Promise.all(
     extensions.map(name => installer.default(installer[name], forceDownload))
-  ).catch(console.log);
+	)
+	.catch(console.log);
 };

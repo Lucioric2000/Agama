@@ -46,9 +46,6 @@ const _electrumServersExtend = {
   },
   xvg: {
     txfee: 10000,
-    serverList: [
-      '46.163.118.201:50002:tcp'
-    ],
   },
   xvc: {
     txfee: 10000,

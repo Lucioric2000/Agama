@@ -27,7 +27,7 @@ module.exports = (api) => {
           if (chain &&
               !api.nativeCoindList[key.toLowerCase()] &&
               key !== 'CHIPS') {
-                api.removePubkey(chain.toLowerCase());
+            api.removePubkey(chain.toLowerCase());
 
             _arg.push(`-ac_name=${chain}`);
 

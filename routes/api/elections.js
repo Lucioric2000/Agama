@@ -45,7 +45,11 @@ module.exports = (api) => {
 
         if (isWif) {
           try {
-            let key = bitcoin.ECPair.fromWIF(_seed, api.getNetworkData(_network.toLowerCase()), true);
+            let key = bitcoin.ECPair.fromWIF(
+              _seed,
+              api.getNetworkData(_network.toLowerCase()),
+              true
+            );
             keys = {
               priv: key.toWIF(),
               pub: key.getAddress(),
@@ -54,7 +58,11 @@ module.exports = (api) => {
             _wifError = true;
           }
         } else {
-          keys = api.seedToWif(_seed, _network, req.body.iguana);
+          keys = api.seedToWif(
+            _seed,
+            _network,
+            req.body.iguana
+          );
         }
 
         api.elections = {
@@ -202,7 +210,11 @@ module.exports = (api) => {
 
                     // decode tx
                     const _network = api.getNetworkData(network);
-                    const decodedTx = api.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                    const decodedTx = api.electrumJSTxDecoder(
+                      _rawtxJSON,
+                      network,
+                      _network
+                    );
                     let _res = {};
                     let _opreturnFound = false;
                     let _region;
