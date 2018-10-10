@@ -153,6 +153,9 @@ const chainParams = {
 		],
 		genproclimit: true,
 	},
+	KOIN: {
+		ac_supply: 125000000,
+	},
 };
 
 module.exports = chainParams;
