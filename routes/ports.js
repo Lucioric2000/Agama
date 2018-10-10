@@ -41,6 +41,7 @@ const assetChainPorts = {
   CALL: 19609,
   PIRATE: 45453,
   CCL: 20849,
+  KOIN: 10701,
 };
 
 module.exports = assetChainPorts;
