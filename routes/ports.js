@@ -42,6 +42,7 @@ const assetChainPorts = {
   PIRATE: 45453,
   CCL: 20849,
   KOIN: 10701,
+  DION: 23895,
 };
 
 module.exports = assetChainPorts;

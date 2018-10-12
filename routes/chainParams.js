@@ -153,6 +153,15 @@ const chainParams = {
 		],
 		genproclimit: true,
 	},
+	DION: {
+		ac_supply: 3900000000,
+		ac_reward: 22260000000,
+		ac_staked: 100,
+		ac_cc: 1,
+		ac_end: 4300000000,
+		addnode: '51.75.124.34',
+		genproclimit: true,
+	},
 };
 
 module.exports = chainParams;
