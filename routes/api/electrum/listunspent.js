@@ -77,7 +77,8 @@ module.exports = (api) => {
                               interest = api.kmdCalcInterest(
                                 decodedTx.format.locktime,
                                 _utxoItem.value,
-                                _utxoItem.height
+                                _utxoItem.height,
+                                true
                               );
                             }
 
@@ -89,8 +90,8 @@ module.exports = (api) => {
                               amount: Number(_utxoItem.value) * 0.00000001,
                               amountSats: _utxoItem.value,
                               locktime: decodedTx.format.locktime,
-                              interest: Number(interest.toFixed(8)),
-                              interestSats: Math.floor(interest * 100000000),
+                              interest: Number((interest * 0.00000001).toFixed(8)),
+                              interestSats: interest,
                               timeElapsedFromLocktime: Math.floor(Date.now() / 1000) - decodedTx.format.locktime * 1000,
                               timeElapsedFromLocktimeInSeconds: _locktimeSec,
                               timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - _locktimeSec > 0 ? UTXO_1MONTH_THRESHOLD_SECONDS - _locktimeSec : 0,

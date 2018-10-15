@@ -62,7 +62,6 @@ module.exports = (api) => {
                             _rawtxJSON,
                             network,
                             _network,
-                            api.electrumServers[network].proto === 'insight'
                           );
                           api.getTransactionDecoded(_utxoItem.tx_hash, network, decodedTx);
                         }
@@ -73,7 +72,8 @@ module.exports = (api) => {
                           interestTotal += api.kmdCalcInterest(
                             decodedTx.format.locktime,
                             _utxoItem.value,
-                            _utxoItem.height
+                            _utxoItem.height,
+                            true
                           );
                           api.log(`interest ${interestTotal} for txid ${_utxoItem.tx_hash}`, 'interest');
                         }
@@ -95,11 +95,11 @@ module.exports = (api) => {
                         unconfirmed: Number((0.00000001 * json.unconfirmed).toFixed(8)),
                         unconfirmedSats: json.unconfirmed,
                         balanceSats: json.confirmed,
-                        interest: Number(interestTotal.toFixed(8)),
-                        interestSats: Math.floor(interestTotal * 100000000),
+                        interest: Number((interestTotal * 0.00000001).toFixed(8)),
+                        interestSats: interestTotal,
                         utxoIssues,
-                        total: interestTotal > 0 ? Number((0.00000001 * json.confirmed + interestTotal).toFixed(8)) : 0,
-                        totalSats: interestTotal > 0 ? json.confirmed + Math.floor(interestTotal * 100000000) : 0,
+                        total: interestTotal > 0 ? Number(((json.confirmed + interestTotal) * 0.00000001).toFixed(8)) : 0,
+                        totalSats: interestTotal > 0 ? json.confirmed + interestTotal : 0,
                       },
                     };
 
