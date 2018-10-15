@@ -1,4 +1,6 @@
 const Promise = require('bluebird');
+const { checkTimestamp } = require('agama-wallet-lib/src/time');
+const UTXO_1MONTH_THRESHOLD_SECONDS = 2592000;
 
 module.exports = (api) => {
   api.get('/electrum/getbalance', (req, res, next) => {
@@ -22,12 +24,15 @@ module.exports = (api) => {
                   utxoList.length) {
                 // filter out < 10 KMD amounts
                 let _utxo = [];
-
+                let utxoIssues = false;
+                
                 for (let i = 0; i < utxoList.length; i++) {
                   api.log(`utxo ${utxoList[i].tx_hash} sats ${utxoList[i].value} value ${Number(utxoList[i].value) * 0.00000001}`, 'spv.getbalance');
 
                   if (Number(utxoList[i].value) * 0.00000001 >= 10) {
                     _utxo.push(utxoList[i]);
+                  } else {
+                    utxoIssues = true;
                   }
                 }
 
@@ -37,13 +42,8 @@ module.exports = (api) => {
                 if (_utxo &&
                     _utxo.length) {
                   let interestTotal = 0;
-                  let utxoIssues = false;
 
                   Promise.all(_utxo.map((_utxoItem, index) => {
-                    if (!_utxoItem.interestRulesCheckPass) {
-                      utxoIssues = true;
-                    }
-
                     return new Promise((resolve, reject) => {
                       api.getTransaction(_utxoItem.tx_hash, network, ecl)
                       .then((_rawtxJSON) => {
@@ -75,6 +75,13 @@ module.exports = (api) => {
                             _utxoItem.height,
                             true
                           );
+
+                          const _locktimeSec = checkTimestamp(decodedTx.format.locktime * 1000);
+                          const interestRulesCheckPass = !decodedTx.format.locktime || Number(decodedTx.format.locktime) === 0 || _locktimeSec > UTXO_1MONTH_THRESHOLD_SECONDS ? false : true;
+                          
+                          if (!interestRulesCheckPass) {
+                            utxoIssues = true;
+                          }
                           api.log(`interest ${interestTotal} for txid ${_utxoItem.tx_hash}`, 'interest');
                         }
 
