@@ -153,6 +153,10 @@ const chainParams = {
 		],
 		genproclimit: true,
 	},
+	KOIN: {
+		ac_supply: 125000000,
+    addnode: '3.0.32.10',
+  },
 	DION: {
 		ac_supply: 3900000000,
 		ac_reward: 22260000000,
