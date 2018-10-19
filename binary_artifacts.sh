@@ -5,7 +5,7 @@ pwd
 [ ! -d assets ] && \
   mkdir -p assets
 cd assets
-rm -r bin
+rm -rf bin
 [ -d artifacts.supernet.org ] && \
   echo Removing old artifacts. && \
   rm -rvf artifacts.supernet.org
