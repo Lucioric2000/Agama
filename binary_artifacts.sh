@@ -5,27 +5,28 @@ pwd
 [ ! -d assets ] && \
   mkdir -p assets
 cd assets
+rm -r bin
 [ -d artifacts.supernet.org ] && \
   echo Removing old artifacts. && \
   rm -rvf artifacts.supernet.org
 echo
 echo =========================================
 echo Step: Downloading latest LINUX komodo binaries from github
-curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases/latest \
+curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases \
   | grep browser_download_url \
   | grep linux_master \
   | cut -d '"' -f 4 \
   | wget -qi -
 tar xvfz komodo_linux_master.tar.gz
-mv src bins_linux/
+mv -Tf src bins_linux/
 echo =========================================
 echo Step: Downloading latest WIN komodo binaries from github
-curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases/latest \
+curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases \
   | grep browser_download_url \
-  | grep win_master \
+  | grep win64_master \
   | cut -d '"' -f 4 \
   | wget -qi -
-unzip komodo_win_master.zip
+unzip komodo_win64_master.zip
 mv komodo_win_master bins_win/
 cd ..
 echo =========================================
@@ -60,13 +61,13 @@ fi
 
 echo =========================================
 echo Moving Windows binaries to assets/bin/win64/
-mv assets/bins_win assets/bin/win64/
+mv -T assets/win64 assets/bin/win64/
 echo
 echo =========================================
 echo Set permission +x for linux64 binaries
 chmod +x assets/bins_linux/komodo*
 echo Moving Linux komodo bins to assets/bin
-mv assets/bins_linux assets/bin/linux64/
+mv -T assets/bins_linux assets/bin/linux64/
 echo
 echo =========================================
 echo Finished Updating binaries from github

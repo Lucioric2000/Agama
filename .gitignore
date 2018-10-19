@@ -55,3 +55,6 @@ coins
 
 # Electron-builder related folders
 build
+
+#MacOSX hidden cache files
+__MACOSX
