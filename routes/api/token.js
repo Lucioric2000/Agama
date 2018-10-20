@@ -5,7 +5,7 @@ module.exports = (api) => {
    *  params: none
    */
   api.get('/token', async (req, res, next) => {
-    return api.appSessionHash;
-  })
+    res.end(api.appSessionHash);
+  });
   return api;
-}
+};
