@@ -22,6 +22,7 @@ const assetChainPorts = {
   MGW: 12386,
   COQUI: 14276,
   CHAIN: 15587,
+  KMDICE: 30177,
   GLXT: 13109,
   MVP: 11676,
   KV: 8299,

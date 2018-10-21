@@ -51,7 +51,14 @@ const chainParams = {
 		ac_supply: 72000000,
 		ac_ccactivate: 200000,
  	},
-	CHAIN: {
+	KMDICE: {ac_supply: 10500000,
+                 ac_reward: 2500000000,
+                 ac_halving: 210000,
+                 ac_cc: 2
+                 addressindex: 1
+                 spentindex: 1
+                 genproclimit: true
+        CHAIN: {
   	ac_supply: 999999,
   	addnode: '78.47.146.222',
   },
