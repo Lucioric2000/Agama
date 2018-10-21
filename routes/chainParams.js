@@ -51,24 +51,26 @@ const chainParams = {
 		ac_supply: 72000000,
 		ac_ccactivate: 200000,
  	},
-	KMDICE: {ac_supply: 10500000,
+	KMDICE: {
+		 ac_supply: 10500000,
                  ac_reward: 2500000000,
                  ac_halving: 210000,
-                 ac_cc: 2
-                 addressindex: 1
-                 spentindex: 1
+                 ac_cc: 2,
+                 addressindex: 1,
+                 spentindex: 1,
                  genproclimit: true
+	},
         CHAIN: {
-  	ac_supply: 999999,
-  	addnode: '78.47.146.222',
-  },
+  	         ac_supply: 999999,
+  	         addnode: '78.47.146.222',
+        },
 	GLXT: {
-    ac_supply: 10000000000,
-    addnode: '13.230.224.15',
-  },
+                ac_supply: 10000000000,
+                addnode: '13.230.224.15',
+       },
 	EQL: {
-    ac_supply: 500000000,
-    addnode: '46.101.124.153',
+                ac_supply: 500000000,
+                addnode: '46.101.124.153',
 	},
 	MNZ: {
 		ac_supply: 257142858,
