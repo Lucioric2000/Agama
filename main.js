@@ -367,7 +367,7 @@ async function createWindow(status, hideLoadingWindow) {
 					pubkeyToAddress: api.pubkeyToAddress,
 				};
 				global.app = _global;
-				  /*for (let i = 0; i < process.argv.length; i++) {
+				/*for (let i = 0; i < process.argv.length; i++) {
 				    if (process.argv[i].indexOf('nvote') > -1) {
 				      console.log('enable notary node elections ui');
 				      mainWindow.nnVoteChain = 'VOTE2018';

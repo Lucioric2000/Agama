@@ -68,6 +68,9 @@ api.pathsDaemons();
 api.appConfigSchema = api._appConfig.schema;
 api.defaultAppConfig = Object.assign({}, api.appConfig);
 api.kmdMainPassiveMode = false;
+api.native = {
+  startParams: {},
+};
 
 // spv
 api = require('./api/electrum/network.js')(api);

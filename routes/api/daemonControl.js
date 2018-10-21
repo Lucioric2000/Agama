@@ -218,7 +218,8 @@ module.exports = (api) => {
             if (!api.kmdMainPassiveMode) {
               let _arg = `${coindACParam}${data.ac_options.join(' ')}${_customParam}`;
               _arg = _arg.trim().split(' ');
-
+              api.native.startParams[data.ac_name] = _arg;
+              
               const _daemonName = data.ac_name !== 'komodod' ? data.ac_name : 'komodod';
               const _daemonLogName = `${api.agamaDir}/${_daemonName}.log`;
 
