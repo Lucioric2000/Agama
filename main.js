@@ -362,7 +362,7 @@ async function createWindow(status, hideLoadingWindow) {
 					getPubkeys: api.getPubkeys,
 					kvEncode: api.kvEncode,
 					kvDecode: api.kvDecode,
-					electrumServers: api.electrumServers,
+					electrumServers: api.electrumServersFlag,
 					chainParams,
 					pubkeyToAddress: api.pubkeyToAddress,
 				};
