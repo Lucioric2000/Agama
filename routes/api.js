@@ -142,7 +142,11 @@ api = require('./api/elections.js')(api);
 api = require('./api/kv.js')(api);
 
 // eth
+api.eth = {};
 api = require('./api/eth/keys.js')(api);
+api = require('./api/eth/network.js')(api);
+api = require('./api/eth/balance.js')(api);
+api = require('./api/eth/test.js')(api);
 
 api.printDirs();
 
