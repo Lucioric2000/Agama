@@ -45,7 +45,7 @@ module.exports = (api) => {
                 for (let i = 0; i < kvElectrumServersCache[key].length; i++) {
                   if (!api.electrumServers[key].serverList ||
                       !api.electrumServers[key].serverList.find((item) => { return item === kvElectrumServersCache[key][i]; })) {
-                        api.electrumServers[key].serverList.push(kvElectrumServersCache[key][i]);
+                    api.electrumServers[key].serverList.push(kvElectrumServersCache[key][i]);
                   }
                 }
               }

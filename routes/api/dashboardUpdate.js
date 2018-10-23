@@ -164,7 +164,11 @@ module.exports = (api) => {
                   result[1].length) {
                 Promise.all(result[1].map((_address, index) => {
                   return new Promise((resolve, reject) => {
-                    _bitcoinRPC(coin, 'z_getbalance', [_address])
+                    _bitcoinRPC(
+                      coin,
+                      'z_getbalance',
+                      [_address]
+                    )
                     .then((__json) => {
                       try {
                         __json = JSON.parse(__json);
@@ -192,7 +196,11 @@ module.exports = (api) => {
                       (chainParams[coin] && chainParams[coin].ac_private)) {
                     Promise.all(result[1].map((_address, index) => {
                       return new Promise((resolve, reject) => {
-                        _bitcoinRPC(coin, 'z_listreceivedbyaddress', [_address])
+                        _bitcoinRPC(
+                          coin,
+                          'z_listreceivedbyaddress',
+                          [_address]
+                        )
                         .then((__json) => {
                           try {
                             __json = JSON.parse(__json);
@@ -333,7 +341,7 @@ module.exports = (api) => {
           _params = [
             '*',
             api.appConfig.native.listtransactionsMaxLength,
-            0
+            0,
           ];
         }
 
@@ -351,10 +359,10 @@ module.exports = (api) => {
               const _jsonParsed = JSON.parse(json);
 
               if (api.appConfig.native.zgetoperationresult &&
-                _call === 'z_getoperationstatus' &&
-                _jsonParsed &&
-                _jsonParsed.result &&
-                _jsonParsed.result.length) {
+                  _call === 'z_getoperationstatus' &&
+                  _jsonParsed &&
+                  _jsonParsed.result &&
+                  _jsonParsed.result.length) {
                 api.log('found runtime z data, purge all', 'native');
 
                 _bitcoinRPC(

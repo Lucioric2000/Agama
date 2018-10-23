@@ -178,7 +178,7 @@ module.exports = (api) => {
         } else {
           const retObj = {
             msg: 'error',
-            result: `file ${req.query.pubkey}.pin doesnt exist`,
+            result: `file ${_pubkey}.pin doesnt exist`,
           };
 
           res.end(JSON.stringify(retObj));

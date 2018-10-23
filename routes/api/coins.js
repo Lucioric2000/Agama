@@ -23,6 +23,7 @@ module.exports = (api) => {
         native: nativeCoindList,
         spv: electrumCoinsList,
         total: Object.keys(api.electrumCoins).length - 1 + Object.keys(nativeCoindList).length,
+        params: api.native.startParams,
       };
 
       res.end(JSON.stringify(retObj));
