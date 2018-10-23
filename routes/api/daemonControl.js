@@ -151,7 +151,10 @@ module.exports = (api) => {
       // truncate debug.log
       if (!api.kmdMainPassiveMode) {
         try {
-          const _confFileAccess = _fs.accessSync(kmdDebugLogLocation, fs.R_OK | fs.W_OK);
+          const _confFileAccess = _fs.accessSync(
+            kmdDebugLogLocation,
+            fs.R_OK | fs.W_OK
+          );
 
           if (_confFileAccess) {
             api.log(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
@@ -204,18 +207,19 @@ module.exports = (api) => {
               _customParam = _customParam + ' -datadir=' + api.appConfig.native.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
             }
 
-            api.log(`exec ${api.komododBin} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
-            api.writeLog(`exec ${api.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
-
             const isChain = data.ac_name.match(/^[A-Z]*$/);
             const coindACParam = isChain ? ` -ac_name=${data.ac_name} ` : '';
+
+            api.log(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
+            api.writeLog(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`);
             api.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
 
             api.coindInstanceRegistry[data.ac_name] = true;
             if (!api.kmdMainPassiveMode) {
               let _arg = `${coindACParam}${data.ac_options.join(' ')}${_customParam}`;
               _arg = _arg.trim().split(' ');
-
+              api.native.startParams[data.ac_name] = _arg;
+              
               const _daemonName = data.ac_name !== 'komodod' ? data.ac_name : 'komodod';
               const _daemonLogName = `${api.agamaDir}/${_daemonName}.log`;
 
@@ -241,7 +245,10 @@ module.exports = (api) => {
                 })
                 .unref();
               } else {
-                let logStream = fs.createWriteStream(_daemonLogName, { flags: 'a' });
+                let logStream = fs.createWriteStream(
+                  _daemonLogName,
+                  { flags: 'a' }
+                );
 
                 let _daemonChildProc = execFile(`${api.komododBin}`, _arg, {
                   maxBuffer: 1024 * 1000000, // 1000 mb
@@ -267,15 +274,18 @@ module.exports = (api) => {
                 // TODO: logger add verbose native output
                 _daemonChildProc.stdout.on('data', (data) => {
                   // api.log(`${_daemonName} stdout: \n${data}`);
-                }).pipe(logStream);
+                })
+                .pipe(logStream);
 
                 _daemonChildProc.stdout.on('error', (data) => {
                   // api.log(`${_daemonName} stdout: \n${data}`);
-                }).pipe(logStream);
+                })
+                .pipe(logStream);
 
                 _daemonChildProc.stderr.on('data', (data) => {
                   // api.error(`${_daemonName} stderr:\n${data}`);
-                }).pipe(logStream);
+                })
+                .pipe(logStream);
 
                 _daemonChildProc.on('exit', (exitCode) => {
                   const _errMsg = exitCode === 0 ? `${_daemonName} exited with code ${exitCode}` : `${_daemonName} exited with code ${exitCode}, crashed?`;
@@ -290,7 +300,7 @@ module.exports = (api) => {
                 });
               }
             }
-          } else {
+          } else { // deprecated(?)
             if (api.kmdMainPassiveMode) {
               api.coindInstanceRegistry[data.ac_name] = true;
             }
@@ -315,7 +325,10 @@ module.exports = (api) => {
 
       // truncate debug.log
       try {
-        const _confFileAccess = _fs.accessSync(kmdDebugLogLocation, fs.R_OK | fs.W_OK);
+        const _confFileAccess = _fs.accessSync(
+          kmdDebugLogLocation,
+          fs.R_OK | fs.W_OK
+        );
 
         if (_confFileAccess) {
           api.log(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
@@ -929,9 +942,9 @@ module.exports = (api) => {
    *  type: POST
    */
   api.post('/getconf', (req, res) => {
-    if (api.checkToken(req.body.token)) {
-      const _body = req.body;
+    const _body = req.body;
 
+    if (api.checkToken(_body.token)) {
       api.log('getconf req.body =>', 'native.confd');
       api.log(_body, 'native.confd');
 

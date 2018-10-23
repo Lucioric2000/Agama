@@ -16,7 +16,6 @@ const disableCoins = [
   'ac', // awaiting funds
   'btcp', // sort out kv
   'blk',
-  'arg',
   // untested coins
   'usc',
   'bca',

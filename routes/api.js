@@ -46,7 +46,12 @@ api.electrumCache = {};
 
 api.electrumJSCore = require('./electrumjs/electrumjs.core.js');
 api.electrumJSNetworks = require('./electrumjs/electrumjs.networks.js');
-api.electrumServers = require('./electrumjs/electrumServers.js');
+const {
+  electrumServers,
+  electrumServersFlag,
+} = require('./electrumjs/electrumServers.js');
+api.electrumServers = electrumServers;
+api.electrumServersFlag = electrumServersFlag;
 
 api.CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -68,6 +73,9 @@ api.pathsDaemons();
 api.appConfigSchema = api._appConfig.schema;
 api.defaultAppConfig = Object.assign({}, api.appConfig);
 api.kmdMainPassiveMode = false;
+api.native = {
+  startParams: {},
+};
 
 // spv
 api = require('./api/electrum/network.js')(api);
@@ -122,6 +130,7 @@ api = require('./api/auth.js')(api);
 api = require('./api/coins.js')(api);
 api = require('./api/coindWalletKeys.js')(api);
 api = require('./api/addressBook.js')(api);
+api = require('./api/dice.js')(api);
 
 // elections
 api = require('./api/elections.js')(api);

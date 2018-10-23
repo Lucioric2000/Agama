@@ -1,5 +1,6 @@
 const async = require('async');
 const Promise = require('bluebird');
+const { hex2str } = require('agama-wallet-lib/src/crypto/utils');
 
 // TODO: add z -> pub, pub -> z flag for zcash forks
 
@@ -77,11 +78,19 @@ module.exports = (api) => {
 
                 // callback hell, use await?
                 async.eachOfSeries(json, (transaction, ind, callback) => {
-                  api.getBlockHeader(transaction.height, network, ecl)
+                  api.getBlockHeader(
+                    transaction.height,
+                    network,
+                    ecl
+                  )
                   .then((blockInfo) => {
                     if (blockInfo &&
                         blockInfo.timestamp) {
-                      api.getTransaction(transaction.tx_hash, network, ecl)
+                      api.getTransaction(
+                        transaction.tx_hash,
+                        network,
+                        ecl
+                      )
                       .then((_rawtxJSON) => {
                         api.log('electrum gettransaction ==>', 'spv.listtransactions');
                         api.log((index + ' | ' + (_rawtxJSON.length - 1)), 'spv.listtransactions');
@@ -92,10 +101,21 @@ module.exports = (api) => {
                         let decodedTx;
 
                         if (api.getTransactionDecoded(transaction.tx_hash, network)) {
-                          decodedTx = api.getTransactionDecoded(transaction.tx_hash, network);
+                          decodedTx = api.getTransactionDecoded(
+                            transaction.tx_hash,
+                            network
+                          );
                         } else {
-                          decodedTx = api.electrumJSTxDecoder(_rawtxJSON, network, _network);
-                          api.getTransactionDecoded(transaction.tx_hash, network, decodedTx);
+                          decodedTx = api.electrumJSTxDecoder(
+                            _rawtxJSON,
+                            network,
+                            _network
+                          );
+                          api.getTransactionDecoded(
+                            transaction.tx_hash,
+                            network,
+                            decodedTx
+                          );
                         }
 
                         let txInputs = [];
@@ -120,7 +140,7 @@ module.exports = (api) => {
                                   kvDecoded: api.kvDecode(decodedTx.outputs[i].scriptPubKey.asm.substr(10, decodedTx.outputs[i].scriptPubKey.asm.length), true),
                                 };
                               } else {
-                                opreturn = api.hex2str(decodedTx.outputs[i].scriptPubKey.hex);
+                                opreturn = hex2str(decodedTx.outputs[i].scriptPubKey.hex);
                               }
                             }
                           }
@@ -146,7 +166,11 @@ module.exports = (api) => {
                                   confirmations: Number(transaction.height) === 0 || Number(transaction.height) === -1 ? 0 : currentHeight - transaction.height,
                                 };
 
-                                const formattedTx = api.parseTransactionAddresses(_parsedTx, _address, network);
+                                const formattedTx = api.parseTransactionAddresses(
+                                  _parsedTx,
+                                  _address,
+                                  network
+                                );
 
                                 if (formattedTx.type) {
                                   formattedTx.height = transaction.height;
@@ -217,9 +241,14 @@ module.exports = (api) => {
                             }
 
                             if (_decodedInput.txid !== '0000000000000000000000000000000000000000000000000000000000000000') {
-                              api.getTransaction(_decodedInput.txid, network, ecl)
+                              api.getTransaction(
+                                _decodedInput.txid, network, ecl)
                               .then((rawInput) => {
-                                const decodedVinVout = api.electrumJSTxDecoder(rawInput, network, _network);
+                                const decodedVinVout = api.electrumJSTxDecoder(
+                                  rawInput,
+                                  network,
+                                  _network
+                                );
 
                                 if (decodedVinVout) {
                                   api.log(decodedVinVout.outputs[_decodedInput.n], 'spv.listtransactions');
@@ -243,7 +272,11 @@ module.exports = (api) => {
                             opreturn,
                           };
 
-                          const formattedTx = api.parseTransactionAddresses(_parsedTx, _address, network);
+                          const formattedTx = api.parseTransactionAddresses(
+                            _parsedTx,
+                            _address,
+                            network
+                          );
                           _rawtx.push(formattedTx);
                           index++;
 
@@ -283,7 +316,11 @@ module.exports = (api) => {
                         timestamp: 'cant get block info',
                         confirmations: Number(transaction.height) === 0 ? 0 : currentHeight - transaction.height,
                       };
-                      const formattedTx = api.parseTransactionAddresses(_parsedTx, _address, network);
+                      const formattedTx = api.parseTransactionAddresses(
+                        _parsedTx,
+                        _address,
+                        network
+                      );
                       _rawtx.push(formattedTx);
                       index++;
 

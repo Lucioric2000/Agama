@@ -21,6 +21,7 @@ const Promise = require('bluebird');
 const arch = require('arch');
 const bip39 = require('bip39');
 const chainParams = require('./routes/chainParams');
+const { formatBytes } = require('agama-wallet-lib/src/utils');
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -254,7 +255,13 @@ function createAppCloseWindow() {
   });
 }
 
-function createWindow(status, hideLoadingWindow) {
+async function createWindow(status, hideLoadingWindow) {
+	if (
+    	process.env.NODE_ENV === 'development' ||
+    	process.env.DEBUG_PROD === 'true'
+  	) {
+    	await installExtensions();
+  	}
 	if (process.argv.indexOf('spvcoins=all/add-all') > -1) {
 		api.startSPV('kmd');
 	}
@@ -355,12 +362,12 @@ function createWindow(status, hideLoadingWindow) {
 					getPubkeys: api.getPubkeys,
 					kvEncode: api.kvEncode,
 					kvDecode: api.kvDecode,
-					electrumServers: api.electrumServers,
+					electrumServers: api.electrumServersFlag,
 					chainParams,
 					pubkeyToAddress: api.pubkeyToAddress,
 				};
 				global.app = _global;
-				  /*for (let i = 0; i < process.argv.length; i++) {
+				/*for (let i = 0; i < process.argv.length; i++) {
 				    if (process.argv[i].indexOf('nvote') > -1) {
 				      console.log('enable notary node elections ui');
 				      mainWindow.nnVoteChain = 'VOTE2018';
@@ -545,25 +552,13 @@ app.on('quit', (event) => {
 	}
 });
 
-function formatBytes(bytes, decimals) {
-  if (bytes === 0) {
-    return '0 Bytes';
-  }
+const installExtensions = async () => {
+  const installer = require('electron-devtools-installer');
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
 
-  const k = 1000;
-	const dm = decimals + 1 || 3;
-	const sizes = [
-    'Bytes',
-    'KB',
-    'MB',
-    'GB',
-    'TB',
-    'PB',
-    'EB',
-    'ZB',
-    'YB'
-  ];
-	const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
+  return Promise.all(
+    extensions.map(name => installer.default(installer[name], forceDownload))
+	)
+	.catch(console.log);
+};

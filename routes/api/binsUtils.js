@@ -9,7 +9,7 @@ module.exports = (api) => {
     const osPlatform = os.platform();
     const _bins = [
       api.komododBin,
-      api.komodocliBin
+      api.komodocliBin,
     ];
 
     if (osPlatform === 'darwin' ||

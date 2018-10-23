@@ -39,6 +39,8 @@ const appConfig = {
       dataDir: '',
       listtransactionsMaxLength: 300,
       csvListtransactionsMaxLength: 1000,
+      zlistreceivedbyaddress: false,
+      zgetoperationresult: false,
     },
     pubkey: '',
     // coinControl: false,
@@ -237,6 +239,18 @@ const appConfig = {
         displayName: 'CSV export max transactions history count',
         info: 'Warning: keep this settings option within a sane range of values (default value: 1000).<br/>The higher the value the more time it will require to process transactions history.',
         type: 'number',
+      },
+      zlistreceivedbyaddress: {
+        display: true,
+        displayName: 'Fetch received z transactions (z_listreceivedbyaddress)',
+        info: 'Warning: turning on this option may have an impact on weak systems.<br>If you don\'t use private addresses or don\'t need to see all private transactions to your addresses keep this option disabled.',
+        type: 'boolean',
+      },
+      zgetoperationresult: {
+        display: true,
+        displayName: 'Clear runtime Z transactions data automatically',
+        info: 'For maximum privacy it\'s advised to clear all traces of your outgoing z transactions including runtime data.',
+        type: 'boolean',
       },
     },
     pubkey: {

@@ -1,6 +1,7 @@
 const bs58check = require('bs58check');
 const bitcoin = require('bitcoinjs-lib');
 const Promise = require('bluebird');
+const { hex2str } = require('agama-wallet-lib/src/crypto/utils');
 
 module.exports = (api) => {
   api.elections = {};
@@ -44,7 +45,11 @@ module.exports = (api) => {
 
         if (isWif) {
           try {
-            let key = bitcoin.ECPair.fromWIF(_seed, api.getNetworkData(_network.toLowerCase()), true);
+            let key = bitcoin.ECPair.fromWIF(
+              _seed,
+              api.getNetworkData(_network.toLowerCase()),
+              true
+            );
             keys = {
               priv: key.toWIF(),
               pub: key.getAddress(),
@@ -53,7 +58,11 @@ module.exports = (api) => {
             _wifError = true;
           }
         } else {
-          keys = api.seedToWif(_seed, _network, req.body.iguana);
+          keys = api.seedToWif(
+            _seed,
+            _network,
+            req.body.iguana
+          );
         }
 
         api.elections = {
@@ -201,7 +210,11 @@ module.exports = (api) => {
 
                     // decode tx
                     const _network = api.getNetworkData(network);
-                    const decodedTx = api.electrumJSTxDecoder(_rawtxJSON, network, _network);
+                    const decodedTx = api.electrumJSTxDecoder(
+                      _rawtxJSON,
+                      network,
+                      _network
+                    );
                     let _res = {};
                     let _opreturnFound = false;
                     let _region;
@@ -212,7 +225,7 @@ module.exports = (api) => {
                       for (let i = 0; i < decodedTx.outputs.length; i++) {
                         if (decodedTx.outputs[i].scriptPubKey.asm.indexOf('OP_RETURN') > -1) {
                           _opreturnFound = true;
-                          _region = api.hex2str(decodedTx.outputs[i].scriptPubKey.hex.substr(4, decodedTx.outputs[i].scriptPubKey.hex.length));
+                          _region = hex2str(decodedTx.outputs[i].scriptPubKey.hex.substr(4, decodedTx.outputs[i].scriptPubKey.hex.length));
                           api.log(`found opreturn tag ${_region}`, 'elections.listtransactions');
                           break;
                         }

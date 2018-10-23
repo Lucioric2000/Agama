@@ -1,11 +1,11 @@
 {
   "name": "agama-app",
   "productName": "Agama",
-  "version": "0.2.42",
+  "version": "0.2.43",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "cross-env NODE_ENV=development electron .",
     "make-patch": "./make-patch.sh",
     "make-rpm": "node make-rpm.js",
     "make-deb": "node make-deb.js"
@@ -24,7 +24,9 @@
   "author": "SuperNET Team",
   "license": "MIT",
   "devDependencies": {
-    "electron": "2.0.8"
+    "cross-env": "^5.2.0",
+    "electron": "2.0.8",
+    "electron-devtools-installer": "^2.2.4"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",

@@ -51,17 +51,26 @@ const chainParams = {
 		ac_supply: 72000000,
 		ac_ccactivate: 200000,
  	},
-	CHAIN: {
-  	ac_supply: 999999,
-  	addnode: '78.47.146.222',
-  },
+	KMDICE: {
+		 ac_supply: 10500000,
+                 ac_reward: 2500000000,
+                 ac_halving: 210000,
+                 ac_cc: 2,
+                 addressindex: 1,
+                 spentindex: 1,
+                 genproclimit: true
+	},
+        CHAIN: {
+  	         ac_supply: 999999,
+  	         addnode: '78.47.146.222',
+        },
 	GLXT: {
-    ac_supply: 10000000000,
-    addnode: '13.230.224.15',
-  },
+                ac_supply: 10000000000,
+                addnode: '13.230.224.15',
+       },
 	EQL: {
-    ac_supply: 500000000,
-    addnode: '46.101.124.153',
+                ac_supply: 500000000,
+                addnode: '46.101.124.153',
 	},
 	MNZ: {
 		ac_supply: 257142858,
@@ -151,6 +160,19 @@ const chainParams = {
 			'136.243.102.225',
 			'78.47.205.239',
 		],
+		genproclimit: true,
+	},
+	KOIN: {
+		ac_supply: 125000000,
+    addnode: '3.0.32.10',
+  },
+	DION: {
+		ac_supply: 3900000000,
+		ac_reward: 22260000000,
+		ac_staked: 100,
+		ac_cc: 1,
+		ac_end: 4300000000,
+		addnode: '51.75.124.34',
 		genproclimit: true,
 	},
 };
