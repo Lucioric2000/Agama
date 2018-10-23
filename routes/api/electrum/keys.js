@@ -277,7 +277,7 @@ module.exports = (api) => {
       'fair',
       'doge',
       'kmd',
-      'mona'
+      'mona',
     ];
 
     try {

@@ -141,6 +141,9 @@ api = require('./api/elections.js')(api);
 // kv
 api = require('./api/kv.js')(api);
 
+// eth
+api = require('./api/eth/keys.js')(api);
+
 api.printDirs();
 
 // default route
