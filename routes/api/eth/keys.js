@@ -15,7 +15,6 @@ module.exports = (api) => {
 
   api.post('/eth/keys', (req, res, next) => {
     const seed = req.body.seed;
-    const mnemonicWallet = api.eth._keys(seed);
     
     if (api.eth.wallet &&
         api.eth.wallet.signingKey &&
