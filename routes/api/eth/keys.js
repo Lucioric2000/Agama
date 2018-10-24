@@ -4,26 +4,10 @@ module.exports = (api) => {
   api.get('/eth/priv', (req, res, next) => {
     const seed = req.query.seed;
     const mnemonicWallet = api.eth._keys(seed);
-
-    api.eth.wallet = mnemonicWallet;
     
     const retObj = {
       msg: 'success',
       result: mnemonicWallet,
-    };
-
-    res.end(JSON.stringify(retObj));
-  });
-
-  api.post('/eth/auth', (req, res, next) => {
-    const seed = req.body.seed;
-    const mnemonicWallet = api.eth._keys(seed);
-    
-    api.eth.wallet = mnemonicWallet;    
-
-    const retObj = {
-      msg: 'success',
-      result: 'success',
     };
 
     res.end(JSON.stringify(retObj));
@@ -43,7 +27,7 @@ module.exports = (api) => {
       };
     } else {
       const retObj = {
-        msg: 'false',
+        msg: 'error',
         result: 'true',
       };
     }
@@ -61,5 +45,5 @@ module.exports = (api) => {
     return mnemonicWallet;
   };
 
-  return api;  
+  return api;
 };
