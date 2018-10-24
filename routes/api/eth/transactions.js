@@ -2,8 +2,6 @@ const ethers = require('ethers');
 const request = require('request');
 const Promise = require('bluebird');
 
-// http://api.etherscan.io/api?module=account&action=txlist&address=0xea4a2c3431108db25b7e370675ccfa9f0b43df26&startblock=0&endblock=99999999&sort=asc&apikey=YourApiKeyToken
-
 module.exports = (api) => {  
   api.get('/eth/transactions', (req, res, next) => {
     const address = req.query.address;
@@ -37,7 +35,8 @@ module.exports = (api) => {
         method: 'GET',
       };
 
-      console.log(options);
+      api.log('etherscan transactions url');
+      api.log(options);
 
       request(options, (error, response, body) => {
         if (response &&
