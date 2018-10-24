@@ -17,7 +17,7 @@ module.exports = (api) => {
     res.end(JSON.stringify(retObj));
   });
 
-  api.post('/eth/logout', (req, res, next) => {    
+  api.post('/eth/logout', (req, res, next) => {
     api.eth.wallet = null;
 
     const retObj = {

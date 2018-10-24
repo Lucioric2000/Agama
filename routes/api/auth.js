@@ -12,12 +12,14 @@ module.exports = (api) => {
 
       if (Object.keys(api.coindInstanceRegistry).length) {
         if (Object.keys(api.electrumCoins).length > 1 &&
-        api.electrumCoins.auth) {
+            api.electrumCoins.auth) {
           _status = true;
         } else if (
           Object.keys(api.electrumCoins).length === 1 &&
           !api.electrumCoins.auth
         ) {
+          _status = true;
+        } else if (api.eth.wallet) {
           _status = true;
         }
       } else if (
@@ -29,6 +31,8 @@ module.exports = (api) => {
         Object.keys(api.electrumCoins).length === 1 &&
         !Object.keys(api.coindInstanceRegistry).length
       ) {
+        _status = true;
+      } else if (api.eth.wallet) {
         _status = true;
       }
 
@@ -47,6 +51,7 @@ module.exports = (api) => {
     }
   });
 
+  // TODO: move to utils
   api.checkToken = (token) => {
     if (token === api.appSessionHash ||
         process.argv.indexOf('devmode') > -1) {
