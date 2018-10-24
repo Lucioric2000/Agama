@@ -1,17 +1,32 @@
 const ethers = require('ethers');
 const Promise = require('bluebird');
+const request = require('request');
 
 module.exports = (api) => {  
   api.get('/eth/balance', (req, res, next) => {
-    api.eth._balance()
-    .then((balance) => {
-      const retObj = {
-        msg: 'success',
-        result: balance,
-      };
-  
-      res.end(JSON.stringify(retObj));  
-    });
+    const address = req.query.address;
+    
+    if (address) {
+      api.eth._balanceEtherscan(address, req.query.network)
+      .then((balance) => {
+        const retObj = {
+          msg: 'success',
+          result: balance,
+        };
+    
+        res.end(JSON.stringify(retObj));  
+      });
+    } else {
+      api.eth._balance()
+      .then((balance) => {
+        const retObj = {
+          msg: 'success',
+          result: balance,
+        };
+    
+        res.end(JSON.stringify(retObj));  
+      });
+    }
   });
 
   api.eth._balance = () => {
@@ -29,6 +44,51 @@ module.exports = (api) => {
         api.log(error, 'eth.balance');
 
         resolve(error);
+      });
+    });
+  };
+
+  api.eth._balanceEtherscan = (address, network = 'homestead') => {
+    return new Promise((resolve, reject) => {
+      const _url = [
+        'module=account',
+        'action=balance',
+        `address=${address}`,
+        'tag=latest',
+        'apikey=YourApiKeyToken',
+      ];
+      const _etherscanEndPoint = network === 'homestead' ? 'https://api.etherscan.io/api?' : `https://api-${network}.etherscan.io/api?`;
+      const options = {
+        url: _etherscanEndPoint + _url.join('&'),
+        method: 'GET',
+      };
+
+      api.log('etherscan balance url');
+      api.log(options);
+
+      request(options, (error, response, body) => {
+        if (response &&
+            response.statusCode &&
+            response.statusCode === 200) {
+          try {
+            const _json = JSON.parse(body);
+
+            if (_json.message === 'OK' &&
+                _json.result) {
+              resolve({
+                balance: ethers.utils.formatEther(_json.result),                
+                balanceWei: _json.result,                
+              });
+            } else {
+              resolve(_json);
+            }
+          } catch (e) {
+            api.log('eth balance parse error', 'eth.balance');
+            api.log(e);
+          }
+        } else {
+          api.log(`eth balance error: unable to request ${network}`, 'eth.balance');
+        }
       });
     });
   };
