@@ -151,7 +151,10 @@ module.exports = (api) => {
       // truncate debug.log
       if (!api.kmdMainPassiveMode) {
         try {
-          const _confFileAccess = _fs.accessSync(kmdDebugLogLocation, fs.R_OK | fs.W_OK);
+          const _confFileAccess = _fs.accessSync(
+            kmdDebugLogLocation,
+            fs.R_OK | fs.W_OK
+          );
 
           if (_confFileAccess) {
             api.log(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
@@ -215,7 +218,8 @@ module.exports = (api) => {
             if (!api.kmdMainPassiveMode) {
               let _arg = `${coindACParam}${data.ac_options.join(' ')}${_customParam}`;
               _arg = _arg.trim().split(' ');
-
+              api.native.startParams[data.ac_name] = _arg;
+              
               const _daemonName = data.ac_name !== 'komodod' ? data.ac_name : 'komodod';
               const _daemonLogName = `${api.agamaDir}/${_daemonName}.log`;
 
@@ -241,7 +245,10 @@ module.exports = (api) => {
                 })
                 .unref();
               } else {
-                let logStream = fs.createWriteStream(_daemonLogName, { flags: 'a' });
+                let logStream = fs.createWriteStream(
+                  _daemonLogName,
+                  { flags: 'a' }
+                );
 
                 let _daemonChildProc = execFile(`${api.komododBin}`, _arg, {
                   maxBuffer: 1024 * 1000000, // 1000 mb
@@ -318,7 +325,10 @@ module.exports = (api) => {
 
       // truncate debug.log
       try {
-        const _confFileAccess = _fs.accessSync(kmdDebugLogLocation, fs.R_OK | fs.W_OK);
+        const _confFileAccess = _fs.accessSync(
+          kmdDebugLogLocation,
+          fs.R_OK | fs.W_OK
+        );
 
         if (_confFileAccess) {
           api.log(`error accessing ${kmdDebugLogLocation}`, 'native.debug');
@@ -932,9 +942,9 @@ module.exports = (api) => {
    *  type: POST
    */
   api.post('/getconf', (req, res) => {
-    if (api.checkToken(req.body.token)) {
-      const _body = req.body;
+    const _body = req.body;
 
+    if (api.checkToken(_body.token)) {
       api.log('getconf req.body =>', 'native.confd');
       api.log(_body, 'native.confd');
 

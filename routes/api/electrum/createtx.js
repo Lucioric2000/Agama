@@ -3,6 +3,10 @@ const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
 const coinSelect = require('coinselect');
+const { estimateTxSize } = require('agama-wallet-lib/src/utils');
+
+// TODO: - account for 1000 sats opreturn in tx calc
+//       - use agama-wallet-lib
 
 module.exports = (api) => {
   // unsigned tx
@@ -445,7 +449,7 @@ module.exports = (api) => {
             if ((network === 'komodo' || network.toLowerCase() === 'kmd') &&
                 totalInterest > 0) {
               // account for extra vout
-              // const _feeOverhead = outputs.length === 1 ? api.estimateTxSize(0, 1) * feeRate : 0;
+              // const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
               const _feeOverhead = 0;
 
               api.log(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`, 'spv.createrawtx');
@@ -481,9 +485,16 @@ module.exports = (api) => {
                 vinSum += inputs[i].value;
               }
 
+              let voutSum = 0;
+              
+              for (let i = 0; i < outputs.length; i++) {
+                voutSum += outputs[i].value;
+              }
+
               const _estimatedFee = vinSum - outputs[0].value - _change;
 
               api.log(`vin sum ${vinSum} (${vinSum * 0.00000001})`, 'spv.createrawtx');
+              api.log(`vout sum ${voutSum} (${voutSum * 0.00000001})`, 'spv.createrawtx');
               api.log(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`, 'spv.createrawtx');
               // double check no extra fee is applied
               api.log(`vin - vout ${vinSum - value - _change}`, 'spv.createrawtx');
@@ -494,6 +505,27 @@ module.exports = (api) => {
               } else if ((vinSum - value - _change) === 0) { // max amount spend edge case
                 api.log(`zero fee, reduce output size by ${fee}`, 'spv.createrawtx');
                 value = value - fee;
+              }
+
+              api.log(`change ${_change}`, 'spv.createrawtx');
+              api.log(`network ${network.toLowerCase()}`, 'spv.createrawtx');
+              api.log(`estimated fee ${_estimatedFee}`, 'spv.createrawtx');
+              
+              // 1h kmd interest lee way to mitigate client-server time diff
+              if (_estimatedFee < 0 &&
+                  network.toLowerCase() === 'kmd' &&
+                  _change > 0) {
+                api.log('estimated fee < 0, subtract 20k sats fee', 'spv.createrawtx');
+                const _changeOld = _change;
+                _change -= fee * 2;
+
+                if (Math.abs(Math.abs(_changeOld) - Math.abs(_change)) >= fee &&
+                    Math.abs(Math.abs(_changeOld) - Math.abs(_change)) < fee * 2) {
+                  api.log('subtracted fee is less than 20k sats, subtract 10k sats', 'spv.createrawtx');
+                  _change -= fee;
+                }
+                _change = _change < 0 ? 0 : _change;
+                api.log(`change adjusted ${_change}`, 'spv.createrawtx');
               }
 
               // TODO: use individual dust thresholds
@@ -620,7 +652,7 @@ module.exports = (api) => {
                       res.end(JSON.stringify(retObj));
                     } else if (
                       txid &&
-                      txid.indexOf('bad-txns-inputs-spent') > -1
+                      JSON.stringify(txid).indexOf('bad-txns-inputs-spent') > -1
                     ) {
                       const retObj = {
                         msg: 'error',
@@ -633,7 +665,7 @@ module.exports = (api) => {
                       txid &&
                       txid.length === 64
                     ) {
-                      if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                      if (JSON.stringify(txid).indexOf('bad-txns-in-belowout') > -1) {
                         const retObj = {
                           msg: 'error',
                           result: 'Bad transaction inputs spent',
@@ -651,7 +683,7 @@ module.exports = (api) => {
                       }
                     } else if (
                       txid &&
-                      txid.indexOf('bad-txns-in-belowout') > -1
+                      JSON.stringify(txid).indexOf('bad-txns-in-belowout') > -1
                     ) {
                       const retObj = {
                         msg: 'error',

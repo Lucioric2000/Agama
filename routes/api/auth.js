@@ -60,7 +60,7 @@ module.exports = (api) => {
   };
 
   api.isWatchOnly = () => {
-    return api._isWatchOnly;
+    return api.argv && api.argv.watchonly === 'override' ? false : api._isWatchOnly;
   };
 
   api.setPubkey = (seed, coin) => {

@@ -49,8 +49,16 @@ module.exports = (api) => {
                         if (api.getTransactionDecoded(_utxoItem.tx_hash, network)) {
                           decodedTx = api.getTransactionDecoded(_utxoItem.tx_hash, network);
                         } else {
-                          decodedTx = api.electrumJSTxDecoder(_rawtxJSON, network, _network);
-                          api.getTransactionDecoded(_utxoItem.tx_hash, network, decodedTx);
+                          decodedTx = api.electrumJSTxDecoder(
+                            _rawtxJSON,
+                            network,
+                            _network
+                          );
+                          api.getTransactionDecoded(
+                            _utxoItem.tx_hash,
+                            network,
+                            decodedTx
+                          );
                         }
 
                         // api.log('decoded tx =>', true);
@@ -66,9 +74,15 @@ module.exports = (api) => {
 
                             if (Number(_utxoItem.value) * 0.00000001 >= 10 &&
                                 decodedTx.format.locktime > 0) {
-                              interest = api.kmdCalcInterest(decodedTx.format.locktime, _utxoItem.value, _utxoItem.height);
+                              interest = api.kmdCalcInterest(
+                                decodedTx.format.locktime,
+                                _utxoItem.value,
+                                _utxoItem.height,
+                                true
+                              );
                             }
 
+                            const _locktimeSec = checkTimestamp(decodedTx.format.locktime * 1000);
                             let _resolveObj = {
                               txid: _utxoItem.tx_hash,
                               vout: _utxoItem.tx_pos,
@@ -76,12 +90,11 @@ module.exports = (api) => {
                               amount: Number(_utxoItem.value) * 0.00000001,
                               amountSats: _utxoItem.value,
                               locktime: decodedTx.format.locktime,
-                              interest: Number(interest.toFixed(8)),
-                              interestSats: Math.floor(interest * 100000000),
-                              timeElapsedFromLocktime: Math.floor(Date.now() / 1000) - decodedTx.format.locktime * 1000,
-                              timeElapsedFromLocktimeInSeconds: checkTimestamp(decodedTx.format.locktime * 1000),
-                              timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - checkTimestamp(decodedTx.format.locktime * 1000) > 0 ? UTXO_1MONTH_THRESHOLD_SECONDS - checkTimestamp(decodedTx.format.locktime * 1000) : 0,
-                              interestRulesCheckPass: !decodedTx.format.locktime || Number(decodedTx.format.locktime) === 0 || checkTimestamp(decodedTx.format.locktime * 1000) > UTXO_1MONTH_THRESHOLD_SECONDS ? false : true,
+                              interest: interest >= 0 ? Number((interest * 0.00000001).toFixed(8)) : 0,
+                              interestSats: interest >= 0 ? interest : 0,
+                              timeElapsedFromLocktimeInSeconds: _locktimeSec,
+                              timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - _locktimeSec > 0 ? UTXO_1MONTH_THRESHOLD_SECONDS - _locktimeSec : 0,
+                              interestRulesCheckPass: !decodedTx.format.locktime || Number(decodedTx.format.locktime) === 0 || _locktimeSec > UTXO_1MONTH_THRESHOLD_SECONDS || _utxoItem.value < 1000000000 ? false : true,
                               confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
                               spendable: true,
                               verified: false,

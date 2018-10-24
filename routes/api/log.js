@@ -94,7 +94,11 @@ module.exports = (api) => {
       const _log = JSON.parse(JSON.stringify(api.appRuntimeLog));
       const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
 
-      const err = fs.writeFileSync(`${api.agamaDir}/shepherd/log/log-${_time}.json`, JSON.stringify(_log), 'utf8');
+      const err = fs.writeFileSync(
+        `${api.agamaDir}/shepherd/log/log-${_time}.json`,
+        JSON.stringify(_log),
+        'utf8'
+      );
 
       if (err) {
         const retObj = {
