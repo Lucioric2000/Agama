@@ -22,7 +22,8 @@ module.exports = (api) => {
       retObj = {
         native: nativeCoindList,
         spv: electrumCoinsList,
-        total: Object.keys(api.electrumCoins).length - 1 + Object.keys(nativeCoindList).length,
+        eth: api.eth.wallet ? true : false,
+        total: Object.keys(api.electrumCoins).length - 1 + Object.keys(nativeCoindList).length + (api.eth.wallet ? 1 : 0),
         params: api.native.startParams,
       };
 
