@@ -13,14 +13,33 @@ module.exports = (api) => {
           },
         },
       };
+      res.end(JSON.stringify(retObj));
     } else {
       const retObj = {
         msg: 'error',
         result: 'false',
       };
+      res.end(JSON.stringify(retObj));
+    }
+  });
+
+  api.get('/eth/coins/add', (req, res, next) => {
+    if (!api.eth.wallet) {
+      api.eth.wallet = {};
+
+      const retObj = {
+        msg: 'success',
+        result: 'true',
+      };
+      res.end(JSON.stringify(retObj));      
+    } else {
+      const retObj = {
+        msg: 'error',
+        result: 'eth is active',
+      };
+      res.end(JSON.stringify(retObj));      
     }
 
-    res.end(JSON.stringify(retObj));
   });
 
   return api; 
