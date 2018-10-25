@@ -21,13 +21,16 @@ module.exports = (api) => {
   }
 
   // src: https://github.com/bitcoinjs/bitcoinjs-lib/blob/master/src/ecpair.js#L62
-  api.fromWif = (string, network) => {
+  api.fromWif = (string, network, checkVersion) => {
     const decoded = wif.decode(string);
     const version = decoded.version;
     
     if (!network) throw new Error('Unknown network version');
-    if (network.wifAlt && version !== network.wif && network.wifAlt.indexOf(version) === -1) throw new Error('Invalid network version');
-    if (!network.wifAlt && version !== network.wif) throw new Error('Invalid network version');
+    
+    if (checkVersion) {
+      if (network.wifAlt && version !== network.wif && network.wifAlt.indexOf(version) === -1) throw new Error('Invalid network version');
+      if (!network.wifAlt && version !== network.wif) throw new Error('Invalid network version');
+    }
   
     const d = bigi.fromBuffer(decoded.privateKey);
 
