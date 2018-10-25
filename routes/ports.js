@@ -44,6 +44,7 @@ const assetChainPorts = {
   CCL: 20849,
   KOIN: 10702,
   DION: 23895,
+  PTX: 61940,
 };
 
 module.exports = assetChainPorts;
