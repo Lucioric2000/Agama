@@ -24,14 +24,14 @@ module.exports = (api) => {
         msg: 'success',
         result: 'true',
       };
+      res.end(JSON.stringify(retObj));
     } else {
       const retObj = {
         msg: 'error',
         result: 'true',
       };
+      res.end(JSON.stringify(retObj));
     }
-
-    res.end(JSON.stringify(retObj));
   });
 
   // TODO: priv/seed detect
