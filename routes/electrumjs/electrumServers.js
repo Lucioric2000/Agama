@@ -46,9 +46,6 @@ const _electrumServersExtend = {
   },
   xvg: {
     txfee: 10000,
-    serverList: [
-      '46.163.118.201:50002:tcp'
-    ],
   },
   xvc: {
     txfee: 10000,
@@ -286,12 +283,21 @@ const _electrumServersExtend = {
 };
 
 let electrumServers = Object.assign({}, _electrumServers, _electrumServersExtend);
+let electrumServersFlag = Object.assign({}, _electrumServers, _electrumServersExtend);
 
 for (let i = 0; i < disableCoins.length; i++) {
   if (electrumServers[disableCoins[i]]) {
     delete electrumServers[disableCoins[i]];
+    delete electrumServersFlag[disableCoins[i]];
     // console.log(`disable spv coin ${disableCoins[i]}`);
   }
 }
 
-module.exports = electrumServers;
+for (key in electrumServersFlag) {
+  electrumServersFlag[key] = true;
+}
+
+module.exports = {
+  electrumServers,
+  electrumServersFlag,
+};

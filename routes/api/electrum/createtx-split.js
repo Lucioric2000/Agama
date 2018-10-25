@@ -3,6 +3,8 @@ const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
 
+// merge into agama-wallet-lib
+
 module.exports = (api) => {
   // utxo split 1 -> 1, multiple outputs
   api.post('/electrum/createrawtx-split', (req, res, next) => {

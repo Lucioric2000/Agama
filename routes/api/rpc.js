@@ -63,15 +63,17 @@ module.exports = (api) => {
    *  params: payload
    */
   api.post('/cli', (req, res, next) => {
-    if (api.checkToken(req.body.payload.token)) {
-      if (!req.body.payload) {
+    const payload = req.body.payload;
+
+    if (api.checkToken(payload.token)) {
+      if (!payload) {
         const retObj = {
           msg: 'error',
           result: 'no payload provided',
         };
 
         res.end(JSON.stringify(retObj));
-      } else if (!req.body.payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
+      } else if (!payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
         const retObj = {
           msg: 'error',
           result: 'wrong cli string format',
@@ -79,17 +81,17 @@ module.exports = (api) => {
 
         res.end(JSON.stringify(retObj));
       } else {
-        const _mode = req.body.payload.mode === 'passthru' ? 'passthru' : 'default';
-        const _chain = req.body.payload.chain === 'KMD' ? null : req.body.payload.chain;
-        let _params = req.body.payload.params ? ` ${req.body.payload.params}` : '';
-        let _cmd = req.body.payload.cmd;
+        const _mode = payload.mode === 'passthru' ? 'passthru' : 'default';
+        const _chain = payload.chain === 'KMD' ? null : payload.chain;
+        let _params = payload.params ? ` ${payload.params}` : '';
+        let _cmd = payload.cmd;
 
         if (!api.rpcConf[_chain]) {
-          api.getConf(req.body.payload.chain === 'KMD' || !req.body.payload.chain && api.kmdMainPassiveMode ? 'komodod' : req.body.payload.chain);
+          api.getConf(payload.chain === 'KMD' || !payload.chain && api.kmdMainPassiveMode ? 'komodod' : payload.chain);
         }
 
         if (_mode === 'default') {
-          if (req.body.payload.rpc2cli) {
+          if (payload.rpc2cli) {
             let _coindCliBin = api.komodocliBin;
 
             if (api.nativeCoindList &&
@@ -248,21 +250,21 @@ module.exports = (api) => {
                 method: _cmd,
               };
 
-              if (req.body.payload.params) {
+              if (payload.params) {
                 _body = {
                   agent: 'bitcoinrpc',
                   method: _cmd,
-                  params: req.body.payload.params === ' ' ? [''] : req.body.payload.params,
+                  params: payload.params === ' ' ? [''] : payload.params,
                 };
               }
 
               if (req.body.payload.chain) {
                 const options = {
-                  url: `http://localhost:${api.rpcConf[req.body.payload.chain].port}`,
+                  url: `http://localhost:${api.rpcConf[payload.chain].port}`,
                   method: 'POST',
                   auth: {
-                    user: api.rpcConf[req.body.payload.chain].user,
-                    pass: api.rpcConf[req.body.payload.chain].pass,
+                    user: api.rpcConf[payload.chain].user,
+                    pass: api.rpcConf[payload.chain].pass,
                   },
                   body: JSON.stringify(_body),
                 };
@@ -279,7 +281,7 @@ module.exports = (api) => {
                       result: 'error',
                       error: {
                         code: -777,
-                        message: `unable to call method ${_cmd} at port ${api.rpcConf[req.body.payload.chain].port}`,
+                        message: `unable to call method ${_cmd} at port ${api.rpcConf[payload.chain].port}`,
                       },
                     };
                     res.end(body ? body : JSON.stringify(retObj));

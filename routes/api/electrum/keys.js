@@ -213,7 +213,11 @@ module.exports = (api) => {
 
   api.post('/electrum/seedtowif', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
-      let keys = api.seedToWif(req.body.seed, req.body.network.toLowerCase(), req.body.iguana);
+      const keys = api.seedToWif(
+        req.body.seed,
+        req.body.network.toLowerCase(),
+        req.body.iguana
+      );
 
       const retObj = {
         msg: 'success',
@@ -235,7 +239,11 @@ module.exports = (api) => {
 
   api.get('/electrum/seedtowif', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      let keys = api.seedToWif(req.query.seed, req.query.network.toLowerCase(), req.query.iguana);
+      const keys = api.seedToWif(
+        req.query.seed,
+        req.query.network.toLowerCase(),
+        req.query.iguana
+      );
 
       const retObj = {
         msg: 'success',
@@ -345,15 +353,15 @@ module.exports = (api) => {
           
           if (isWif) {
             try {
-              let key = _network.isZcash ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
-              priv = key.toWIF();
-              pub = key.getAddress();
+              const _key = _network.isZcash ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
+              priv = _key.toWIF();
+              pub = _key.getAddress();
             } catch (e) {
               _wifError = true;
               break;
             }
           } else {
-            let _keys = api.seedToWif(_seed, _network, req.body.iguana);
+            const _keys = api.seedToWif(_seed, _network, req.body.iguana);
             priv = _keys.priv;
             pub = _keys.pub;
           }

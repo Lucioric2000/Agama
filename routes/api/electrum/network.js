@@ -9,14 +9,14 @@ const txDecoder = {
 module.exports = (api) => {
   api.isZcash = (network) => {
     if (api.electrumJSNetworks[network.toLowerCase()] &&
-    api.electrumJSNetworks[network.toLowerCase()].isZcash) {
+        api.electrumJSNetworks[network.toLowerCase()].isZcash) {
       return true;
     }
   };
 
   api.isPos = (network) => {
     if (api.electrumJSNetworks[network.toLowerCase()] &&
-    api.electrumJSNetworks[network.toLowerCase()].isPoS) {
+        api.electrumJSNetworks[network.toLowerCase()].isPoS) {
       return true;
     }
   };
@@ -212,10 +212,6 @@ module.exports = (api) => {
       let _currentElectrumServer;
       network = network.toLowerCase();
 
-      /*console.log(`ecl net ${network}`);
-      console.log(api.electrumCoins[network]);
-      console.log(api.electrumServers[network].serverList);*/
-
       if (api.electrumCoins[network]) {
         _currentElectrumServer = api.electrumCoins[network];
       } else {
@@ -243,7 +239,12 @@ module.exports = (api) => {
             proto: api.electrumCoins[network] && api.electrumCoins[network].server.proto || _currentElectrumServer.proto,
           };
 
-          return new api.electrumJSCore(electrum.port, electrum.ip, electrum.proto, api.appConfig.spv.socketTimeout);
+          return new api.electrumJSCore(
+            electrum.port,
+            electrum.ip,
+            electrum.proto,
+            api.appConfig.spv.socketTimeout
+          );
         }
       }
     }

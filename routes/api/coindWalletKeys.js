@@ -59,11 +59,18 @@ module.exports = (api) => {
 
                   for (let i = 0; i < privateKeys.length; i++) {
                     const privateKey = new Buffer(Buffer.from(privateKeys[i], 'latin1').toString('hex'), 'hex');
-                    const key = wif.encode(0xbc, privateKey, true);
+                    const key = wif.encode(
+                      0xbc,
+                      privateKey,
+                      true
+                    );
                     const keyObj = wif.decode(key);
                     const wifKey = wif.encode(keyObj);
 
-                    const keyPair = bitcoinJS.ECPair.fromWIF(wifKey, api.electrumJSNetworks.komodo);
+                    const keyPair = bitcoinJS.ECPair.fromWIF(
+                      wifKey,
+                      api.electrumJSNetworks.komodo
+                    );
                     const _keyPair = {
                       priv: keyPair.toWIF(),
                       pub: keyPair.getAddress(),

@@ -58,3 +58,4 @@ build
 
 #MacOSX hidden cache files
 __MACOSX
+package-lock.json

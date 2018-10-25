@@ -54,7 +54,8 @@ module.exports = (api) => {
 
           if (isWif) {
             try {
-              const _key = api.isZcash(key.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, api.getNetworkData(key.toLowerCase()), true) : bitcoin.ECPair.fromWIF(_seed, api.getNetworkData(key.toLowerCase()), true);
+              const _network = api.getNetworkData(key.toLowerCase());
+              const _key = api.isZcash(key.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
               keys = {
                 priv: _key.toWIF(),
                 pub: _key.getAddress(),
