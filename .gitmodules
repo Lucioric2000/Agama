@@ -1,3 +1,4 @@
 [submodule "gui/EasyDEX-GUI"]
 	path = gui/EasyDEX-GUI
-	url = https://github.com/KomodoPlatform/EasyDEX-GUI.git
+	#url = https://github.com/KomodoPlatform/EasyDEX-GUI.git
+	url = https://bitbucket.org/predicationsapp/easydex-gui.git
