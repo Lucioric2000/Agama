@@ -22,13 +22,13 @@ module.exports = (api) => {
         api.eth.wallet.signingKey.mnemonic === seed) {
       const retObj = {
         msg: 'success',
-        result: 'true',
+        result: api.eth.wallet.signingKey,
       };
       res.end(JSON.stringify(retObj));
     } else {
       const retObj = {
         msg: 'error',
-        result: 'true',
+        result: false,
       };
       res.end(JSON.stringify(retObj));
     }
