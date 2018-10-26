@@ -52,7 +52,18 @@ module.exports = (api) => {
               // normalize transactions list to btc-like
               if (_json.result.length) {
                 for (let i = 0; i < _json.result.length; i++) {
+                  let type;
+
+                  if (_json.result[i].from === _json.result[i].to) {
+                    type = 'self';
+                  } else if (_json.result[i].from === address.toLowerCase()) {
+                    type = 'sent';                    
+                  } else if (_json.result[i].to === address.toLowerCase()) {
+                    type = 'received';                    
+                  }
+
                   _txs.push({
+                    type,
                     blocknumber: _json.result[i].blockNumber,
                     timestamp: _json.result[i].timeStamp,
                     txid: _json.result[i].hash,
@@ -61,8 +72,8 @@ module.exports = (api) => {
                     txindex: _json.result[i].transactionIndex,
                     src: _json.result[i].from,
                     address: _json.result[i].to,
-                    value: ethers.utils.formatEther(_json.result[i].value),
-                    valueWei: _json.result[i].value,
+                    amount: ethers.utils.formatEther(_json.result[i].value),
+                    amountWei: _json.result[i].value,
                     gas: ethers.utils.formatEther(_json.result[i].gas),
                     gasWei: _json.result[i].gas,
                     gasPrice: ethers.utils.formatEther(_json.result[i].gasPrice),
