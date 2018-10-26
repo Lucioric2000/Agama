@@ -2,6 +2,8 @@ const bs58check = require('bs58check');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoin = require('bitcoinjs-lib');
 
+// TODO: merge spv and eth login/logout into a single func
+
 module.exports = (api) => {
   api.post('/electrum/login', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
@@ -29,6 +31,8 @@ module.exports = (api) => {
 
   api.auth = (seed, isIguana) => {
     let _wifError = false;
+
+    api.seed = seed;
 
     for (let key in api.electrumCoins) {
       if (key !== 'auth') {
@@ -89,7 +93,9 @@ module.exports = (api) => {
     if (api.checkToken(req.body.token)) {
       api.electrumCoins.auth = false;
       api.electrumKeys = {};
-
+      api.seed = null;
+      api.eth.wallet = {};
+      
       const retObj = {
         msg: 'success',
         result: 'true',
@@ -108,10 +114,16 @@ module.exports = (api) => {
 
   api.post('/electrum/logout', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
+      api.seed = null;      
       api.electrumCoins = {
         auth: false,
       };
       api.electrumKeys = {};
+      api.eth = {
+        coins: {},
+        connect: {},
+        wallet: null,
+      };
 
       const retObj = {
         msg: 'success',

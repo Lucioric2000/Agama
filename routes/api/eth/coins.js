@@ -25,24 +25,30 @@ module.exports = (api) => {
     const _coin = req.query.coin;
     
     if (_coin) {
-      const _coinlc = _coin.toLowerCase();
+      const _coinuc = _coin.toUpperCase();
 
       if (!api.eth.wallet) {
         api.eth.wallet = {};
       }
 
+      if (api.seed) {
+        const mnemonicWallet = api.eth._keys(api.seed);
+
+        api.eth.wallet = mnemonicWallet;
+      }
+
       if (_coin &&
-          !api.eth.coins[_coinlc]) {
+          !api.eth.coins[_coinuc]) {
         if (api.eth.wallet.signingKey &&
             api.eth.wallet.signingKey.address) {
-          const network = key.indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
+          const network = key.toLowerCase().indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
               
-          api.eth.coins[_coinlc] = {
+          api.eth.coins[_coinuc] = {
             pub: api.eth.wallet.signingKey.address,
             network,
           };
         } else {
-          api.eth.coins[_coinlc] = {};
+          api.eth.coins[_coinuc] = {};
         }
 
         const retObj = {
@@ -53,7 +59,7 @@ module.exports = (api) => {
       } else {
         const retObj = {
           msg: 'error',
-          result: _coinlc + ' is active',
+          result: _coinuc + ' is active',
         };
         res.end(JSON.stringify(retObj));
       }
@@ -70,7 +76,7 @@ module.exports = (api) => {
     const _coin = req.query.coin;
 
     if (_coin) {
-      api.eth.coins[_coin.toLowerCase()] = {};
+      api.eth.coins[_coin.toUpperCase()] = {};
 
       const retObj = {
         msg: 'success',

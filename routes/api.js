@@ -76,6 +76,7 @@ api.kmdMainPassiveMode = false;
 api.native = {
   startParams: {},
 };
+api.seed = null;
 
 // spv
 api = require('./api/electrum/network.js')(api);

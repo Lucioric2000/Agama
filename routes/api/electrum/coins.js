@@ -55,6 +55,8 @@ module.exports = (api) => {
         priv: _keys.priv,
         pub: _keys.pub,
       };
+    } else if (api.seed) {
+      api.auth(api.seed, true);
     }
 
     return true;

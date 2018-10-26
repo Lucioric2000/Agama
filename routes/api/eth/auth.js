@@ -5,6 +5,8 @@ module.exports = (api) => {
     const seed = req.body.seed;
     const mnemonicWallet = api.eth._keys(seed);
     
+    api.seed = seed;
+
     api.eth.wallet = mnemonicWallet;
 
     for (let key in api.eth.coins) {
