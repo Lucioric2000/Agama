@@ -144,6 +144,7 @@ api = require('./api/kv.js')(api);
 // eth
 api.eth = {
   coins: {},
+  connect: {},
 };
 api = require('./api/eth/auth.js')(api);
 api = require('./api/eth/keys.js')(api);

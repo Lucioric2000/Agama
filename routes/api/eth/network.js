@@ -3,7 +3,8 @@ const ethers = require('ethers');
 module.exports = (api) => {  
   api.get('/eth/network/connect', (req, res, next) => {
     const network = req.query.network || 'homestead';
-    const _connect = api.eth._connect(network);
+    const coin = req.query.coin.toLowerCase();
+    const _connect = api.eth._connect(coin, network);
 
     const retObj = {
       msg: 'success',
@@ -13,9 +14,9 @@ module.exports = (api) => {
     res.end(JSON.stringify(retObj));
   });
 
-  api.eth._connect = (network) => {
-    api.eth.activeWallet = api.eth.wallet.connect(new ethers.getDefaultProvider(network));
-    api.log('eth network connect', api.eth.activeWallet);    
+  api.eth._connect = (coin, network) => {
+    api.eth.connect[coin] = api.eth.wallet.connect(new ethers.getDefaultProvider(network));
+    api.log(`eth connect coin ${coin} network ${network}`, api.eth.connect[coin]);    
   };
 
   return api;

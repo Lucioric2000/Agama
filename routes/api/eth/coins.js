@@ -35,8 +35,11 @@ module.exports = (api) => {
           !api.eth.coins[_coinlc]) {
         if (api.eth.wallet.signingKey &&
             api.eth.wallet.signingKey.address) {
+          const network = key.indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
+              
           api.eth.coins[_coinlc] = {
             pub: api.eth.wallet.signingKey.address,
+            network,
           };
         } else {
           api.eth.coins[_coinlc] = {};

@@ -3,15 +3,17 @@ const ethers = require('ethers');
 module.exports = (api) => {  
   api.post('/eth/auth', (req, res, next) => {
     const seed = req.body.seed;
-    const network = req.body.network;
     const mnemonicWallet = api.eth._keys(seed);
     
     api.eth.wallet = mnemonicWallet;
-    api.eth._connect(network || 'homestead');
 
     for (let key in api.eth.coins) {
+      const network = key.indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
+      
+      api.eth._connect(key, network);
       api.eth.coins[key] = {
         pub: api.eth.wallet.signingKey.address,
+        network,
       };
     }
 
