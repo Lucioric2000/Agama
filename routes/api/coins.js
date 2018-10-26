@@ -8,6 +8,7 @@ module.exports = (api) => {
       let retObj;
       let nativeCoindList = [];
       let electrumCoinsList = [];
+      let ethereumCoins = [];
 
       for (let key in api.electrumCoins) {
         if (key !== 'auth') {
@@ -19,11 +20,15 @@ module.exports = (api) => {
         nativeCoindList.push(key === 'komodod' ? 'KMD' : key);
       }
 
+      for (let key in api.eth.coins) {
+        ethereumCoins.push(key);
+      }
+
       retObj = {
         native: nativeCoindList,
         spv: electrumCoinsList,
-        eth: api.eth.wallet ? ['eth'] : [],
-        total: Object.keys(api.electrumCoins).length - 1 + Object.keys(nativeCoindList).length + (api.eth.wallet ? 1 : 0),
+        eth: ethereumCoins,
+        total: nativeCoindList.length + electrumCoinsList.length + ethereumCoins.length,
         params: api.native.startParams,
       };
 

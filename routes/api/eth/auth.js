@@ -9,6 +9,12 @@ module.exports = (api) => {
     api.eth.wallet = mnemonicWallet;
     api.eth._connect(network || 'homestead');
 
+    for (let key in api.eth.coins) {
+      api.eth.coins[key] = {
+        pub: api.eth.wallet.signingKey.address,
+      };
+    }
+
     const retObj = {
       msg: 'success',
       result: 'success',
@@ -19,6 +25,10 @@ module.exports = (api) => {
 
   api.post('/eth/logout', (req, res, next) => {
     api.eth.wallet = null;
+
+    for (let key in api.eth.coins) {
+      api.eth.coins[key] = {};
+    }
 
     const retObj = {
       msg: 'success',

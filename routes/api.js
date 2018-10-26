@@ -142,7 +142,9 @@ api = require('./api/elections.js')(api);
 api = require('./api/kv.js')(api);
 
 // eth
-api.eth = {};
+api.eth = {
+  coins: {},
+};
 api = require('./api/eth/auth.js')(api);
 api = require('./api/eth/keys.js')(api);
 api = require('./api/eth/network.js')(api);
