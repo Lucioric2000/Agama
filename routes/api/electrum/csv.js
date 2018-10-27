@@ -2,6 +2,8 @@ const fs = require('fs-extra');
 const request = require('request');
 const { secondsToString } = require('agama-wallet-lib/src/time');
 
+// TODO: combine into a single function
+
 module.exports = (api) => {
   api.get('/electrum/listtransactions/csv', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
@@ -14,7 +16,9 @@ module.exports = (api) => {
       })
       .then((txhistory) => {
         const _coin = req.query.coin || req.query.network;
-        const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '_').replace(/:/g, '-');
+        const _time = secondsToString(Date.now() / 1000)
+                      .replace(/\s+/g, '_')
+                      .replace(/:/g, '-');
 
         api.log(`csv ${_coin} txhistory length ${txhistory.result.length}`, 'spv.csv');
 
@@ -24,10 +28,14 @@ module.exports = (api) => {
           let _csv = ['Direction, Time, Amount, Address, TXID'];
 
           for (let i = 0; i < txhistory.result.length; i++) {
-            _csv.push(`${txhistory.result[i].type}, ${secondsToString(txhistory.result[i].timestamp)}, ${txhistory.result[i].amount}, ${txhistory.result[i].address || ''}, ${txhistory.result[i].txid}`);
+            _csv.push(`${txhistory.result[i].type}, ` +
+                      `${secondsToString(txhistory.result[i].timestamp)}, ` +
+                      `${txhistory.result[i].amount}, ${txhistory.result[i].address || ''}, ` +
+                      `${txhistory.result[i].txid}`);
           }
 
-          const err = fs.writeFileSync(`${api.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-${req.query.address}-${_time}.csv`, _csv.join('\r\n'), 'utf8');
+          const _fname = `${api.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-${req.query.address}-${_time}.csv`;
+          const err = fs.writeFileSync(_fname, _csv.join('\r\n'), 'utf8');
 
           if (err) {
             const retObj = {
@@ -38,7 +46,7 @@ module.exports = (api) => {
           } else {
             const retObj = {
               msg: 'success',
-              result: `${api.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-${req.query.address}-${_time}.csv`,
+              result: _fname,
             };
             res.end(JSON.stringify(retObj));
           }
@@ -59,7 +67,9 @@ module.exports = (api) => {
   api.get('/native/listtransactions/csv', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
       const _coin = req.query.coin;
-      const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '_').replace(/:/g, '-');
+      const _time = secondsToString(Date.now() / 1000)
+                    .replace(/\s+/g, '_')
+                    .replace(/:/g, '-');
 
       const _payload = {
         mode: null,
@@ -97,10 +107,14 @@ module.exports = (api) => {
             let _csv = ['Direction, Time, Amount, Address, TXID'];
 
             for (let i = 0; i < txhistory.result.length; i++) {
-              _csv.push(`${txhistory.result[i].category}, ${secondsToString(txhistory.result[i].time)}, ${txhistory.result[i].amount}, ${txhistory.result[i].address || ''}, ${txhistory.result[i].txid}`);
+              _csv.push(`${txhistory.result[i].category}, ` +
+                        `${secondsToString(txhistory.result[i].time)}, ` +
+                        `${txhistory.result[i].amount}, ${txhistory.result[i].address || ''}, ` +
+                        `${txhistory.result[i].txid}`);
             }
 
-            const err = fs.writeFileSync(`${api.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-native-all-${_time}.csv`, _csv.join('\r\n'), 'utf8');
+            const _fname = `${api.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-native-all-${_time}.csv`;
+            const err = fs.writeFileSync(_fname, _csv.join('\r\n'), 'utf8');
 
             if (err) {
               const retObj = {
@@ -111,7 +125,7 @@ module.exports = (api) => {
             } else {
               const retObj = {
                 msg: 'success',
-                result: `${api.agamaDir}/shepherd/csv/${_coin.toUpperCase()}-native-all-${_time}.csv`,
+                result: _fname,
               };
               res.end(JSON.stringify(retObj));
             }

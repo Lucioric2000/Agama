@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const _sha256 = (data) => {
   return crypto.createHash('sha256').update(data).digest();
 };
+const { getRandomIntInclusive } = require('agama-wallet-lib/src/utils');
 
 module.exports = (api) => {
   // get merkle root
@@ -21,9 +22,15 @@ module.exports = (api) => {
       const _proofBuff = new Buffer(proof[i], 'hex');
 
       if ((pos & 1) == 0) {
-        serialized = Buffer.concat([reverse(_hashBuff), reverse(_proofBuff)]);
+        serialized = Buffer.concat([
+          reverse(_hashBuff),
+          reverse(_proofBuff)
+        ]);
       } else {
-        serialized = Buffer.concat([reverse(_proofBuff), reverse(_hashBuff)]);
+        serialized = Buffer.concat([
+          reverse(_proofBuff),
+          reverse(_hashBuff)
+        ]);
       }
 
       hash = reverse(_sha256(_sha256(serialized))).toString('hex');
@@ -35,19 +42,16 @@ module.exports = (api) => {
 
   api.verifyMerkle = (txid, height, serverList, mainServer, network) => {
     // select random server
-    const getRandomIntInclusive = (min, max) => {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-
-      return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
-    }
-
     const _rnd = getRandomIntInclusive(0, serverList.length - 1);
     const randomServer = serverList[_rnd];
     const _randomServer = randomServer.split(':');
     const _mainServer = mainServer.split(':');
 
-    let ecl = api.ecl(network, { ip: _mainServer[0], port: _mainServer[1], proto: _mainServer[2] });
+    let ecl = api.ecl(network, {
+      ip: _mainServer[0],
+      port: _mainServer[1],
+      proto: _mainServer[2],
+    });
 
     return new Promise((resolve, reject) => {
       api.log(`main server: ${mainServer}`, 'spv.merkle');
@@ -63,10 +67,18 @@ module.exports = (api) => {
           api.log(merkleData, 'spv.merkle');
           ecl.close();
 
-          const _res = api.getMerkleRoot(txid, merkleData.merkle, merkleData.pos);
+          const _res = api.getMerkleRoot(
+            txid,
+            merkleData.merkle,
+            merkleData.pos
+          );
           api.log(_res, 'spv.merkle');
 
-          ecl = api.ecl(network, { ip: _randomServer[0], port: _randomServer[1], proto: _randomServer[2] });
+          ecl = api.ecl(network, {
+            ip: _randomServer[0],
+            port: _randomServer[1],
+            proto: _randomServer[2],
+          });
           ecl.connect();
 
           api.getBlockHeader(height, network, ecl)
@@ -104,9 +116,10 @@ module.exports = (api) => {
 
   api.verifyMerkleByCoin = (coin, txid, height) => {
     const _serverList = api.electrumCoins[coin].serverList;
+    const _server = api.electrumCoins[coin].server;
 
     api.log('verifyMerkleByCoin', 'spv.merkle');
-    api.log(api.electrumCoins[coin].server, 'spv.merkle');
+    api.log(_server, 'spv.merkle');
     api.log(api.electrumCoins[coin].serverList, 'spv.merkle');
 
     return new Promise((resolve, reject) => {
@@ -114,7 +127,7 @@ module.exports = (api) => {
         let _filteredServerList = [];
 
         for (let i = 0; i < _serverList.length; i++) {
-          if (_serverList[i] !== api.electrumCoins[coin].server.ip + ':' + api.electrumCoins[coin].server.port + ':' + api.electrumCoins[coin].server.proto) {
+          if (_serverList[i] !== _server.ip + ':' + _server.port + ':' + _server.proto) {
             _filteredServerList.push(_serverList[i]);
           }
         }
@@ -123,7 +136,7 @@ module.exports = (api) => {
           txid,
           height,
           _filteredServerList,
-          api.electrumCoins[coin].server.ip + ':' + api.electrumCoins[coin].server.port + ':' + api.electrumCoins[coin.toLowerCase() === 'kmd' || coin === 'komodo' ? 'kmd' : coin].server.proto,
+          _server.ip + ':' + _server.port + ':' + api.electrumCoins[coin.toLowerCase() === 'kmd' || coin === 'komodo' ? 'kmd' : coin].server.proto,
           coin
         )
         .then((proof) => {

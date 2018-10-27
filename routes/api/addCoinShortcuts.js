@@ -1,7 +1,6 @@
 const electrumServers = require('../electrumjs/electrumServers');
 const request = require('request');
-
-// TODO: refactor, get params from acParams file
+const chainParams = require('../chainParams');
 
 module.exports = (api) => {
   api.startSPV = (coin) => {
@@ -22,33 +21,7 @@ module.exports = (api) => {
 
   api.startKMDNative = (selection, isManual) => {
     let herdData;
-    const acHerdData = {
-      REVS: {
-        name: 'REVS',
-        seedNode: '78.47.196.146',
-        supply: 1300000,
-      },
-      JUMBLR: {
-        name: 'JUMBLR',
-        seedNode: '78.47.196.146',
-        supply: 999999,
-      },
-      MNZ: {
-        name: 'MNZ',
-        seedNode: '78.47.196.146',
-        supply: 257142858,
-      },
-      BTCH: {
-        name: 'BTCH',
-        seedNode: '78.47.196.146',
-        supply: 20998641,
-      },
-      BNTN: {
-        name: 'BNTN',
-        seedNode: '94.130.169.205',
-        supply: 500000000,
-      },
-    };
+
     const httpRequest = () => {
       const options = {
         url: `http://127.0.0.1:${api.appConfig.agamaPort}/api/herd`,
@@ -90,13 +63,13 @@ module.exports = (api) => {
       selection === 'BNTN'
     ) {
       herdData = {
-        ac_name: acHerdData[selection].name,
+        ac_name: selection,
         ac_options: [
           '-daemon=0',
           '-server',
-          `-ac_name=${acHerdData[selection].name}`,
-          `-addnode=${acHerdData[selection].seedNode}`,
-          `-ac_supply=${acHerdData[selection].supply}`,
+          `-ac_name=${selection}`,
+          `-addnode=${chainParams[selection].addnone}`,
+          `-addnode=${chainParams[selection].ac_supply}`,
         ],
       };
 
@@ -114,8 +87,8 @@ module.exports = (api) => {
           '-daemon=0',
           '-server',
           `-ac_name=REVS`,
-          '-addnode=78.47.196.146',
-          '-ac_supply=1300000',
+          `-addnode=${chainParams.REVS.addnone}`,
+          `-addnode=${chainParams.REVS.ac_supply}`,
         ],
       }, {
         ac_name: 'JUMBLR',
@@ -123,8 +96,8 @@ module.exports = (api) => {
           '-daemon=0',
           '-server',
           `-ac_name=JUMBLR`,
-          '-addnode=78.47.196.146',
-          '-ac_supply=999999',
+          `-addnode=${chainParams.JUMBLR.addnone}`,
+          `-addnode=${chainParams.JUMBLR.ac_supply}`,
         ],
       }];
 

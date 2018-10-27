@@ -1,25 +1,12 @@
 const request = require('request');
 const Promise = require('bluebird');
+const { getRandomIntInclusive } = require('agama-wallet-lib/src/utils');
+const { checkTimestamp } = require('agama-wallet-lib/src/time');
 
 let btcFeeBlocks = [];
 
 for (let i = 0; i < 25; i++) {
   btcFeeBlocks.push(i);
-}
-
-// TODO: use agama-wallet-lib
-const checkTimestamp = (dateToCheck) => {
-  const currentEpochTime = new Date(Date.now()) / 1000;
-  const secondsElapsed = Number(currentEpochTime) - Number(dateToCheck);
-
-  return Math.floor(secondsElapsed);
-}
-
-const getRandomIntInclusive = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-
-  return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
 }
 
 let btcFees = {
