@@ -64,7 +64,7 @@ module.exports = (api) => {
 
                   _txs.push({
                     type,
-                    blocknumber: _json.result[i].blockNumber,
+                    height: _json.result[i].blockNumber,
                     timestamp: _json.result[i].timeStamp,
                     txid: _json.result[i].hash,
                     nonce: _json.result[i].nonce,
