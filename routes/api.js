@@ -146,6 +146,7 @@ api = require('./api/kv.js')(api);
 api.eth = {
   coins: {},
   connect: {},
+  gasPrice: {},
 };
 api = require('./api/eth/auth.js')(api);
 api = require('./api/eth/keys.js')(api);
@@ -153,6 +154,7 @@ api = require('./api/eth/network.js')(api);
 api = require('./api/eth/balance.js')(api);
 api = require('./api/eth/transactions.js')(api);
 api = require('./api/eth/coins.js')(api);
+api = require('./api/eth/gasPrice.js')(api);
 api = require('./api/eth/test.js')(api);
 
 api.printDirs();
