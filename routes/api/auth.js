@@ -12,7 +12,7 @@ module.exports = (api) => {
 
       if (Object.keys(api.coindInstanceRegistry).length) {
         if (Object.keys(api.electrumCoins).length > 1 &&
-        api.electrumCoins.auth) {
+            api.electrumCoins.auth) {
           _status = true;
         } else if (
           Object.keys(api.electrumCoins).length === 1 &&

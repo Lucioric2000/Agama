@@ -82,6 +82,8 @@ module.exports = (api) => {
                     cumulativeGasUsedWei: _json.result[i].cumulativeGasUsed,
                     gasUsed: ethers.utils.formatEther(_json.result[i].gasUsed),
                     gasUsedWei: _json.result[i].gasUsed,
+                    fee: ethers.utils.formatEther(Number(_json.result[i].gasPrice) * Number(_json.result[i].gasUsed)),
+                    feeWei: Number(_json.result[i].gasPrice) * Number(_json.result[i].gasUsed),
                     error: _json.result[i].isError,
                     txreceipt_status: _json.result[i].txreceipt_status,
                     input: _json.result[i].input,
