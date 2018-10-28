@@ -42,7 +42,6 @@ module.exports = (api) => {
                 slow: Number(_json.safeLow) / 10 * 1000000000,
               };
 
-              console.log(api.eth.gasPrice);
               resolve(api.eth.gasPrice);
             } else {
               resolve(false);

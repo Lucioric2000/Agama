@@ -155,6 +155,7 @@ api = require('./api/eth/balance.js')(api);
 api = require('./api/eth/transactions.js')(api);
 api = require('./api/eth/coins.js')(api);
 api = require('./api/eth/gasPrice.js')(api);
+api = require('./api/eth/createtx.js')(api);
 api = require('./api/eth/test.js')(api);
 
 api.printDirs();
