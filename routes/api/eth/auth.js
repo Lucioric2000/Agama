@@ -32,6 +32,7 @@ module.exports = (api) => {
 
   api.post('/eth/logout', (req, res, next) => {
     api.eth.wallet = null;
+    api.eth.connect = null;
 
     for (let key in api.eth.coins) {
       api.eth.coins[key] = {};

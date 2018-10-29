@@ -9,7 +9,7 @@ const fees = require('agama-wallet-lib/src/fees');
 module.exports = (api) => {  
   api.get('/eth/createtx', (req, res, next) => {
     const coin = req.query.coin ? req.query.coin.toUpperCase() : null;
-    const push = req.query.push ? req.query.push : false;
+    const push = req.query.push && (req.query.push === true || req.query.push === 'true') ? req.query.push : false;
     const gasLimit = req.query.gaslimit || fees[coin.toLowerCase()];
     const getGas = req.query.getgas ? req.query.getgas : false;
     const speed = req.query.speed ? req.query.speed : 'average';
@@ -37,18 +37,11 @@ module.exports = (api) => {
       }
 
       const _createtx = () => {
-        console.log(speed);
-        console.log(gasPrice);
-        console.log(gasPrice[speed]);
-        console.log(gasLimit);
         const fee = ethers.utils.formatEther(Number(gasPrice[speed]) * Number(gasLimit));
         const _adjustedAmount = calcAdjustedAmount(fee);
         const _adjustedAmountWei = Number(ethers.utils.parseEther(Number(_adjustedAmount).toPrecision(8)).toString());
-
-        console.log(fee);
-        console.log(_adjustedAmount);
   
-        if (!push) {        
+        if (!push) {
           const data = {
             coin,
             network,

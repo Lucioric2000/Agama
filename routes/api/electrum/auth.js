@@ -119,11 +119,9 @@ module.exports = (api) => {
         auth: false,
       };
       api.electrumKeys = {};
-      api.eth = {
-        coins: {},
-        connect: {},
-        wallet: null,
-      };
+      api.eth.coins = {};
+      api.eth.connect = {};
+      api.eth.wallet = {};
 
       const retObj = {
         msg: 'success',
