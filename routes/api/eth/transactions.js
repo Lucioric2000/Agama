@@ -92,8 +92,11 @@ module.exports = (api) => {
                   });
                 }
               }
-              
-              resolve(_txs);
+
+              let _uniqueTxs = new Array();
+              _uniqueTxs = Array.from(new Set(_txs.map(JSON.stringify))).map(JSON.parse);
+
+              resolve(_uniqueTxs);
             } else {
               resolve(_json);
             }

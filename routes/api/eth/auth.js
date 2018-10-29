@@ -10,7 +10,7 @@ module.exports = (api) => {
     api.eth.wallet = mnemonicWallet;
 
     for (let key in api.eth.coins) {
-      const network = key.indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
+      const network = key.toLowerCase().indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
       
       api.eth._connect(key, network);
       api.eth.coins[key] = {
@@ -18,6 +18,9 @@ module.exports = (api) => {
         network,
       };
     }
+
+    console.log(api.eth.coins);    
+    console.log(api.eth.connect);
 
     const retObj = {
       msg: 'success',
