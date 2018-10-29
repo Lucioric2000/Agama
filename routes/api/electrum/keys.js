@@ -377,21 +377,39 @@ module.exports = (api) => {
         }
       }
 
-      if (req.body.active) {
-        _electrumKeys = JSON.parse(JSON.stringify(api.electrumKeys));
+      if (api.electrumCoins &&
+          Object.keys(api.electrumCoins).length) {
+        if (req.body.active) {
+          _electrumKeys = JSON.parse(JSON.stringify(api.electrumKeys));
 
-        for (let key in _electrumKeys) {
-          if (!api.electrumCoins[key]) {
-            delete _electrumKeys[key];
+          for (let key in _electrumKeys) {
+            if (!api.electrumCoins[key]) {
+              delete _electrumKeys[key];
+            }
           }
+        } else {
+          _electrumKeys = api.electrumKeys;
         }
-      } else {
-        _electrumKeys = api.electrumKeys;
+      }
+
+      if (api.eth.wallet &&
+          api.eth.wallet.signingKey &&
+          api.eth.wallet.signingKey.mnemonic &&
+          api.eth.wallet.signingKey.mnemonic === _seed) {
+        for (let key in api.eth.coins) {
+          _totalKeys++;
+          _matchingKeyPairs++;
+  
+          _electrumKeys[key] = {
+            pub: api.eth.wallet.signingKey.address,
+            priv: api.eth.wallet.signingKey.privateKey,
+          };
+        }
       }
 
       const retObj = {
         msg: _wifError ? 'error' : 'success',
-        result: _wifError ? false : (_matchingKeyPairs === _totalKeys ? _electrumKeys : false),
+        result: _wifError ? false : (_matchingKeyPairs === _totalKeys ? (Object.keys(_electrumKeys).length ? _electrumKeys : false) : false),
       };
 
       res.end(JSON.stringify(retObj));
