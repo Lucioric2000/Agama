@@ -41,8 +41,9 @@ module.exports = (api) => {
           !api.eth.coins[_coinuc]) {
         if (api.eth.wallet.signingKey &&
             api.eth.wallet.signingKey.address) {
-          const network = key.toLowerCase().indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
-              
+          const network = _coin.toLowerCase().indexOf('ropsten') > -1 ? 'ropsten' : 'homestead';
+          api.eth._connect(_coin, network);
+          
           api.eth.coins[_coinuc] = {
             pub: api.eth.wallet.signingKey.address,
             network,
