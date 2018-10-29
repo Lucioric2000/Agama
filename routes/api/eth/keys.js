@@ -1,4 +1,6 @@
 const ethers = require('ethers');
+const sha256 = require('js-sha256');
+const ethUtil = require('ethereumjs-util');
 
 module.exports = (api) => {  
   api.get('/eth/priv', (req, res, next) => {
@@ -36,7 +38,17 @@ module.exports = (api) => {
 
   // TODO: priv/seed detect
   api.eth._keys = (seed) => {
-    const mnemonicWallet = ethers.Wallet.fromMnemonic(seed, null, ethers.wordlists.en, true);
+    const hash = sha256.create().update(seed);
+    bytes = hash.array();
+    const iguana = true;
+
+    if (iguana) {
+      bytes[0] &= 248;
+      bytes[31] &= 127;
+      bytes[31] |= 64;
+    }
+    
+    const mnemonicWallet = new ethers.Wallet(ethUtil.bufferToHex(bytes)); //ethers.Wallet.fromMnemonic(seed, null, ethers.wordlists.en, true);
     
     api.log('eth priv');
     api.log(mnemonicWallet);
