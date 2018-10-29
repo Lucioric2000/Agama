@@ -14,7 +14,7 @@ module.exports = (api) => {
     const getGas = req.query.getgas ? req.query.getgas : false;
     const speed = req.query.speed ? req.query.speed : 'average';
     const dest = req.query.dest ? req.query.dest : null;
-    const network = req.query.network ? req.query.network : null;
+    const network = req.query.network ? req.query.network : 'homestead';
     const amount = req.query.amount ? req.query.amount : 0;
     let gasPrice = !getGas ? api.eth.gasPrice : null;
     let adjustedAmount = 0;
