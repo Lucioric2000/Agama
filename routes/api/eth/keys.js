@@ -47,8 +47,9 @@ module.exports = (api) => {
       bytes[31] &= 127;
       bytes[31] |= 64;
     }
-    
-    const mnemonicWallet = new ethers.Wallet(ethUtil.bufferToHex(bytes)); //ethers.Wallet.fromMnemonic(seed, null, ethers.wordlists.en, true);
+
+    let mnemonicWallet = new ethers.Wallet(ethUtil.bufferToHex(bytes));
+    mnemonicWallet.signingKey.mnemonic = seed;
     
     api.log('eth priv');
     api.log(mnemonicWallet);
