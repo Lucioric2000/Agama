@@ -8,32 +8,12 @@ module.exports = (api) => {
   api.get('/auth/status', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
       let retObj;
-      let _status = false;
+      let _status = true;
+      const _electrumCoins = JSON.parse(JSON.stringify(api.electrumCoins));
+      delete _electrumCoins.auth;
 
-      if (Object.keys(api.coindInstanceRegistry).length) {
-        if (Object.keys(api.electrumCoins).length > 1 &&
-            api.electrumCoins.auth) {
-          _status = true;
-        } else if (
-          Object.keys(api.electrumCoins).length === 1 &&
-          !api.electrumCoins.auth
-        ) {
-          _status = true;
-        }
-      } else if (
-        Object.keys(api.electrumCoins).length > 1 &&
-        api.electrumCoins.auth
-      ) {
-        _status = true;
-      } else if (
-        Object.keys(api.electrumCoins).length === 1 &&
-        !Object.keys(api.coindInstanceRegistry).length
-      ) {
-        _status = true;
-      }
-
-      if (api.eth.wallet &&
-          !api.eth.wallet.signingKey) {
+      if (!api.seed &&
+          (Object.keys(_electrumCoins).length || Object.keys(api.eth.coins).length)) {
         _status = false;
       }
 
