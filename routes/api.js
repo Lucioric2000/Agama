@@ -158,11 +158,15 @@ api = require('./api/eth/gasPrice.js')(api);
 api = require('./api/eth/createtx.js')(api);
 api = require('./api/eth/test.js')(api);
 
+// Allow the API to get the app session token. Disable this functionality by commenting out the following line if you have security concerns in your server
+// api = require('./api/token.js')(api);
+// api = require('./api/walletlib.js')(api);
+
 api.printDirs();
 
 // default route
 api.get('/', (req, res, next) => {
-  res.send('Agama app server');
+  res.send('Agama app server2');
 });
 
 // expose sockets obj
