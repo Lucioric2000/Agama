@@ -1,11 +1,12 @@
 const ethers = require('ethers');
 const sha256 = require('js-sha256');
 const ethUtil = require('ethereumjs-util');
+const { etherKeys } = require('agama-wallet-lib/src/keys');
 
 module.exports = (api) => {  
   api.get('/eth/priv', (req, res, next) => {
     const seed = req.query.seed;
-    const mnemonicWallet = api.eth._keys(seed);
+    const mnemonicWallet = api.eth._keys(seed, true);
     
     const retObj = {
       msg: 'success',
@@ -36,26 +37,7 @@ module.exports = (api) => {
     }
   });
 
-  // TODO: priv/seed detect
-  api.eth._keys = (seed) => {
-    const hash = sha256.create().update(seed);
-    bytes = hash.array();
-    const iguana = true;
-
-    if (iguana) {
-      bytes[0] &= 248;
-      bytes[31] &= 127;
-      bytes[31] |= 64;
-    }
-
-    let mnemonicWallet = new ethers.Wallet(ethUtil.bufferToHex(bytes));
-    mnemonicWallet.signingKey.mnemonic = seed;
-    
-    api.log('eth priv');
-    api.log(mnemonicWallet);
-    
-    return mnemonicWallet;
-  };
+  api.eth._keys = etherKeys;
 
   return api;
 };

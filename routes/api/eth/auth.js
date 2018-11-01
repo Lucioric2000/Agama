@@ -3,7 +3,7 @@ const ethers = require('ethers');
 module.exports = (api) => {  
   api.post('/eth/auth', (req, res, next) => {
     const seed = req.body.seed;
-    const mnemonicWallet = api.eth._keys(seed);
+    const mnemonicWallet = api.eth._keys(seed, true);
     
     api.seed = seed;
 
