@@ -1,6 +1,6 @@
-const ethers = require('ethers');
 const request = require('request');
 const Promise = require('bluebird');
+const { ethTransactionsToBtc } = require('agama-wallet-lib/src/eth');
 
 module.exports = (api) => {  
   api.get('/eth/transactions', (req, res, next) => {
@@ -47,56 +47,8 @@ module.exports = (api) => {
 
             if (_json.message === 'OK' &&
                 _json.result) {
-              let _txs = [];
-              
-              // normalize transactions list to btc-like
-              if (_json.result.length) {
-                for (let i = 0; i < _json.result.length; i++) {
-                  let type;
-
-                  if (_json.result[i].from === _json.result[i].to) {
-                    type = 'self';
-                  } else if (_json.result[i].from === address.toLowerCase()) {
-                    type = 'sent';                    
-                  } else if (_json.result[i].to === address.toLowerCase()) {
-                    type = 'received';                    
-                  }
-
-                  _txs.push({
-                    type,
-                    height: _json.result[i].blockNumber,
-                    timestamp: _json.result[i].timeStamp,
-                    txid: _json.result[i].hash,
-                    nonce: _json.result[i].nonce,
-                    blockhash: _json.result[i].blockHash,
-                    txindex: _json.result[i].transactionIndex,
-                    src: _json.result[i].from,
-                    address: _json.result[i].to,
-                    amount: ethers.utils.formatEther(_json.result[i].value),
-                    amountWei: _json.result[i].value,
-                    gas: ethers.utils.formatEther(_json.result[i].gas),
-                    gasWei: _json.result[i].gas,
-                    gasPrice: ethers.utils.formatEther(_json.result[i].gasPrice),
-                    gasPriceWei: _json.result[i].gasPrice,
-                    cumulativeGasUsed: ethers.utils.formatEther(_json.result[i].cumulativeGasUsed),
-                    cumulativeGasUsedWei: _json.result[i].cumulativeGasUsed,
-                    gasUsed: ethers.utils.formatEther(_json.result[i].gasUsed),
-                    gasUsedWei: _json.result[i].gasUsed,
-                    fee: ethers.utils.formatEther(Number(_json.result[i].gasPrice) * Number(_json.result[i].gasUsed)),
-                    feeWei: Number(_json.result[i].gasPrice) * Number(_json.result[i].gasUsed),
-                    error: _json.result[i].isError,
-                    txreceipt_status: _json.result[i].txreceipt_status,
-                    input: _json.result[i].input,
-                    contractAddress: _json.result[i].contractAddress,
-                    confirmations: _json.result[i].confirmations,
-                  });
-                }
-              }
-
-              let _uniqueTxs = new Array();
-              _uniqueTxs = Array.from(new Set(_txs.map(JSON.stringify))).map(JSON.parse);
-
-              resolve(_uniqueTxs);
+              const _txs = ethTransactionsToBtc(_json.result, address);
+              resolve(_txs);
             } else {
               resolve(_json);
             }
