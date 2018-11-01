@@ -181,7 +181,7 @@ const chainParams = {
 		ac_staked: 50,
 		ac_pubkey: '0359e2ee32833398c26378a2bb0962f98a7d77f3f6e6e4d27316bcb85542f23c61',
 		ac_end: 12000000,
-		addnode: '142.11.199.63"',
+		addnode: '142.11.199.63',
 		genproclimit: true,
 	},
 };
