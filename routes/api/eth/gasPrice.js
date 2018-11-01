@@ -1,4 +1,4 @@
-const ethers = require('ethers');
+const { ethGasStationRateToWei } = require('agama-wallet-lib/src/eth');
 const Promise = require('bluebird');
 const request = require('request');
 
@@ -37,9 +37,9 @@ module.exports = (api) => {
                 _json.fast &&
                 _json.safeLow) {
               api.eth.gasPrice = {
-                fast: Number(_json.fast) / 10 * 1000000000, // 2 min
-                average: Number(_json.average) / 10 * 1000000000,
-                slow: Number(_json.safeLow) / 10 * 1000000000,
+                fast: ethGasStationRateToWei(_json.fast), // 2 min
+                average: ethGasStationRateToWei(_json.average),
+                slow: ethGasStationRateToWei(_json.safeLow),
               };
 
               resolve(api.eth.gasPrice);
