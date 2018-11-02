@@ -2,6 +2,7 @@ const ethers = require('ethers');
 const Promise = require('bluebird');
 const request = require('request');
 const fees = require('agama-wallet-lib/src/fees');
+const { maxSpend } = require('agama-wallet-lib/src/eth');
 
 // TODO: error handling, input vars check
 
@@ -24,21 +25,9 @@ module.exports = (api) => {
       network
     )
     .then((maxBalance) => {
-      const calcAdjustedAmount = (fee) => {
-        const _amount = amount > maxBalance.balance ? maxBalance.balance : amount;
-
-        if (Number(_amount) + fee > maxBalance.balance) {
-          adjustedAmount = _amount - fee;
-        } else {
-          adjustedAmount = _amount;
-        }
-
-        return adjustedAmount;
-      }
-
       const _createtx = () => {
         const fee = ethers.utils.formatEther(Number(gasPrice[speed]) * Number(gasLimit));
-        const _adjustedAmount = calcAdjustedAmount(fee);
+        const _adjustedAmount = maxSpend(maxBalance.balance, fee, amount);
         const _adjustedAmountWei = Number(ethers.utils.parseEther(Number(_adjustedAmount).toPrecision(8)).toString());
   
         if (!push) {
