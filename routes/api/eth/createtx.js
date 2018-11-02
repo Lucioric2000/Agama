@@ -59,10 +59,12 @@ module.exports = (api) => {
             adjustedAmount: _adjustedAmount,
             adjustedAmountWei: _adjustedAmountWei,
             maxBalance,
-            connect: api.eth.connect,
+            //connect: api.eth.connect,
           };
+
           api.log('tx data', 'eth.createtx');
-          api.log(data);
+          api.log(data, 'eth.createtx');
+          
           const retObj = {
             msg: 'success',
             result: data,
@@ -78,7 +80,8 @@ module.exports = (api) => {
           })
           .then((tx) => {
             api.log('eth tx pushed', 'eth.createtx');
-            api.log(tx);
+            api.log(tx, 'eth.createtx');
+
             tx.txid = tx.hash;
             
             const retObj = {

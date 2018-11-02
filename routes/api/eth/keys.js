@@ -1,7 +1,10 @@
 const ethers = require('ethers');
 const sha256 = require('js-sha256');
 const ethUtil = require('ethereumjs-util');
-const { etherKeys } = require('agama-wallet-lib/src/keys');
+const {
+  etherKeys,
+  seedToPriv,
+} = require('agama-wallet-lib/src/keys');
 
 module.exports = (api) => {  
   api.get('/eth/priv', (req, res, next) => {
@@ -16,6 +19,7 @@ module.exports = (api) => {
     res.end(JSON.stringify(retObj));
   });
 
+  // for debug purpose, not used in the app
   api.post('/eth/keys', (req, res, next) => {
     const seed = req.body.seed;
     
@@ -37,7 +41,10 @@ module.exports = (api) => {
     }
   });
 
-  api.eth._keys = etherKeys;
+  api.eth._keys = (seed) => {
+    seed = seedToPriv(seed, 'eth');
+    return etherKeys(seed, true);
+  };
 
   return api;
 };

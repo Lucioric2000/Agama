@@ -16,7 +16,7 @@ module.exports = (api) => {
 
   api.eth._connect = (coin, network) => {
     api.eth.connect[coin] = api.eth.wallet.connect(new ethers.getDefaultProvider(network));
-    api.log(`eth connect coin ${coin} network ${network}`, api.eth.connect[coin]);    
+    api.log(`eth connect coin ${coin} network ${network}`, 'eth.connect');    
   };
 
   return api;

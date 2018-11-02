@@ -23,7 +23,7 @@ module.exports = (api) => {
         method: 'GET',
       };
 
-      api.log('ethgasstation.info gas price req');
+      api.log('ethgasstation.info gas price req', 'eth.gasprice');
 
       request(options, (error, response, body) => {
         if (response &&

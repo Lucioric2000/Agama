@@ -1,6 +1,7 @@
 const bs58check = require('bs58check');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoin = require('bitcoinjs-lib');
+const { seedToPriv } = require('agama-wallet-lib/src/keys');
 
 // TODO: merge spv and eth login/logout into a single func
 
@@ -32,7 +33,11 @@ module.exports = (api) => {
   api.auth = (seed, isIguana) => {
     let _wifError = false;
 
-    api.seed = seed;
+    if (!api.seed) {
+      api.seed = seed;
+    }
+
+    seed = seedToPriv(seed, 'btc');
 
     for (let key in api.electrumCoins) {
       if (key !== 'auth') {

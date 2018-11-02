@@ -35,9 +35,6 @@ module.exports = (api) => {
         method: 'GET',
       };
 
-      api.log('etherscan transactions url');
-      api.log(options);
-
       request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
@@ -54,7 +51,7 @@ module.exports = (api) => {
             }
           } catch (e) {
             api.log('eth transactions parse error', 'eth.transactions');
-            api.log(e);
+            api.log(e, 'eth.transactions');
           }
         } else {
           api.log(`eth transactions error: unable to request ${network}`, 'eth.transactions');

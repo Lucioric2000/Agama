@@ -63,9 +63,6 @@ module.exports = (api) => {
         method: 'GET',
       };
 
-      api.log('etherscan balance url');
-      api.log(options);
-
       request(options, (error, response, body) => {
         if (response &&
             response.statusCode &&
@@ -84,7 +81,7 @@ module.exports = (api) => {
             }
           } catch (e) {
             api.log('eth balance parse error', 'eth.balance');
-            api.log(e);
+            api.log(e, 'eth.balance');
           }
         } else {
           api.log(`eth balance error: unable to request ${network}`, 'eth.balance');
@@ -104,7 +101,7 @@ module.exports = (api) => {
       return transactionCount;
     }, (error) => {
       api.log('eth tx count error', 'eth.txcount');
-      api.log(error, 'eth.balance');
+      api.log(error, 'eth.txcount');
     });
   };
 
