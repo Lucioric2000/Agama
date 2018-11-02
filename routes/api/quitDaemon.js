@@ -185,7 +185,6 @@ module.exports = (api) => {
         delete api.electrumCoins[_chain.toLowerCase()];
 
         if (Object.keys(api.electrumCoins).length - 1 === 0) {
-          api.electrumCoins.auth = false;
           api.electrumKeys = {};
         }
 
