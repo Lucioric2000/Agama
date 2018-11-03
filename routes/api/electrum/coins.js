@@ -55,6 +55,7 @@ module.exports = (api) => {
         priv: _keys.priv,
         pub: _keys.pub,
       };
+
     } else if (api.seed) {
       api.auth(api.seed, true);
     }
@@ -110,6 +111,7 @@ module.exports = (api) => {
         if (api.electrumKeys[key]) {
           _electrumCoins[key].pub = api.electrumKeys[key].pub;
           _electrumCoins[key].name = key.toUpperCase();
+          _electrumCoins[key].pubHex = api.electrumKeys[key].pubHex;
           _electrumCoins[key.toUpperCase()] = JSON.parse(JSON.stringify(_electrumCoins[key]));
           delete _electrumCoins[key];
         }

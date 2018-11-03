@@ -17,6 +17,7 @@ module.exports = (api) => {
     return {
       pub: key.getAddress(),
       priv: key.toWIF(),
+      pubHex: key.getPublicKeyBuffer().toString('hex'),
       fromWif: api.fromWif(wif, _network),
     };
   }
@@ -148,6 +149,7 @@ module.exports = (api) => {
       keys = {
         priv: key.toWIF(),
         pub: key.getAddress(),
+        pubHex: key.getPublicKeyBuffer().toString('hex'),
         fromWif: api.fromWif(key.toWIF(), _network),
       };
 

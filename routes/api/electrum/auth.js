@@ -68,6 +68,7 @@ module.exports = (api) => {
               keys = {
                 priv: _key.toWIF(),
                 pub: _key.getAddress(),
+                pubHex: key.getPublicKeyBuffer().toString('hex'),
               };
             } catch (e) {
               _wifError = true;
@@ -84,6 +85,7 @@ module.exports = (api) => {
           api.electrumKeys[key] = {
             priv: keys.priv,
             pub: keys.pub,
+            pubHex: keys.pubHex,
           };
         }
       }

@@ -188,7 +188,7 @@ if (api.argv) {
 
 		for (let i = 0; i < _coins.length; i++) {
 			api.addElectrumCoin(_coins[i].toUpperCase());
-			console.log(`add coin from argv ${_coins[i]}`);
+			api.log(`add coin from argv ${_coins[i]}`, 'dev');
 		}
 	}
 
@@ -197,7 +197,7 @@ if (api.argv) {
 
 		if (_seed &&
 				_seed[0]) {
-			console.log('load seed from argv');
+			api.log('load seed from argv', 'dev');
 			api.auth(_seed[0], true);
 		}
 	}
@@ -364,7 +364,6 @@ async function createWindow(status, hideLoadingWindow) {
 					kvDecode: api.kvDecode,
 					electrumServers: api.electrumServersFlag,
 					chainParams,
-					pubkeyToAddress: api.pubkeyToAddress,
 				};
 				global.app = _global;
 				/*for (let i = 0; i < process.argv.length; i++) {
