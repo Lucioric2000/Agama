@@ -25,7 +25,7 @@
   "license": "MIT",
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "electron": "2.0.8",
+    "electron": "3.0.7",
     "electron-devtools-installer": "^2.2.4"
   },
   "dependencies": {
@@ -43,7 +43,7 @@
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",
     "coinselect": "github:bitcoinjs/coinselect",
-    "electron": "2.0.8",
+    "electron": "3.0.7",
     "ethereumjs-util": "^6.0.0",
     "ethers": "git://github.com/pbca26/ethers.js",
     "express": "^4.14.0",
