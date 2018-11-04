@@ -1,31 +1,57 @@
 const ethers = require('ethers');
 const Promise = require('bluebird');
 const request = require('request');
+const erc20ContractId = require('agama-wallet-lib/src/eth-erc20-contract-id');
 
 module.exports = (api) => {  
   api.get('/eth/balance', (req, res, next) => {
     const address = req.query.address;
+    const symbol = req.query.symbol;
     
-    if (address) {
-      api.eth._balanceEtherscan(address, req.query.network)
-      .then((balance) => {
-        const retObj = {
-          msg: 'success',
-          result: balance,
-        };
-    
-        res.end(JSON.stringify(retObj));  
-      });
+    if (symbol) {
+      if (symbol === 'all') {
+        api.eth._balanceERC20All(address)
+        .then((balance) => {
+          const retObj = {
+            msg: 'success',
+            result: balance,
+          };
+      
+          res.end(JSON.stringify(retObj));  
+        });
+      } else {
+        api.eth._balanceERC20(address, symbol.toUpperCase())
+        .then((balance) => {
+          const retObj = {
+            msg: 'success',
+            result: balance,
+          };
+      
+          res.end(JSON.stringify(retObj));  
+        });
+      }
     } else {
-      api.eth._balance()
-      .then((balance) => {
-        const retObj = {
-          msg: 'success',
-          result: balance,
-        };
-    
-        res.end(JSON.stringify(retObj));  
-      });
+      if (address) {
+        api.eth._balanceEtherscan(address, req.query.network)
+        .then((balance) => {
+          const retObj = {
+            msg: 'success',
+            result: balance,
+          };
+      
+          res.end(JSON.stringify(retObj));  
+        });
+      } else {
+        api.eth._balance()
+        .then((balance) => {
+          const retObj = {
+            msg: 'success',
+            result: balance,
+          };
+      
+          res.end(JSON.stringify(retObj));  
+        });
+      }
     }
   });
 
@@ -90,16 +116,56 @@ module.exports = (api) => {
     });
   };
 
-  api.eth._balanceERC20All = (address) => {
+  api.eth._balanceERC20 = (address, symbol) => {
+    const _url = `https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${erc20ContractId[symbol]}&address=${address}&tag=latest&apikey=YourApiKeyToken`;    
     let _balance = {};
 
     return new Promise((resolve, reject) => {
       const options = {
-        url: `http://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`,
+        url: _url,
         method: 'GET',
       };
 
-      console.log(`http://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`);
+      api.log(`_balanceERC20 url ${_url}`);
+      
+      request(options, (error, response, body) => {
+        if (response &&
+            response.statusCode &&
+            response.statusCode === 200) {
+          try {
+            const _json = JSON.parse(body);
+
+            if (_json.message === 'OK' &&
+                _json.result) {
+              resolve({
+                balance: ethers.utils.formatEther(_json.result),
+                balanceWei: _json.result,
+              });
+            } else {
+              resolve(_json);
+            }
+          } catch (e) {
+            api.log('etherscan erc20 balance parse error', 'eth.erc20-balance');
+            api.log(e, 'eth.erc20-balance');
+          }
+        } else {
+          api.log(`etherscan balance error: unable to request ${_url}`, 'eth.erc20-balance');
+        }
+      });
+    });
+  };
+
+  api.eth._balanceERC20All = (address) => {
+    const _url = `http://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`;
+    let _balance = {};
+
+    return new Promise((resolve, reject) => {
+      const options = {
+        url: _url,
+        method: 'GET',
+      };
+
+      api.log(`_balanceERC20All url ${_url}`);
 
       request(options, (error, response, body) => {
         if (response &&
@@ -110,13 +176,11 @@ module.exports = (api) => {
 
             if (_json &&
                 _json.address) {
-              console.log(_json.tokens);
               if (_json.tokens) {
-                //_json.tokens
                 for (let i = 0; i < _json.tokens.length; i++) {
                   _balance[_json.tokens[i].tokenInfo.symbol] = {
-                    wei: _json.tokens[i].balance,
-                    float: ethers.utils.formatEther(_json.tokens[i].balance.toString()),                    
+                    balance: ethers.utils.formatEther(_json.tokens[i].balance.toString()),                    
+                    balanceWei: _json.tokens[i].balance,
                   };
                 }
                 resolve(_balance);
@@ -135,33 +199,6 @@ module.exports = (api) => {
       });
     });
   };
-
-  api.get('/eth/erc20/balance/all', (req, res, next) => {
-    const address = req.query.address;
-    const erc20 = req.query.erc20;
-    
-    if (address) {
-      api.eth._balanceERC20All(address)
-      .then((balance) => {
-        const retObj = {
-          msg: 'success',
-          result: balance,
-        };
-    
-        res.end(JSON.stringify(retObj));  
-      });
-    } else {
-      api.eth._balance()
-      .then((balance) => {
-        const retObj = {
-          msg: 'success',
-          result: balance,
-        };
-    
-        res.end(JSON.stringify(retObj));  
-      });
-    }
-  });
 
   api.eth._txcount = () => {
     let _txCount = 0;
