@@ -147,6 +147,8 @@ api.eth = {
   coins: {},
   connect: {},
   gasPrice: {},
+  tokenInfo: {},
+  abi: {},
 };
 api = require('./api/eth/auth.js')(api);
 api = require('./api/eth/keys.js')(api);

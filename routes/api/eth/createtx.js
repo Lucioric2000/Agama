@@ -3,6 +3,8 @@ const Promise = require('bluebird');
 const request = require('request');
 const fees = require('agama-wallet-lib/src/fees');
 const { maxSpend } = require('agama-wallet-lib/src/eth');
+const erc20ContractId = require('agama-wallet-lib/src/eth-erc20-contract-id');
+const standartABI = require('./abi');
 
 // TODO: error handling, input vars check
 
@@ -105,6 +107,208 @@ module.exports = (api) => {
       }
     });
   });
+
+  api.eth._getContractABI = (address) => {
+    const _url = [
+      'module=contract',
+      'action=getabi',
+      `address=${address}`,
+      'apikey=YourApiKeyToken',
+    ];
+    let _balance = {};
+
+    return new Promise((resolve, reject) => {
+      const options = {
+        url: 'https://api.etherscan.io/api?' + _url.join('&'),
+        method: 'GET',
+      };
+
+      api.log(`_getContractABI url ${_url}`);
+      
+      request(options, (error, response, body) => {
+        if (response &&
+            response.statusCode &&
+            response.statusCode === 200) {
+          try {
+            const _json = JSON.parse(body);
+
+            if (_json.message === 'OK' &&
+                _json.result) {
+              try {
+                const _abi = JSON.parse(_json.result);
+                resolve(_abi);
+              } catch (e) {
+                api.log('etherscan erc20 contact abi parse error', 'eth.erc20-abi');
+                api.log(e, 'eth.erc20-abi');
+              }
+            } else {
+              resolve(false);
+            }
+          } catch (e) {
+            api.log('etherscan erc20 contact abi parse error', 'eth.erc20-abi');
+            api.log(e, 'eth.erc20-abi');
+          }
+        } else {
+          api.log(`etherscan erc20 contact abi error: unable to request ${_url}`, 'eth.erc20-balance');
+        }
+      });
+    });
+  };
+
+  api.get('/eth/erc20/abi', (req, res, next) => {
+    const symbol = req.query.symbol ? req.query.symbol : null;    
+    
+    api.eth._getContractABI(erc20ContractId[symbol.toUpperCase()])
+    .then((abi) => {
+      const retObj = {
+        msg: 'success',
+        result: abi,
+      };
+  
+      res.end(JSON.stringify(retObj)); 
+    })
+  });
+
+  api.get('/eth/createtx/erc20', (req, res, next) => {
+    const push = req.query.push && (req.query.push === true || req.query.push === 'true') ? req.query.push : false;
+    const speed = req.query.speed ? req.query.speed : 'average';
+    const dest = req.query.dest ? req.query.dest : null;
+    const amount = req.query.amount ? req.query.amount : 0;
+    const symbol = req.query.symbol ? req.query.symbol : null;
+    const _contract = erc20ContractId[symbol.toUpperCase()];
+    let gasPrice = api.eth.gasPrice;
+    let adjustedAmount = 0;
+
+    api.eth._balanceEtherscan(
+      api.eth.wallet.signingKey.address,
+      'homestead'
+    )
+    .then((maxBalance) => {
+      api.eth._tokenInfo(symbol.toUpperCase())
+      .then((tokenInfo) => {
+        if (!tokenInfo) {
+          const retObj = {
+            msg: 'error',
+            result: 'unable to get token info for ' + symbol.toUpperCase(),
+          };
+    
+          res.end(JSON.stringify(retObj));
+        } else {
+          const contractAddress = erc20ContractId[symbol.toUpperCase()];
+          const contract = new ethers.Contract(contractAddress, standartABI, api.eth.connect[symbol.toUpperCase()]);
+          const numberOfDecimals = tokenInfo.decimals || 18;
+          const numberOfTokens = ethers.utils.parseUnits(amount, numberOfDecimals);
+
+          api.log(`${symbol.toUpperCase()} decimals ${tokenInfo.decimals}`);
+          
+          if (!push) {
+            contract.estimate.transfer(contractAddress, numberOfTokens)
+            .then((estimate) => {
+              const _estimate = estimate.toString();
+              api.log(`erc20 ${symbol.toUpperCase()} transfer estimate ${_estimate}`);
+
+              const _fee = Number(_estimate) * Number(gasPrice[speed]);
+              const _balanceAferFee = maxBalance.balanceWei - _fee;
+              const retObj = {
+                msg: 'error',
+                result: {
+                  gasLimit: _estimate,
+                  gasPrice: Number(gasPrice[speed]),
+                  feeWei: _fee,
+                  fee: ethers.utils.formatEther(_fee.toString()),
+                  maxBalance,
+                  balanceAfterFeeWei: _balanceAferFee,
+                  balanceAferFee: ethers.utils.formatEther(_balanceAferFee.toString()),
+                  notEnoughBalance: _balanceAferFee > 0 ? false : true,
+                },
+              };
+        
+              res.end(JSON.stringify(retObj));
+            });
+          } else {
+            contract.transfer(dest, numberOfTokens, {
+              gasPrice: Number(gasPrice[speed]),
+            })
+            .then((tx) => {
+              api.log('erc20 tx pushed', 'eth.createtx');
+              api.log(tx, 'eth.createtx');
+
+              tx.txid = tx.hash;
+              
+              const retObj = {
+                msg: 'success',
+                result: tx,
+              };
+
+              res.end(JSON.stringify(retObj));
+            }, (error) => {
+              const retObj = {
+                msg: 'error',
+                result: tx,
+              };
+
+              res.end(JSON.stringify(retObj));
+            });
+          }
+        }
+      });
+    });
+  });
+
+  api.get('/eth/erc20/info', (req, res, next) => {
+    const symbol = req.query.symbol ? req.query.symbol : null;    
+    
+    api.eth._tokenInfo(symbol.toUpperCase())
+    .then((tokenInfo) => {
+      const retObj = {
+        msg: 'success',
+        result: tokenInfo,
+      };
+  
+      res.end(JSON.stringify(retObj)); 
+    })
+  });
+
+  api.eth._tokenInfo = (symbol) => {
+    const _url = `https://api.ethplorer.io/getTokenInfo/${erc20ContractId[symbol.toUpperCase()]}?apiKey=freekey`;
+
+    return new Promise((resolve, reject) => {
+      if (!api.eth.tokenInfo[symbol.toUpperCase()]) {
+        const options = {
+          url: _url,
+          method: 'GET',
+        };
+
+        api.log(`_tokenInfo url ${_url}`);
+
+        request(options, (error, response, body) => {
+          if (response &&
+              response.statusCode &&
+              response.statusCode === 200) {
+            try {
+              const _json = JSON.parse(body);
+
+              if (_json &&
+                  _json.address &&
+                  _json.decimals) {
+                api.eth.tokenInfo[symbol.toUpperCase()] = _json;
+                resolve(_json);
+              } else {
+                resolve(false);
+              }
+            } catch (e) {
+              api.log('ethplorer token info parse error', 'eth.erc20-tokeninfo');
+              api.log(e, 'eth.erc20-tokeninfo');
+            }
+          } else {
+            api.log(`ethplorer balance error: unable to request ${_url}`, 'eth.erc20-tokeninfo');
+          }
+        });
+      } else {
+        resolve(api.eth.tokenInfo[symbol.toUpperCase()]);
+      }
+    });
+  };
 
   return api;
 };
