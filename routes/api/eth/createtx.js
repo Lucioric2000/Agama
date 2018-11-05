@@ -4,7 +4,7 @@ const request = require('request');
 const fees = require('agama-wallet-lib/src/fees');
 const { maxSpend } = require('agama-wallet-lib/src/eth');
 const erc20ContractId = require('agama-wallet-lib/src/eth-erc20-contract-id');
-const standartABI = require('./abi');
+const standartABI = require('agama-wallet-lib/src/erc20-standard-abi');
 
 // TODO: error handling, input vars check
 
@@ -210,7 +210,7 @@ module.exports = (api) => {
               const _fee = Number(_estimate) * Number(gasPrice[speed]);
               const _balanceAferFee = maxBalance.balanceWei - _fee;
               const retObj = {
-                msg: 'error',
+                msg: 'success',
                 result: {
                   gasLimit: _estimate,
                   gasPrice: Number(gasPrice[speed]),
