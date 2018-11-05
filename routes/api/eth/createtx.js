@@ -28,7 +28,7 @@ module.exports = (api) => {
     )
     .then((maxBalance) => {
       const _createtx = () => {
-        const fee = ethers.utils.formatEther(Number(gasPrice[speed]) * Number(gasLimit));
+        const fee = ethers.utils.formatEther(ethers.utils.bigNumberify(gasLimit).mul(ethers.utils.bigNumberify(gasPrice[speed])));
         const _adjustedAmount = maxSpend(maxBalance.balance, fee, amount);
         const _adjustedAmountWei = Number(ethers.utils.parseEther(Number(_adjustedAmount).toPrecision(8)).toString());
   
@@ -44,7 +44,7 @@ module.exports = (api) => {
             gasPriceUsed: gasPrice[speed],
             speed,
             fee,
-            feeWei: Number(gasPrice[speed]) * Number(gasLimit),
+            feeWei: ethers.utils.bigNumberify(gasLimit).mul(ethers.utils.bigNumberify(gasPrice[speed])).toString(),
             amount,
             amountWei: ethers.utils.parseEther(Number(amount).toPrecision(8)).toString(),
             adjustedAmount: _adjustedAmount,
@@ -66,7 +66,7 @@ module.exports = (api) => {
           api.eth.connect[coin].sendTransaction({
             to: dest,
             value: _adjustedAmountWei,
-            gasPrice: Number(gasPrice[speed]),
+            gasPrice: ethers.utils.bigNumberify(gasPrice[speed]),
             gasLimit,
           })
           .then((tx) => {
@@ -206,20 +206,22 @@ module.exports = (api) => {
             .then((estimate) => {
               const _estimate = estimate.toString();
               api.log(`erc20 ${symbol.toUpperCase()} transfer estimate ${_estimate}`);
+              api.log(`gas price ${gasPrice[speed]}`);
 
-              const _fee = Number(_estimate) * Number(gasPrice[speed]);
-              const _balanceAferFee = maxBalance.balanceWei - _fee;
+              const _fee = ethers.utils.bigNumberify(_estimate).mul(ethers.utils.bigNumberify(gasPrice[speed]));
+              const _balanceAferFee = ethers.utils.bigNumberify(maxBalance.balanceWei).sub(_fee).toString();
+
               const retObj = {
                 msg: 'success',
                 result: {
                   gasLimit: _estimate,
-                  gasPrice: Number(gasPrice[speed]),
-                  feeWei: _fee,
+                  gasPrice: ethers.utils.bigNumberify(gasPrice[speed]).toString(),
+                  feeWei: _fee.toString(),
                   fee: ethers.utils.formatEther(_fee.toString()),
                   maxBalance,
                   balanceAfterFeeWei: _balanceAferFee,
                   balanceAferFee: ethers.utils.formatEther(_balanceAferFee.toString()),
-                  notEnoughBalance: _balanceAferFee > 0 ? false : true,
+                  notEnoughBalance: Number(_balanceAferFee) > 0 ? false : true,
                 },
               };
         
@@ -227,7 +229,7 @@ module.exports = (api) => {
             });
           } else {
             contract.transfer(dest, numberOfTokens, {
-              gasPrice: Number(gasPrice[speed]),
+              gasPrice: ethers.utils.bigNumberify(gasPrice[speed]),
             })
             .then((tx) => {
               api.log('erc20 tx pushed', 'eth.createtx');
@@ -244,7 +246,7 @@ module.exports = (api) => {
             }, (error) => {
               const retObj = {
                 msg: 'error',
-                result: tx,
+                result: error,
               };
 
               res.end(JSON.stringify(retObj));
