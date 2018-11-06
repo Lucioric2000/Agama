@@ -197,7 +197,7 @@ module.exports = (api) => {
       } else if (req.body.mode === 'eth') {
         delete api.eth.coins[_chain.toUpperCase()];
         
-        if (Object.keys(api.eth.coins).length - 1 === 0) {
+        if (Object.keys(api.eth.coins).length === 0) {
           api.eth.coins = null;
           api.eth.wallet = null;
           api.eth.connect = null;
