@@ -143,7 +143,7 @@ module.exports = (api) => {
 
   api.get('/electrum/wiftopub', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      const _network = api.electrumJSNetworks[req.query.coin];
+      const _network = api.electrumJSNetworks[req.query.coin.toLowerCase()];
       let key = _network.isZcash ? new bitcoinZcash.ECPair.fromWIF(req.query.wif, _network, true) : new bitcoin.ECPair.fromWIF(req.query.wif, _network, true);
 
       keys = {
