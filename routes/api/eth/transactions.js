@@ -2,6 +2,7 @@ const request = require('request');
 const Promise = require('bluebird');
 const { ethTransactionsToBtc } = require('agama-wallet-lib/src/eth');
 const erc20ContractId = require('agama-wallet-lib/src/eth-erc20-contract-id');
+const decimals = require('agama-wallet-lib/src/eth-erc20-decimals');
 
 module.exports = (api) => {  
   api.get('/eth/transactions', (req, res, next) => {
@@ -102,7 +103,8 @@ module.exports = (api) => {
 
             if (_json.message === 'OK' &&
                 _json.result) {
-              const _txs = ethTransactionsToBtc(_json.result, address, true);
+              const _decimals = decimals[symbol.toUpperCase()];
+              const _txs = ethTransactionsToBtc(_json.result, address, true, _decimals < 18 && _decimals >= 0 ? 18 - _decimals : 0);
               resolve(_txs);
             } else {
               resolve(_json);

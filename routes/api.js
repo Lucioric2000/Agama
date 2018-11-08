@@ -158,7 +158,7 @@ api = require('./api/eth/transactions.js')(api);
 api = require('./api/eth/coins.js')(api);
 api = require('./api/eth/gasPrice.js')(api);
 api = require('./api/eth/createtx.js')(api);
-api = require('./api/eth/test.js')(api);
+api = require('./api/eth/utils.js')(api);
 
 // Allow the API to get the app session token. Disable this functionality by commenting out the following line if you have security concerns in your server
 // api = require('./api/token.js')(api);

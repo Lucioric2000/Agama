@@ -2,6 +2,7 @@ const ethers = require('ethers');
 const Promise = require('bluebird');
 const request = require('request');
 const erc20ContractId = require('agama-wallet-lib/src/eth-erc20-contract-id');
+const decimals = require('agama-wallet-lib/src/eth-erc20-decimals');
 
 module.exports = (api) => {  
   api.get('/eth/balance', (req, res, next) => {
@@ -133,7 +134,7 @@ module.exports = (api) => {
         method: 'GET',
       };
 
-      api.log(`_balanceERC20 url ${_url}`);
+      api.log(`_balanceERC20 url ${options.url}`);
       
       request(options, (error, response, body) => {
         if (response &&
@@ -144,8 +145,10 @@ module.exports = (api) => {
 
             if (_json.message === 'OK' &&
                 _json.result) {
+              const _decimals = decimals[symbol.toUpperCase()];
+              console.log(_decimals);
               resolve({
-                balance: ethers.utils.formatEther(_json.result),
+                balance: ethers.utils.formatEther(ethers.utils.parseUnits(_json.result, _decimals < 18 && _decimals >= 0 ? 18 - _decimals : 0).toString()),
                 balanceWei: _json.result,
               });
             } else {

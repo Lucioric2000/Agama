@@ -5,6 +5,7 @@ const fees = require('agama-wallet-lib/src/fees');
 const { maxSpend } = require('agama-wallet-lib/src/eth');
 const erc20ContractId = require('agama-wallet-lib/src/eth-erc20-contract-id');
 const standartABI = require('agama-wallet-lib/src/erc20-standard-abi');
+const decimals = require('agama-wallet-lib/src/eth-erc20-decimals');
 
 // TODO: error handling, input vars check
 
@@ -184,76 +185,64 @@ module.exports = (api) => {
       'homestead'
     )
     .then((maxBalance) => {
-      api.eth._tokenInfo(symbol.toUpperCase())
-      .then((tokenInfo) => {
-        if (!tokenInfo) {
+      const contractAddress = erc20ContractId[symbol.toUpperCase()];
+      const contract = new ethers.Contract(contractAddress, standartABI, api.eth.connect[symbol.toUpperCase()]);
+      const numberOfDecimals = decimals[symbol.toUpperCase()] || 18;
+      const numberOfTokens = ethers.utils.parseUnits(amount, numberOfDecimals);
+
+      api.log(`${symbol.toUpperCase()} decimals ${decimals[symbol.toUpperCase()]}`);
+      
+      if (!push) {
+        contract.estimate.transfer(contractAddress, numberOfTokens)
+        .then((estimate) => {
+          const _estimate = estimate.toString();
+          api.log(`erc20 ${symbol.toUpperCase()} transfer estimate ${_estimate}`);
+          api.log(`gas price ${gasPrice[speed]}`);
+
+          const _fee = ethers.utils.bigNumberify(_estimate).mul(ethers.utils.bigNumberify(gasPrice[speed]));
+          const _balanceAferFee = ethers.utils.bigNumberify(maxBalance.balanceWei).sub(_fee).toString();
+
           const retObj = {
-            msg: 'error',
-            result: 'unable to get token info for ' + symbol.toUpperCase(),
+            msg: 'success',
+            result: {
+              gasLimit: _estimate,
+              gasPrice: ethers.utils.bigNumberify(gasPrice[speed]).toString(),
+              feeWei: _fee.toString(),
+              fee: ethers.utils.formatEther(_fee.toString()),
+              maxBalance,
+              balanceAfterFeeWei: _balanceAferFee,
+              balanceAferFee: ethers.utils.formatEther(_balanceAferFee.toString()),
+              notEnoughBalance: Number(_balanceAferFee) > 0 ? false : true,
+            },
           };
     
           res.end(JSON.stringify(retObj));
-        } else {
-          const contractAddress = erc20ContractId[symbol.toUpperCase()];
-          const contract = new ethers.Contract(contractAddress, standartABI, api.eth.connect[symbol.toUpperCase()]);
-          const numberOfDecimals = tokenInfo.decimals || 18;
-          const numberOfTokens = ethers.utils.parseUnits(amount, numberOfDecimals);
+        });
+      } else {
+        contract.transfer(dest, numberOfTokens, {
+          gasPrice: ethers.utils.bigNumberify(gasPrice[speed]),
+        })
+        .then((tx) => {
+          api.log('erc20 tx pushed', 'eth.createtx');
+          api.log(tx, 'eth.createtx');
 
-          api.log(`${symbol.toUpperCase()} decimals ${tokenInfo.decimals}`);
+          tx.txid = tx.hash;
           
-          if (!push) {
-            contract.estimate.transfer(contractAddress, numberOfTokens)
-            .then((estimate) => {
-              const _estimate = estimate.toString();
-              api.log(`erc20 ${symbol.toUpperCase()} transfer estimate ${_estimate}`);
-              api.log(`gas price ${gasPrice[speed]}`);
+          const retObj = {
+            msg: 'success',
+            result: tx,
+          };
 
-              const _fee = ethers.utils.bigNumberify(_estimate).mul(ethers.utils.bigNumberify(gasPrice[speed]));
-              const _balanceAferFee = ethers.utils.bigNumberify(maxBalance.balanceWei).sub(_fee).toString();
+          res.end(JSON.stringify(retObj));
+        }, (error) => {
+          const retObj = {
+            msg: 'error',
+            result: error,
+          };
 
-              const retObj = {
-                msg: 'success',
-                result: {
-                  gasLimit: _estimate,
-                  gasPrice: ethers.utils.bigNumberify(gasPrice[speed]).toString(),
-                  feeWei: _fee.toString(),
-                  fee: ethers.utils.formatEther(_fee.toString()),
-                  maxBalance,
-                  balanceAfterFeeWei: _balanceAferFee,
-                  balanceAferFee: ethers.utils.formatEther(_balanceAferFee.toString()),
-                  notEnoughBalance: Number(_balanceAferFee) > 0 ? false : true,
-                },
-              };
-        
-              res.end(JSON.stringify(retObj));
-            });
-          } else {
-            contract.transfer(dest, numberOfTokens, {
-              gasPrice: ethers.utils.bigNumberify(gasPrice[speed]),
-            })
-            .then((tx) => {
-              api.log('erc20 tx pushed', 'eth.createtx');
-              api.log(tx, 'eth.createtx');
-
-              tx.txid = tx.hash;
-              
-              const retObj = {
-                msg: 'success',
-                result: tx,
-              };
-
-              res.end(JSON.stringify(retObj));
-            }, (error) => {
-              const retObj = {
-                msg: 'error',
-                result: error,
-              };
-
-              res.end(JSON.stringify(retObj));
-            });
-          }
-        }
-      });
+          res.end(JSON.stringify(retObj));
+        });
+      }
     });
   });
 
