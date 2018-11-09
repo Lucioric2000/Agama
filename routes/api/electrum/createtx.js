@@ -65,7 +65,7 @@ module.exports = (api) => {
     let tx;
     
     if (api.isZcash(network) &&
-        network.overwinter) {
+        api.getNetworkData(network).overwinter) {
       tx = new bitcoinZcash.TransactionBuilder(api.getNetworkData(network));
     } else if (api.isPos(network)) {
       tx = new bitcoinPos.TransactionBuilder(api.getNetworkData(network));
@@ -138,6 +138,7 @@ module.exports = (api) => {
     }
 
     if (versionNum) {
+      console.log(versionNum);
       tx.setVersion(versionNum);
     }
 
