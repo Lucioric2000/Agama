@@ -35,7 +35,7 @@
     "async": "^2.6.0",
     "bigi": "^1.4.2",
     "bip39": "^2.5.0",
-    "bitgo-utxo-lib": "git+https://github.com/miketout/bitgo-utxo-lib.git",
+    "bitgo-utxo-lib": "git+https://github.com/pbca26/bitgo-utxo-lib.git",
     "bitcoinforksjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib#opt-in-bitcoincash-sighash",
     "bitcoinjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib.git",
     "bitcoinjs-lib-pos": "git://github.com/KomodoPlatform/bitcoinjs-lib-pos",

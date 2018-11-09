@@ -146,7 +146,6 @@ module.exports = (api) => {
             if (_json.message === 'OK' &&
                 _json.result) {
               const _decimals = decimals[symbol.toUpperCase()];
-              console.log(_decimals);
               resolve({
                 balance: ethers.utils.formatEther(ethers.utils.parseUnits(_json.result, _decimals < 18 && _decimals >= 0 ? 18 - _decimals : 0).toString()),
                 balanceWei: _json.result,
