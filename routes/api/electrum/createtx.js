@@ -138,7 +138,6 @@ module.exports = (api) => {
     }
 
     if (versionNum) {
-      console.log(versionNum);
       tx.setVersion(versionNum);
     }
 
