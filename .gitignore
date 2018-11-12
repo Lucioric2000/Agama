@@ -56,4 +56,8 @@ coins
 # Electron-builder related folders
 build
 
+#MacOSX hidden cache files
+__MACOSX
 package-lock.json
+package.json
+react/package.json

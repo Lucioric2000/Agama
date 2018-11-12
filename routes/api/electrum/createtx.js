@@ -748,6 +748,15 @@ module.exports = (api) => {
           res.end(JSON.stringify(retObj));
         } else if (
           json &&
+          JSON.stringify(json).indexOf('the transaction was rejected by network rules') > -1
+        ) {
+          const retObj = {
+            msg: 'error',
+            result: json,
+          };
+          res.end(JSON.stringify(retObj));
+        } else if (
+          json &&
           json.indexOf('bad-txns-inputs-spent') > -1
         ) {
           const retObj = {
