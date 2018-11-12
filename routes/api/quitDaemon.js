@@ -177,21 +177,35 @@ module.exports = (api) => {
 
         const retObj = {
           msg: 'success',
-          result: 'result',
+          result: true,
         };
 
         res.end(JSON.stringify(retObj));
-      } else {
+      } else if (req.body.mode === 'spv') {
         delete api.electrumCoins[_chain.toLowerCase()];
 
         if (Object.keys(api.electrumCoins).length - 1 === 0) {
-          api.electrumCoins.auth = false;
           api.electrumKeys = {};
         }
 
         const retObj = {
           msg: 'success',
-          result: 'result',
+          result: true,
+        };
+
+        res.end(JSON.stringify(retObj));
+      } else if (req.body.mode === 'eth') {
+        delete api.eth.coins[_chain.toUpperCase()];
+        
+        if (Object.keys(api.eth.coins).length === 0) {
+          api.eth.coins = null;
+          api.eth.wallet = null;
+          api.eth.connect = null;
+        }
+
+        const retObj = {
+          msg: 'success',
+          result: true,
         };
 
         res.end(JSON.stringify(retObj));

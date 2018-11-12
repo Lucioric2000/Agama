@@ -3,10 +3,11 @@ const buggySha256 = require('sha256');
 const bip39 = require('bip39');
 const crypto = require('crypto');
 const bigi = require('bigi');
-const bitcoinZcash = require('bitcoinjs-lib-zcash');
+const bitcoinZcash = require('bitgo-utxo-lib');
 const bitcoin = require('bitcoinjs-lib');
 const bs58check = require('bs58check');
 const wif = require('wif');
+const { seedToPriv } = require('agama-wallet-lib/src/keys');
 
 module.exports = (api) => {
   api.wifToWif = (wif, network) => {
@@ -16,6 +17,7 @@ module.exports = (api) => {
     return {
       pub: key.getAddress(),
       priv: key.toWIF(),
+      pubHex: key.getPublicKeyBuffer().toString('hex'),
       fromWif: api.fromWif(wif, _network),
     };
   }
@@ -141,12 +143,13 @@ module.exports = (api) => {
 
   api.get('/electrum/wiftopub', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      const _network = api.electrumJSNetworks[req.query.coin];
+      const _network = api.electrumJSNetworks[req.query.coin.toLowerCase()];
       let key = _network.isZcash ? new bitcoinZcash.ECPair.fromWIF(req.query.wif, _network, true) : new bitcoin.ECPair.fromWIF(req.query.wif, _network, true);
 
       keys = {
         priv: key.toWIF(),
         pub: key.getAddress(),
+        pubHex: key.getPublicKeyBuffer().toString('hex'),
         fromWif: api.fromWif(key.toWIF(), _network),
       };
 
@@ -280,7 +283,7 @@ module.exports = (api) => {
       'fair',
       'doge',
       'kmd',
-      'mona'
+      'mona',
     ];
 
     try {
@@ -341,60 +344,71 @@ module.exports = (api) => {
       let _seed = req.body.seed;
       let _wifError = false;
 
-      for (let key in api.electrumCoins) {
-        if (key !== 'auth') {
-          let isWif = false;
-          let priv;
-          let pub;
+      if (api.seed === _seed) {
+        _seed = seedToPriv(_seed, 'btc');
+        
+        for (let key in api.electrumCoins) {
+          if (key !== 'auth') {
+            let isWif = false;
+            let priv;
+            let pub;
 
-          try {
-            bs58check.decode(_seed);
-            isWif = true;
-          } catch (e) {}
-
-          const _network = api.getNetworkData(key);
-          
-          if (isWif) {
             try {
-              const _key = _network.isZcash ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
-              priv = _key.toWIF();
-              pub = _key.getAddress();
-            } catch (e) {
-              _wifError = true;
-              break;
+              bs58check.decode(_seed);
+              isWif = true;
+            } catch (e) {}
+
+            const _network = api.getNetworkData(key);
+            
+            if (isWif) {
+              try {
+                const _key = _network.isZcash ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
+                priv = _key.toWIF();
+                pub = _key.getAddress();
+
+                _electrumKeys[key] = {
+                  priv,
+                  pub,
+                };
+              } catch (e) {
+                _wifError = true;
+                break;
+              }
+            } else {
+              const _keys = api.seedToWif(_seed, _network, req.body.iguana);
+              
+              _electrumKeys[key] = {
+                priv: _keys.priv,
+                pub: _keys.pub,
+              };
             }
-          } else {
-            const _keys = api.seedToWif(_seed, _network, req.body.iguana);
-            priv = _keys.priv;
-            pub = _keys.pub;
-          }
-
-          if (api.electrumKeys[key].pub === pub &&
-              api.electrumKeys[key].priv === priv) {
-            _matchingKeyPairs++;
-          }
-          _totalKeys++;
-        }
-      }
-
-      if (req.body.active) {
-        _electrumKeys = JSON.parse(JSON.stringify(api.electrumKeys));
-
-        for (let key in _electrumKeys) {
-          if (!api.electrumCoins[key]) {
-            delete _electrumKeys[key];
           }
         }
+
+        if (api.eth.wallet &&
+            api.eth.wallet.signingKey) {
+          for (let key in api.eth.coins) {
+            _electrumKeys[key] = {
+              pub: api.eth.wallet.signingKey.address,
+              priv: api.eth.wallet.signingKey.privateKey,
+            };
+          }
+        }
+
+        const retObj = {
+          msg: Object.keys(_electrumKeys).length ? 'success' : 'error',
+          result: Object.keys(_electrumKeys).length ? _electrumKeys : false,
+        };
+
+        res.end(JSON.stringify(retObj));
       } else {
-        _electrumKeys = api.electrumKeys;
+        const retObj = {
+          msg: 'error',
+          result: false,
+        };
+  
+        res.end(JSON.stringify(retObj));
       }
-
-      const retObj = {
-        msg: _wifError ? 'error' : 'success',
-        result: _wifError ? false : (_matchingKeyPairs === _totalKeys ? _electrumKeys : false),
-      };
-
-      res.end(JSON.stringify(retObj));
     } else {
       const retObj = {
         msg: 'error',

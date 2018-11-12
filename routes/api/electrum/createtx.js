@@ -1,6 +1,6 @@
 const bitcoinJS = require('bitcoinjs-lib');
 const bitcoinJSForks = require('bitcoinforksjs-lib');
-const bitcoinZcash = require('bitcoinjs-lib-zcash');
+const bitcoinZcash = require('bitgo-utxo-lib');
 const bitcoinPos = require('bitcoinjs-lib-pos');
 const coinSelect = require('coinselect');
 const { estimateTxSize } = require('agama-wallet-lib/src/utils');
@@ -63,15 +63,16 @@ module.exports = (api) => {
   api.buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn) => {
     let key = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, api.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, api.getNetworkData(network));
     let tx;
-
-    if (api.isZcash(network)) {
+    
+    if (api.isZcash(network) &&
+        api.getNetworkData(network).overwinter) {
       tx = new bitcoinZcash.TransactionBuilder(api.getNetworkData(network));
     } else if (api.isPos(network)) {
       tx = new bitcoinPos.TransactionBuilder(api.getNetworkData(network));
     } else {
       tx = new bitcoinJS.TransactionBuilder(api.getNetworkData(network));
     }
-
+    
     api.log('buildSignedTx', 'spv.createrawtx');
     // console.log(`buildSignedTx priv key ${wif}`);
     api.log(`buildSignedTx pub key ${key.getAddress().toString()}`, 'spv.createrawtx');
@@ -124,6 +125,22 @@ module.exports = (api) => {
     api.log('buildSignedTx unsigned tx data', 'spv.createrawtx');
     api.log(tx, 'spv.createrawtx');
 
+    let versionNum;
+    if ((utxo[0].currentHeight >= 419200 && network === 'zec') || 
+        (utxo[0].currentHeight >= 227520 && network === 'vrsc')){
+      versionNum = 4;
+    } else {
+      if (network === 'zec') {
+        versionNum = 3;
+      } else {
+        versionNum = 1;
+      }
+    }
+
+    if (versionNum) {
+      tx.setVersion(versionNum);
+    }
+
     for (let i = 0; i < utxo.length; i++) {
       if (api.isPos(network)) {
         tx.sign(
@@ -132,7 +149,12 @@ module.exports = (api) => {
           key
         );
       } else {
-        tx.sign(i, key);
+        if (network === 'zec' ||
+            network === 'vrsc') {
+          tx.sign(i, key, '', null, utxo[i].value);
+        } else {
+          tx.sign(i, key);
+        }
       }
     }
 
@@ -311,6 +333,8 @@ module.exports = (api) => {
                 value: Number(utxoList[i].amountSats),
                 interestSats: Number(utxoList[i].interestSats),
                 verified: utxoList[i].verified ? utxoList[i].verified : false,
+                height: utxoList[i].height,
+                currentHeight: utxoList[i].currentHeight,
               });
             } else {
               utxoListFormatted.push({
@@ -318,6 +342,8 @@ module.exports = (api) => {
                 vout: utxoList[i].vout,
                 value: Number(utxoList[i].amountSats),
                 verified: utxoList[i].verified ? utxoList[i].verified : false,
+                height: utxoList[i].height,
+                currentHeight: utxoList[i].currentHeight,
               });
             }
           }
@@ -589,7 +615,7 @@ module.exports = (api) => {
                         inputs,
                         _change,
                         value,
-                        opreturn
+                        opreturn,
                       );
                     }
                   }
