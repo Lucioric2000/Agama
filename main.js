@@ -255,13 +255,13 @@ function createAppCloseWindow() {
   });
 }
 
-async function createWindow(status, hideLoadingWindow) {
-	if (
+/*async*/ function createWindow(status, hideLoadingWindow) {
+	/*if (
     	process.env.NODE_ENV === 'development' ||
     	process.env.DEBUG_PROD === 'true'
   	) {
     	await installExtensions();
-  	}
+  	}*/
 	if (process.argv.indexOf('spvcoins=all/add-all') > -1) {
 		api.startSPV('kmd');
 	}
