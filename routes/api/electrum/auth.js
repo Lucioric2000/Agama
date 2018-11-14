@@ -39,8 +39,6 @@ module.exports = (api) => {
 
     seed = seedToPriv(seed, 'btc');
 
-    console.log(seed);
-
     // TODO: check seed only once
     for (let key in api.electrumCoins) {
       if (key !== 'auth') {
@@ -91,8 +89,6 @@ module.exports = (api) => {
             pub: keys.pub,
             pubHex: keys.pubHex,
           };
-
-          console.log(api.electrumKeys);
         }
       }
     }
