@@ -194,7 +194,7 @@ const chainParams = {
 		ac_pubkey: '039d4a50cc70d1184e462a22edb3b66385da97cc8059196f8305c184a3e21440af',
 		ac_cc: 2,
 		ac_founders: 1,
-		addnode: '5.9.102.21',
+		addnode: '5.9.102.210',
 	},
 };
 
