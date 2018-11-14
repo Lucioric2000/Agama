@@ -363,6 +363,7 @@ function createAppCloseWindow() {
 					kvEncode: api.kvEncode,
 					kvDecode: api.kvDecode,
 					electrumServers: api.electrumServersFlag,
+					getAddressVersion: api.getAddressVersion,
 					chainParams,
 				};
 				global.app = _global;

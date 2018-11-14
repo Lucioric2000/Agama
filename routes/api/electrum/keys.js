@@ -327,6 +327,36 @@ module.exports = (api) => {
     }
   };
 
+  api.getAddressVersion = (address) => {
+    try {
+      const _b58check = bitcoinZcash.address.fromBase58Check(address);
+      let _items = [];
+
+      for (let key in api.electrumJSNetworks) {
+        if (_b58check.version === api.electrumJSNetworks[key].pubKeyHash ||
+            _b58check.version === api.electrumJSNetworks[key].scriptHash) {
+          if (key !== 'vrsc' &&
+              key !== 'komodo') {
+            _items.push(key);
+          }
+        }
+      }
+
+      return _items.length ? { coins: _items, version: _b58check.version } : 'Unknown or invalid pub address';
+    } catch (e) {
+      return 'Invalid pub address';
+    }
+  };
+
+  api.get('/electrum/keys/addressversion', (req, res, next) => {
+    const retObj = {
+      msg: 'success',
+      result: api.getAddressVersion(req.query.address),
+    };
+
+    res.end(JSON.stringify(retObj));
+  });
+
   api.get('/electrum/keys/validateaddress', (req, res, next) => {
     const retObj = {
       msg: 'success',
@@ -434,7 +464,7 @@ module.exports = (api) => {
   api.post('/electrum/seed/bip39/match', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
       const seed = bip39.mnemonicToSeed(req.body.seed);
-      const hdMaster = bitcoin.HDNode.fromSeedBuffer(seed, api.electrumJSNetworks.komodo);
+      const hdMaster = bitcoin.HDNode.fromSeedBuffer(seed, api.electrumJSNetworks.kmd);
       const matchPattern = req.body.match;
       const _defaultAddressDepth = req.body.addressdepth;
       const _defaultAccountCount = req.body.accounts;
