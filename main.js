@@ -188,7 +188,7 @@ if (api.argv) {
 
 		for (let i = 0; i < _coins.length; i++) {
 			api.addElectrumCoin(_coins[i].toUpperCase());
-			console.log(`add coin from argv ${_coins[i]}`);
+			api.log(`add coin from argv ${_coins[i]}`, 'dev');
 		}
 	}
 
@@ -197,7 +197,7 @@ if (api.argv) {
 
 		if (_seed &&
 				_seed[0]) {
-			console.log('load seed from argv');
+			api.log('load seed from argv', 'dev');
 			api.auth(_seed[0], true);
 		}
 	}
@@ -255,13 +255,13 @@ function createAppCloseWindow() {
   });
 }
 
-async function createWindow(status, hideLoadingWindow) {
-	if (
+/*async*/ function createWindow(status, hideLoadingWindow) {
+	/*if (
     	process.env.NODE_ENV === 'development' ||
     	process.env.DEBUG_PROD === 'true'
   	) {
     	await installExtensions();
-  	}
+  	}*/
 	if (process.argv.indexOf('spvcoins=all/add-all') > -1) {
 		api.startSPV('kmd');
 	}
@@ -363,8 +363,8 @@ async function createWindow(status, hideLoadingWindow) {
 					kvEncode: api.kvEncode,
 					kvDecode: api.kvDecode,
 					electrumServers: api.electrumServersFlag,
+					getAddressVersion: api.getAddressVersion,
 					chainParams,
-					pubkeyToAddress: api.pubkeyToAddress,
 				};
 				global.app = _global;
 				/*for (let i = 0; i < process.argv.length; i++) {
@@ -555,7 +555,10 @@ app.on('quit', (event) => {
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
+  const extensions = [
+		'REACT_DEVELOPER_TOOLS',
+		'REDUX_DEVTOOLS'
+	];
 
   return Promise.all(
     extensions.map(name => installer.default(installer[name], forceDownload))

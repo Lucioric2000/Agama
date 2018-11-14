@@ -8,6 +8,10 @@ const txDecoder = {
 
 module.exports = (api) => {
   api.isZcash = (network) => {
+    if (isKomodoCoin(network)) {
+      network = 'kmd';
+    }
+
     if (api.electrumJSNetworks[network.toLowerCase()] &&
         api.electrumJSNetworks[network.toLowerCase()].isZcash) {
       return true;
@@ -22,7 +26,8 @@ module.exports = (api) => {
   };
 
   api.electrumJSTxDecoder = (rawtx, networkName, network, insight) => {
-    if (api.isZcash(networkName)) {
+    if (api.isZcash(networkName) &&
+        network.overwinter) {
       return txDecoder.zcash(rawtx, network);
     } else if (api.isPos(networkName)) {
       return txDecoder.pos(rawtx, network);
@@ -40,6 +45,10 @@ module.exports = (api) => {
     if (!coin &&
         !coinUC) {
       coin = network.toUpperCase();
+    }
+
+    if (network.toLowerCase() === 'vrsc') {
+      return api.electrumJSNetworks.vrsc;
     }
 
     if (isKomodoCoin(coin) ||
