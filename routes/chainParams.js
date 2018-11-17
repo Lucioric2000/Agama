@@ -11,7 +11,7 @@ const chainParams = {
 	PANGEA: {
 		ac_supply: 999999,
 	},
-  PGT: {
+	PGT: {
 		ac_supply: 10000000,
 		ac_end: 1,
 	},
@@ -131,17 +131,6 @@ const chainParams = {
 		ac_cc: 2,
 		ac_end: 2629800,
 		addnode: '142.93.27.180',
-		genproclimit: true,
-	},
-	CALL: {
-		ac_supply: 52500000,
-		ac_reward: 1250000000,
-		ac_end: 4200000,
-		ac_halving: 1400000,
-		addnode: [
-			'185.162.65.14',
-			'185.162.65.15',
-		],
 		genproclimit: true,
 	},
 	CCL: {
