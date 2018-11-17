@@ -39,6 +39,7 @@ module.exports = (api) => {
 
     seed = seedToPriv(seed, 'btc');
 
+    // TODO: check seed only once
     for (let key in api.electrumCoins) {
       if (key !== 'auth') {
         const _seed = seed;
@@ -55,7 +56,7 @@ module.exports = (api) => {
           api._isWatchOnly = true;
         } else {
           api._isWatchOnly = false;
-
+          
           try {
             bs58check.decode(_seed);
             isWif = true;
@@ -68,9 +69,10 @@ module.exports = (api) => {
               keys = {
                 priv: _key.toWIF(),
                 pub: _key.getAddress(),
-                pubHex: key.getPublicKeyBuffer().toString('hex'),
-              };
+                pubHex: _key.getPublicKeyBuffer().toString('hex'),
+              };              
             } catch (e) {
+              api.log(e, 'api.auth');
               _wifError = true;
               break;
             }
