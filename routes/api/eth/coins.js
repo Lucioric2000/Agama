@@ -1,5 +1,3 @@
-const ethers = require('ethers');
-
 module.exports = (api) => {  
   api.get('/eth/coins', (req, res, next) => {
     if (api.eth.wallet &&
