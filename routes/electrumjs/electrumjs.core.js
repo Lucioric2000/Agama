@@ -158,7 +158,7 @@ const initSocket = (self, protocol, socketTimeout, options) => {
 }
 
 class Client {
-  constructor(port, host, protocol = 'tcp', socketTimeout, options = void 0) {
+  constructor(port, host, protocol = 'tcp', socketTimeout = 10000, options = void 0) {
     this.id = 0;
     this.port = port;
     this.host = host;
@@ -265,8 +265,9 @@ class Client {
 }
 
 class ElectrumJSCore extends Client {
-  constructor(protocol, port, host, options) {
-    super(protocol, port, host, options);
+
+  constructor(port, host, protocol, timeout, options) {
+    super(port, host, protocol, timeout, options);
   }
 
   onClose() {

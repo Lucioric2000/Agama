@@ -175,7 +175,8 @@ module.exports = (api) => {
       const ecl = new api.electrumJSCore(
         api.electrumServers[network].port,
         api.electrumServers[network].address,
-        api.electrumServers[network].proto
+        api.electrumServers[network].proto,
+        10000
       ); // tcp or tls
       const type = req.query.type;
       const _address = req.query.address;

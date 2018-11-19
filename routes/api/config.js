@@ -10,6 +10,13 @@ module.exports = (api) => {
     if (fs.existsSync(`${api.agamaDir}/config.json`)) {
       let localAppConfig = fs.readFileSync(`${api.agamaDir}/config.json`, 'utf8');
 
+      try {
+        JSON.parse(localAppConfig);
+      } catch (e) {
+        api.log('unable to parse local config.json', 'settings');
+        localAppConfig = JSON.stringify(defaultConf);
+      }
+
       api.log('app config set from local file', 'settings');
       api.writeLog('app config set from local file');
 
