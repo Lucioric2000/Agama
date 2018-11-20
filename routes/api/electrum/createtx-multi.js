@@ -3,6 +3,7 @@ const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
 const coinSelect = require('coinselect');
+const { estimateTxSize } = require('agama-wallet-lib/src/utils');
 
 // not prod ready, only for voting!
 // needs a fix
@@ -236,7 +237,7 @@ module.exports = (api) => {
             if ((network === 'komodo' || network.toLowerCase() === 'kmd') &&
                 totalInterest > 0) {
               // account for extra vout
-              // const _feeOverhead = outputs.length === 1 ? api.estimateTxSize(0, 1) * feeRate : 0;
+              // const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
               const _feeOverhead = 0;
 
               api.log(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`, 'spv.createrawtx');

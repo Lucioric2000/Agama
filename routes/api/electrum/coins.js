@@ -1,3 +1,5 @@
+const { getRandomIntInclusive } = require('agama-wallet-lib/src/utils');
+
 module.exports = (api) => {
   api.findCoinName = (network) => {
     for (let key in api.electrumServers) {
@@ -11,12 +13,6 @@ module.exports = (api) => {
     coin = coin.toLowerCase();
     const servers = api.electrumServers[coin].serverList;
     // select random server
-    const getRandomIntInclusive = (min, max) => {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-
-      return Math.floor(Math.random() * (max - min + 1)) + min; // the maximum is inclusive and the minimum is inclusive
-    };
     let randomServer;
 
     // pick a random server to communicate with
@@ -59,6 +55,9 @@ module.exports = (api) => {
         priv: _keys.priv,
         pub: _keys.pub,
       };
+
+    } else if (api.seed) {
+      api.auth(api.seed, true);
     }
 
     return true;
@@ -112,6 +111,7 @@ module.exports = (api) => {
         if (api.electrumKeys[key]) {
           _electrumCoins[key].pub = api.electrumKeys[key].pub;
           _electrumCoins[key].name = key.toUpperCase();
+          _electrumCoins[key].pubHex = api.electrumKeys[key].pubHex;
           _electrumCoins[key.toUpperCase()] = JSON.parse(JSON.stringify(_electrumCoins[key]));
           delete _electrumCoins[key];
         }
@@ -138,10 +138,10 @@ module.exports = (api) => {
 
     for (let key in api.electrumJSNetworks) {
       if (!api.electrumServers[key] ||
-          (api.electrumServers[key] &&
-          !api.electrumServers[key].serverList)) {
+          (api.electrumServers[key] && !api.electrumServers[key].serverList)) {
         api.log(`disable ${key}, coin config check not passed`, 'spv.coin');
         delete api.electrumServers[key];
+        delete api.electrumServersFlag[key];
       } else {
         _totalCoins++;
       }

@@ -46,7 +46,12 @@ api.electrumCache = {};
 
 api.electrumJSCore = require('./electrumjs/electrumjs.core.js');
 api.electrumJSNetworks = require('./electrumjs/electrumjs.networks.js');
-api.electrumServers = require('./electrumjs/electrumServers.js');
+const {
+  electrumServers,
+  electrumServersFlag,
+} = require('./electrumjs/electrumServers.js');
+api.electrumServers = electrumServers;
+api.electrumServersFlag = electrumServersFlag;
 
 api.CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -68,6 +73,10 @@ api.pathsDaemons();
 api.appConfigSchema = api._appConfig.schema;
 api.defaultAppConfig = Object.assign({}, api.appConfig);
 api.kmdMainPassiveMode = false;
+api.native = {
+  startParams: {},
+};
+api.seed = null;
 
 // spv
 api = require('./api/electrum/network.js')(api);
@@ -122,6 +131,7 @@ api = require('./api/auth.js')(api);
 api = require('./api/coins.js')(api);
 api = require('./api/coindWalletKeys.js')(api);
 api = require('./api/addressBook.js')(api);
+api = require('./api/dice.js')(api);
 
 // elections
 api = require('./api/elections.js')(api);
@@ -132,11 +142,33 @@ api = require('./api/elections.js')(api);
 // kv
 api = require('./api/kv.js')(api);
 
+// eth
+api.eth = {
+  coins: {},
+  connect: {},
+  gasPrice: {},
+  tokenInfo: {},
+  abi: {},
+};
+api = require('./api/eth/auth.js')(api);
+api = require('./api/eth/keys.js')(api);
+api = require('./api/eth/network.js')(api);
+api = require('./api/eth/balance.js')(api);
+api = require('./api/eth/transactions.js')(api);
+api = require('./api/eth/coins.js')(api);
+api = require('./api/eth/gasPrice.js')(api);
+api = require('./api/eth/createtx.js')(api);
+api = require('./api/eth/utils.js')(api);
+
+// Allow the API to get the app session token. Disable this functionality by commenting out the following line if you have security concerns in your server
+// api = require('./api/token.js')(api);
+// api = require('./api/walletlib.js')(api);
+
 api.printDirs();
 
 // default route
 api.get('/', (req, res, next) => {
-  res.send('Agama app server');
+  res.send('Agama app server2');
 });
 
 // expose sockets obj

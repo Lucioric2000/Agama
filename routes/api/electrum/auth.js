@@ -1,6 +1,9 @@
 const bs58check = require('bs58check');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoin = require('bitcoinjs-lib');
+const { seedToPriv } = require('agama-wallet-lib/src/keys');
+
+// TODO: merge spv and eth login/logout into a single func
 
 module.exports = (api) => {
   api.post('/electrum/login', (req, res, next) => {
@@ -30,6 +33,13 @@ module.exports = (api) => {
   api.auth = (seed, isIguana) => {
     let _wifError = false;
 
+    if (!api.seed) {
+      api.seed = seed;
+    }
+
+    seed = seedToPriv(seed, 'btc');
+
+    // TODO: check seed only once
     for (let key in api.electrumCoins) {
       if (key !== 'auth') {
         const _seed = seed;
@@ -46,7 +56,7 @@ module.exports = (api) => {
           api._isWatchOnly = true;
         } else {
           api._isWatchOnly = false;
-
+          
           try {
             bs58check.decode(_seed);
             isWif = true;
@@ -54,12 +64,15 @@ module.exports = (api) => {
 
           if (isWif) {
             try {
-              const _key = api.isZcash(key.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, api.getNetworkData(key.toLowerCase()), true) : bitcoin.ECPair.fromWIF(_seed, api.getNetworkData(key.toLowerCase()), true);
+              const _network = api.getNetworkData(key.toLowerCase());
+              const _key = api.isZcash(key.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
               keys = {
                 priv: _key.toWIF(),
                 pub: _key.getAddress(),
-              };
+                pubHex: _key.getPublicKeyBuffer().toString('hex'),
+              };              
             } catch (e) {
+              api.log(e, 'api.auth');
               _wifError = true;
               break;
             }
@@ -74,6 +87,7 @@ module.exports = (api) => {
           api.electrumKeys[key] = {
             priv: keys.priv,
             pub: keys.pub,
+            pubHex: keys.pubHex,
           };
         }
       }
@@ -88,7 +102,9 @@ module.exports = (api) => {
     if (api.checkToken(req.body.token)) {
       api.electrumCoins.auth = false;
       api.electrumKeys = {};
-
+      api.seed = null;
+      api.eth.wallet = {};
+      
       const retObj = {
         msg: 'success',
         result: 'true',
@@ -107,10 +123,14 @@ module.exports = (api) => {
 
   api.post('/electrum/logout', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
+      api.seed = null;      
       api.electrumCoins = {
         auth: false,
       };
       api.electrumKeys = {};
+      api.eth.coins = {};
+      api.eth.connect = {};
+      api.eth.wallet = {};
 
       const retObj = {
         msg: 'success',

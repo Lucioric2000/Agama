@@ -1,8 +1,12 @@
 const bitcoinJS = require('bitcoinjs-lib');
 const bitcoinJSForks = require('bitcoinforksjs-lib');
-const bitcoinZcash = require('bitcoinjs-lib-zcash');
+const bitcoinZcash = require('bitgo-utxo-lib');
 const bitcoinPos = require('bitcoinjs-lib-pos');
 const coinSelect = require('coinselect');
+const { estimateTxSize } = require('agama-wallet-lib/src/utils');
+
+// TODO: - account for 1000 sats opreturn in tx calc
+//       - use agama-wallet-lib
 
 module.exports = (api) => {
   // unsigned tx
@@ -59,15 +63,16 @@ module.exports = (api) => {
   api.buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn) => {
     let key = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, api.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, api.getNetworkData(network));
     let tx;
-
-    if (api.isZcash(network)) {
+    
+    if (api.isZcash(network) &&
+        api.getNetworkData(network).overwinter) {
       tx = new bitcoinZcash.TransactionBuilder(api.getNetworkData(network));
     } else if (api.isPos(network)) {
       tx = new bitcoinPos.TransactionBuilder(api.getNetworkData(network));
     } else {
       tx = new bitcoinJS.TransactionBuilder(api.getNetworkData(network));
     }
-
+    
     api.log('buildSignedTx', 'spv.createrawtx');
     // console.log(`buildSignedTx priv key ${wif}`);
     api.log(`buildSignedTx pub key ${key.getAddress().toString()}`, 'spv.createrawtx');
@@ -120,6 +125,22 @@ module.exports = (api) => {
     api.log('buildSignedTx unsigned tx data', 'spv.createrawtx');
     api.log(tx, 'spv.createrawtx');
 
+    let versionNum;
+    if ((utxo[0].currentHeight >= 419200 && network === 'zec') || 
+        (utxo[0].currentHeight >= 227520 && network === 'vrsc')){
+      versionNum = 4;
+    } else {
+      if (network === 'zec') {
+        versionNum = 3;
+      } else {
+        versionNum = 1;
+      }
+    }
+
+    if (versionNum) {
+      tx.setVersion(versionNum);
+    }
+
     for (let i = 0; i < utxo.length; i++) {
       if (api.isPos(network)) {
         tx.sign(
@@ -128,7 +149,12 @@ module.exports = (api) => {
           key
         );
       } else {
-        tx.sign(i, key);
+        if (network === 'zec' ||
+            network === 'vrsc') {
+          tx.sign(i, key, '', null, utxo[i].value);
+        } else {
+          tx.sign(i, key);
+        }
       }
     }
 
@@ -307,6 +333,8 @@ module.exports = (api) => {
                 value: Number(utxoList[i].amountSats),
                 interestSats: Number(utxoList[i].interestSats),
                 verified: utxoList[i].verified ? utxoList[i].verified : false,
+                height: utxoList[i].height,
+                currentHeight: utxoList[i].currentHeight,
               });
             } else {
               utxoListFormatted.push({
@@ -314,6 +342,8 @@ module.exports = (api) => {
                 vout: utxoList[i].vout,
                 value: Number(utxoList[i].amountSats),
                 verified: utxoList[i].verified ? utxoList[i].verified : false,
+                height: utxoList[i].height,
+                currentHeight: utxoList[i].currentHeight,
               });
             }
           }
@@ -445,7 +475,7 @@ module.exports = (api) => {
             if ((network === 'komodo' || network.toLowerCase() === 'kmd') &&
                 totalInterest > 0) {
               // account for extra vout
-              // const _feeOverhead = outputs.length === 1 ? api.estimateTxSize(0, 1) * feeRate : 0;
+              // const _feeOverhead = outputs.length === 1 ? estimateTxSize(0, 1) * feeRate : 0;
               const _feeOverhead = 0;
 
               api.log(`max interest to claim ${totalInterest} (${totalInterest * 0.00000001})`, 'spv.createrawtx');
@@ -481,9 +511,16 @@ module.exports = (api) => {
                 vinSum += inputs[i].value;
               }
 
+              let voutSum = 0;
+              
+              for (let i = 0; i < outputs.length; i++) {
+                voutSum += outputs[i].value;
+              }
+
               const _estimatedFee = vinSum - outputs[0].value - _change;
 
               api.log(`vin sum ${vinSum} (${vinSum * 0.00000001})`, 'spv.createrawtx');
+              api.log(`vout sum ${voutSum} (${voutSum * 0.00000001})`, 'spv.createrawtx');
               api.log(`estimatedFee ${_estimatedFee} (${_estimatedFee * 0.00000001})`, 'spv.createrawtx');
               // double check no extra fee is applied
               api.log(`vin - vout ${vinSum - value - _change}`, 'spv.createrawtx');
@@ -494,6 +531,27 @@ module.exports = (api) => {
               } else if ((vinSum - value - _change) === 0) { // max amount spend edge case
                 api.log(`zero fee, reduce output size by ${fee}`, 'spv.createrawtx');
                 value = value - fee;
+              }
+
+              api.log(`change ${_change}`, 'spv.createrawtx');
+              api.log(`network ${network.toLowerCase()}`, 'spv.createrawtx');
+              api.log(`estimated fee ${_estimatedFee}`, 'spv.createrawtx');
+              
+              // 1h kmd interest lee way to mitigate client-server time diff
+              if (_estimatedFee < 0 &&
+                  network.toLowerCase() === 'kmd' &&
+                  _change > 0) {
+                api.log('estimated fee < 0, subtract 20k sats fee', 'spv.createrawtx');
+                const _changeOld = _change;
+                _change -= fee * 2;
+
+                if (Math.abs(Math.abs(_changeOld) - Math.abs(_change)) >= fee &&
+                    Math.abs(Math.abs(_changeOld) - Math.abs(_change)) < fee * 2) {
+                  api.log('subtracted fee is less than 20k sats, subtract 10k sats', 'spv.createrawtx');
+                  _change -= fee;
+                }
+                _change = _change < 0 ? 0 : _change;
+                api.log(`change adjusted ${_change}`, 'spv.createrawtx');
               }
 
               // TODO: use individual dust thresholds
@@ -557,7 +615,7 @@ module.exports = (api) => {
                         inputs,
                         _change,
                         value,
-                        opreturn
+                        opreturn,
                       );
                     }
                   }
@@ -620,7 +678,7 @@ module.exports = (api) => {
                       res.end(JSON.stringify(retObj));
                     } else if (
                       txid &&
-                      txid.indexOf('bad-txns-inputs-spent') > -1
+                      JSON.stringify(txid).indexOf('bad-txns-inputs-spent') > -1
                     ) {
                       const retObj = {
                         msg: 'error',
@@ -633,7 +691,7 @@ module.exports = (api) => {
                       txid &&
                       txid.length === 64
                     ) {
-                      if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                      if (JSON.stringify(txid).indexOf('bad-txns-in-belowout') > -1) {
                         const retObj = {
                           msg: 'error',
                           result: 'Bad transaction inputs spent',
@@ -651,7 +709,7 @@ module.exports = (api) => {
                       }
                     } else if (
                       txid &&
-                      txid.indexOf('bad-txns-in-belowout') > -1
+                      JSON.stringify(txid).indexOf('bad-txns-in-belowout') > -1
                     ) {
                       const retObj = {
                         msg: 'error',
@@ -713,6 +771,15 @@ module.exports = (api) => {
             result: 'Missing fee',
           };
 
+          res.end(JSON.stringify(retObj));
+        } else if (
+          json &&
+          JSON.stringify(json).indexOf('the transaction was rejected by network rules') > -1
+        ) {
+          const retObj = {
+            msg: 'error',
+            result: json,
+          };
           res.end(JSON.stringify(retObj));
         } else if (
           json &&
