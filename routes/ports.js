@@ -36,6 +36,7 @@ const assetChainPorts = {
   BNTN: 14358,
   EQL: 10306,
   PRLPAY: 9679,
+  PGT: 46705,
   ZILLA: 10041,
   DSEC: 11557,
   MGNX: 20731,
@@ -44,6 +45,8 @@ const assetChainPorts = {
   CCL: 20849,
   KOIN: 10702,
   DION: 23895,
+  PTX: 26436,
+  ZEX: 26476,
 };
 
 module.exports = assetChainPorts;

@@ -11,6 +11,10 @@ const chainParams = {
 	PANGEA: {
 		ac_supply: 999999,
 	},
+  PGT: {
+		ac_supply: 10000000,
+		ac_end: 1,
+	},
 	DEX: {
 		ac_supply: 999999,
 	},
@@ -52,25 +56,25 @@ const chainParams = {
 		ac_ccactivate: 200000,
  	},
 	KMDICE: {
-		 ac_supply: 10500000,
-                 ac_reward: 2500000000,
-                 ac_halving: 210000,
-                 ac_cc: 2,
-                 addressindex: 1,
-                 spentindex: 1,
-                 genproclimit: true
+		ac_supply: 10500000,
+		ac_reward: 2500000000,
+		ac_halving: 210000,
+		ac_cc: 2,
+		addressindex: 1,
+		spentindex: 1,
+		genproclimit: true
 	},
-        CHAIN: {
-  	         ac_supply: 999999,
-  	         addnode: '78.47.146.222',
-        },
+	CHAIN: {
+		ac_supply: 999999,
+		addnode: '78.47.146.222',
+	},
 	GLXT: {
-                ac_supply: 10000000000,
-                addnode: '13.230.224.15',
-       },
+		ac_supply: 10000000000,
+		addnode: '13.230.224.15',
+	},
 	EQL: {
-                ac_supply: 500000000,
-                addnode: '46.101.124.153',
+		ac_supply: 500000000,
+		addnode: '46.101.124.153',
 	},
 	MNZ: {
 		ac_supply: 257142858,
@@ -128,7 +132,7 @@ const chainParams = {
 		ac_end: 2629800,
 		addnode: '142.93.27.180',
 		genproclimit: true,
-  },
+	},
 	CALL: {
 		ac_supply: 52500000,
 		ac_reward: 1250000000,
@@ -164,8 +168,8 @@ const chainParams = {
 	},
 	KOIN: {
 		ac_supply: 125000000,
-    addnode: '3.0.32.10',
-  },
+		addnode: '3.0.32.10',
+	},
 	DION: {
 		ac_supply: 3900000000,
 		ac_reward: 22260000000,
@@ -174,6 +178,23 @@ const chainParams = {
 		ac_end: 4300000000,
 		addnode: '51.75.124.34',
 		genproclimit: true,
+	},
+	PTX: {
+		ac_supply: 12000000,
+		ac_reward: 1500000000,
+		ac_staked: 50,
+		ac_pubkey: '0359e2ee32833398c26378a2bb0962f98a7d77f3f6e6e4d27316bcb85542f23c61',
+		ac_end: 12000000,
+		addnode: '142.11.199.63',
+		genproclimit: true,
+	},
+	ZEX: {
+		ac_reward: 13000000000,
+		ac_halving: 525600,
+		ac_pubkey: '039d4a50cc70d1184e462a22edb3b66385da97cc8059196f8305c184a3e21440af',
+		ac_cc: 2,
+		ac_founders: 1,
+		addnode: '5.9.102.210',
 	},
 };
 

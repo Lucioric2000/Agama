@@ -96,6 +96,8 @@ module.exports = (api) => {
                               timeTill1MonthInterestStopsInSeconds: UTXO_1MONTH_THRESHOLD_SECONDS - _locktimeSec > 0 ? UTXO_1MONTH_THRESHOLD_SECONDS - _locktimeSec : 0,
                               interestRulesCheckPass: !decodedTx.format.locktime || Number(decodedTx.format.locktime) === 0 || _locktimeSec > UTXO_1MONTH_THRESHOLD_SECONDS || _utxoItem.value < 1000000000 ? false : true,
                               confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
+                              height: _utxoItem.height,
+                              currentHeight,
                               spendable: true,
                               verified: false,
                             };
@@ -127,6 +129,8 @@ module.exports = (api) => {
                               amount: Number(_utxoItem.value) * 0.00000001,
                               amountSats: _utxoItem.value,
                               confirmations: Number(_utxoItem.height) === 0 ? 0 : currentHeight - _utxoItem.height,
+                              height: _utxoItem.height,
+                              currentHeight,
                               spendable: true,
                               verified: false,
                             };
