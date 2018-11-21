@@ -1,20 +1,38 @@
+#!/bin/bash
 agamamatch=`expr match "$(pwd)" '.*\([Aa]gama\)'`
 if [[ -z $agamamatch ]]
+	#This IS NOT INTENDED to be run in any other submodule
 then
-    git clone --recursive https://github.com/KomodoPlatform/Agama
+    git clone --recursive https://github.com/Lucioric2000/Agama
     cd Agama
 fi
 
 git checkout dev
+git pull upstream dev
+npm install
+npm install webpack@3.0.0 webpack-cli
 ./binary_artifacts.sh
-npm install
+#npm start
 cd gui
-git clone https://github.com/KomodoPlatform/EasyDEX-GUI
-cd EasyDEX-GUI/react
+if [[ -d EasyDEX-GUI ]]
+then
+	echo The EasyDEX-GUI dir already existed
+	cd EasyDEX-GUI/react
+else
+	git clone https://github.com/Lucioric2000/EasyDEX-GUI
+	cd EasyDEX-GUI/react
+fi
 git checkout dev
+git pull upstream dev
+#npm install electron-packager electron-prebuilt
+sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
 npm install
-cd ../../../
-##Detect OS and run the adequate builder
+cd src
+npm install
+#npm start
+cd ../../../../
+#npm install electron-prebuilt
+#Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}
 
 case "$os" in
@@ -34,4 +52,3 @@ case "$os" in
   echo "Unknown Operating system $OSTYPE"
   exit 1
 esac
-

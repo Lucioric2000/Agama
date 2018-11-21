@@ -8,23 +8,31 @@ then
 fi
 
 git checkout dev
-./binary_artifacts.sh
+git pull upstream dev
 npm install
+npm install webpack@3.0.0 webpack-cli
+./binary_artifacts.sh
+#npm start
 cd gui
 if [[ -d EasyDEX-GUI ]]
 then
 	echo The EasyDEX-GUI dir already existed
 	cd EasyDEX-GUI/react
-	git checkout dev
-	git pull upstream dev
 else
 	git clone https://github.com/Lucioric2000/EasyDEX-GUI
 	cd EasyDEX-GUI/react
-	git checkout dev
 fi
+git checkout dev
+git pull upstream dev
+#npm install electron-packager electron-prebuilt
+sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
 npm install
-cd ../../../
-#Detect OSand run the adequate builder
+cd src
+npm install
+#npm start
+cd ../../../../
+#npm install electron-prebuilt
+#Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}
 
 case "$os" in
