@@ -10,7 +10,7 @@ fi
 git checkout dev
 git pull upstream dev
 npm install
-npm install webpack@3.0.0 webpack-cli
+npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
 #npm start
 cd gui
@@ -26,6 +26,7 @@ git checkout dev
 git pull upstream dev
 #npm install electron-packager electron-prebuilt
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
+npm install electron
 npm install
 cd src
 npm install

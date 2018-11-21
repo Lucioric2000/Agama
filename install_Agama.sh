@@ -3,14 +3,14 @@ agamamatch=`expr match "$(pwd)" '.*\([Aa]gama\)'`
 if [[ -z $agamamatch ]]
 	#This IS NOT INTENDED to be run in any other submodule
 then
-    git clone --recursive https://github.com/Lucioric2000/Agama
+    git clone --recursive https://github.com/komodoplatform/Agama
     cd Agama
 fi
 
 git checkout dev
 git pull upstream dev
 npm install
-npm install webpack@3.0.0 webpack-cli
+npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
 #npm start
 cd gui
@@ -19,13 +19,14 @@ then
 	echo The EasyDEX-GUI dir already existed
 	cd EasyDEX-GUI/react
 else
-	git clone https://github.com/Lucioric2000/EasyDEX-GUI
+	git clone https://github.com/komodoplatform/EasyDEX-GUI
 	cd EasyDEX-GUI/react
 fi
 git checkout dev
 git pull upstream dev
 #npm install electron-packager electron-prebuilt
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
+npm install electron
 npm install
 cd src
 npm install
