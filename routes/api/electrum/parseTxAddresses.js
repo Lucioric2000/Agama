@@ -93,14 +93,12 @@ module.exports = (api) => {
 
     if (_sum.inputs > 0 &&
         _sum.outputs > 0) {
-      // vin + change, break into two tx
-
       // send to self
       if (isSelfSend.inputs &&
           isSelfSend.outputs) {
         result = {
           type: 'self',
-          amount: _sum.inputs === _sum.outputs ? _sum.outputs : Number(_sum.inputs - _sum.outputs).toFixed(8),
+          amount: _sum.inputs === _sum.outputs ? _sum.outputs : network === 'komodo' || network.toLowerCase() === 'kmd' ? Number(_sum.inputs - _sum.outputs).toFixed(8) : _sum.outputs,
           amountIn: Number(_sum.inputs).toFixed(8),
           amountOut: Number(_sum.outputs).toFixed(8),
           address: targetAddress,
@@ -118,29 +116,42 @@ module.exports = (api) => {
           }
         }
       } else {
-        result = [{ // reorder since tx sort by default is from newest to oldest
+        const _sent = { // reorder since tx sort by default is from newest to oldest
           type: 'sent',
-          amount: Number(_sum.inputs).toFixed(8),
+          amount: Number(_sum.inputs - _sum.outputs).toFixed(8),
           amountIn: Number(_sum.inputs).toFixed(8),
           amountOut: Number(_sum.outputs).toFixed(8),
+          totalIn: Number(_total.inputs).toFixed(8),
+          totalOut: Number(_total.outputs).toFixed(8),
           address: _addresses.outputs[0],
           timestamp: tx.timestamp,
           txid: tx.format.txid,
           confirmations: tx.confirmations,
           from: _addresses.inputs,
           to: _addresses.outputs,
-        }, {
+        };
+        const _received = {
           type: 'received',
           amount: Number(_sum.outputs).toFixed(8),
           amountIn: Number(_sum.inputs).toFixed(8),
           amountOut: Number(_sum.outputs).toFixed(8),
+          totalIn: Number(_total.inputs).toFixed(8),
+          totalOut: Number(_total.outputs).toFixed(8),
           address: targetAddress,
           timestamp: tx.timestamp,
           txid: tx.format.txid,
           confirmations: tx.confirmations,
           from: _addresses.inputs,
           to: _addresses.outputs,
-        }];
+        };
+
+        result = [_sent, _received];
+
+        if (_total.inputs === _sum.inputs &&
+            network !== 'komodo' &&
+            network.toLowerCase() !== 'kmd') {
+          result = _sent;
+        }
 
         if (network === 'komodo' ||
             network.toLowerCase() === 'kmd') { // calc claimed interest amount
