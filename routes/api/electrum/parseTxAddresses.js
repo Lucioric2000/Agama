@@ -151,14 +151,14 @@ module.exports = (api) => {
             network !== 'komodo' &&
             network.toLowerCase() !== 'kmd') {
           result = _sent;
-        }
+        } else {
+          if (network === 'komodo' ||
+              network.toLowerCase() === 'kmd') { // calc claimed interest amount
+            const vinVoutDiff = _total.inputs - _total.outputs;
 
-        if (network === 'komodo' ||
-            network.toLowerCase() === 'kmd') { // calc claimed interest amount
-          const vinVoutDiff = _total.inputs - _total.outputs;
-
-          if (vinVoutDiff < 0) {
-            result[1].interest = Number(vinVoutDiff.toFixed(8));
+            if (vinVoutDiff < 0) {
+              result[1].interest = Number(vinVoutDiff.toFixed(8));
+            }
           }
         }
       }
