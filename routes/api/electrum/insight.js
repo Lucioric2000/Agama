@@ -189,7 +189,7 @@ module.exports = (api) => {
                       confirmations: _txs[i].confirmations,
                     };
 
-                    const formattedTx = api.parseTransactionAddresses(_parsedTx, address, api.insightJSCoreActiveCoin.abbr.toLowerCase());
+                    const formattedTx = api.parseTransactionAddresses(_parsedTx, address, api.insightJSCoreActiveCoin.abbr.toLowerCase() === 'kmd');
 
                     if (formattedTx.type) {
                       formattedTx.blocktime = _parsedTx.timestamp;

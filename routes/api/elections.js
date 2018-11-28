@@ -152,7 +152,7 @@ module.exports = (api) => {
             timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
           };
 
-          resolve(api.parseTransactionAddresses(_parsedTx, address, network, true));
+          resolve(api.parseTransactionAddresses(_parsedTx, address, network.toLowerCase() === 'kmd', { skipTargetAddress: true }));
         });
       } else {
         const _parsedTx = {
@@ -164,7 +164,7 @@ module.exports = (api) => {
           timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
         };
 
-        resolve(api.parseTransactionAddresses(_parsedTx, address, network));
+        resolve(api.parseTransactionAddresses(_parsedTx, address, network.toLowerCase() === 'kmd'));
       }
     });
   };
