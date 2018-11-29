@@ -4,9 +4,7 @@ module.exports = (api) => {
    *  params: none
    */
   api.post('/create_wallet', async (req, res, next) => {
-	//const winston=require("winston");
     if (api.checkToken(req.body.token)) {
-    //if (1) {
 	  	ppg=require("../../node_modules/agama-wallet-lib/src/crypto/passphrasegenerator.js")
 	  	walletinfo={
 	      display: false,
@@ -38,8 +36,6 @@ module.exports = (api) => {
 	      selectedShortcutSPV: '',
 	      seedExtraSpaces: false
 	    };
-		walletinfo.randomSeed=ppg.generatePassPhrase(walletinfo.bitsOption);
-		//var wmw=__webpack_require__("./util/mainWindow.js");
 		var entrop=false;
 		var itime=0;
 		while (!entrop){
@@ -53,9 +49,12 @@ module.exports = (api) => {
 		walletinfo.randomSeedConfirm=walletinfo.randomSeed;
 		//walletinfo.ipassphrasegenerationattempt=itime;
 		walletinfo.msg="success";
-	    res.end(JSON.stringify(walletinfo));
+	    //res.end(JSON.stringify(walletinfo));
+		const isIguana=true;
+		const _wifError = api.auth(walletinfo.randomSeed, isIguana);
+		logininfo={"seed":walletinfo.randomSeed,"result":_wifError?"error":"success"}
+		res.end(JSON.stringify(logininfo));
 	} else {
-		//winston.log("info","invalid login");
         const retObj = {
             msg: 'error',
             result: 'unauthorized access',
