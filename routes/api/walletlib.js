@@ -49,7 +49,6 @@ module.exports = (api) => {
 		walletinfo.randomSeedConfirm=walletinfo.randomSeed;
 		//walletinfo.ipassphrasegenerationattempt=itime;
 		walletinfo.msg="success";
-		walletinfo.randomSeedConfirm=walletinfo.randomSeed;
 	    //res.end(JSON.stringify(walletinfo));
 		const isIguana=true;
 		const _wifError = api.auth(walletinfo.randomSeed, isIguana);
