@@ -23,7 +23,6 @@ else
 	cd EasyDEX-GUI/react
 fi
 echo edex en:
-pwd
 git checkout dev
 git pull upstream dev
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
