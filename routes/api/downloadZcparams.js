@@ -1,42 +1,20 @@
-// ref: https://github.com/VerusCoin/Agama/blob/master/routes/shepherd/downloadZcparams.js
-
 const fs = require('fs-extra');
 const _fs = require('graceful-fs');
 const Promise = require('bluebird');
-
-// TODO: refactor into a loop
-
-const fileSizes = {
-  proving: 910173851,
-  verifying: 1449,
-  output: 3592860,
-  spend: 47958396,
-  groth16: 725523612,
-};
-let _inMemCheckList;
 
 module.exports = (api) => {
   api.zcashParamsDownloadLinks = {
     'agama.komodoplatform.com': {
       proving: 'https://agama.komodoplatform.com/file/supernet/sprout-proving.key',
       verifying: 'https://agama.komodoplatform.com/file/supernet/sprout-verifying.key',
-      spend: 'https://agama.komodoplatform.com/file/komodo/sapling-params/sapling-spend.params',
-      output: 'https://agama.komodoplatform.com/file/komodo/sapling-params/sapling-output.params',
-      groth16: 'https://agama.komodoplatform.com/file/komodo/sapling-params/sprout-groth16.params',
     },
-    'z.cash': {
-      proving: 'https://z.cash/downloads/sprout-proving.key',
-      verifying: 'https://z.cash/downloads/sprout-verifying.key',
-      spend: 'https://z.cash/downloads/sapling-spend.params',
-      output: 'https://z.cash/downloads/sapling-output.params',
-      groth16: 'https://z.cash/downloads/sprout-groth16.params',
+    'agama-yq0ysrdtr.stackpathdns.com': {
+      proving: 'http://agama-yq0ysrdtr.stackpathdns.com/file/supernet/sprout-proving.key',
+      verifying: 'http://agama-yq0ysrdtr.stackpathdns.com/file/supernet/sprout-verifying.key',
     },
-    'veruscoin.io': {
-      proving: 'https://veruscoin.io/zcparams/sprout-proving.key',
-      verifying: 'https://veruscoin.io/zcparams/sprout-verifying.key',
-      spend: 'https://veruscoin.io/zcparams/sapling-spend.params',
-      output: 'https://veruscoin.io/zcparams/sapling-output.params',
-      groth16: 'https://veruscoin.io/zcparams/sprout-groth16.params',
+    'zcash.dl.mercerweiss.com': {
+      proving: 'https://zcash.dl.mercerweiss.com/sprout-proving.key',
+      verifying: 'https://zcash.dl.mercerweiss.com/sprout-verifying.key',
     },
   };
 
@@ -47,71 +25,43 @@ module.exports = (api) => {
       provingKeySize: false,
       verifyingKey: _fs.existsSync(`${api.zcashParamsDir}/sprout-verifying.key`),
       verifyingKeySize: false,
-      spendKey: _fs.existsSync(`${api.zcashParamsDir}/sapling-spend.params`),
-      spendKeySize: false,
-      outputKey: _fs.existsSync(`${api.zcashParamsDir}/sapling-output.params`),
-      outputKeySize: false,
-      groth16Key: _fs.existsSync(`${api.zcashParamsDir}/sapling-groth16.params`),
-      groth16KeySize: false,
       errors: false,
     };
 
     if (_checkList.rootDir &&
         _checkList.provingKey ||
-        _checkList.verifyingKey ||
-        _checkList.spendKey ||
-        _checkList.outputKey ||
-        _checkList.groth16Key) {
+        _checkList.verifyingKey) {
       // verify each key size
       const _provingKeySize = _checkList.provingKey ? fs.lstatSync(`${api.zcashParamsDir}/sprout-proving.key`) : 0;
       const _verifyingKeySize = _checkList.verifyingKey ? fs.lstatSync(`${api.zcashParamsDir}/sprout-verifying.key`) : 0;
-      const _spendKeySize = _checkList.spendKey ? fs.lstatSync(`${api.zcashParamsDir}/sapling-spend.params`) : 0;
-      const _outputKeySize = _checkList.outputKey ? fs.lstatSync(`${api.zcashParamsDir}/sapling-output.params`) : 0;
-      const _groth16KeySize = _checkList.groth16Key ? fs.lstatSync(`${api.zcashParamsDir}/sapling-groth16.params`) : 0;
-      
-      if (Number(_provingKeySize.size) === fileSizes.proving) { // bytes
+
+      if (Number(_provingKeySize.size) === 910173851) { // bytes
         _checkList.provingKeySize = true;
       }
-      if (Number(_verifyingKeySize.size) === fileSizes.verifying) {
+      if (Number(_verifyingKeySize.size) === 1449) {
         _checkList.verifyingKeySize = true;
       }
-      if (Number(_spendKeySize.size) === fileSizes.spend) {
-        _checkList.spendKeySize = true;
-      }
-      if (Number(_outputKeySize.size) === fileSizes.output) {
-        _checkList.outputKeySize = true;
-      }
-      if (Number(_groth16KeySize.size) === fileSizes.groth16) {
-        _checkList.groth16KeySize = true;
-      }
 
-      api.log('zcashparams exist', 'native.zcashParams');
+      api.log('zcashparams exist', 'native.zcparams');
     } else {
-      api.log('zcashparams doesnt exist', 'native.zcashParams');
+      api.log('zcashparams doesnt exist', 'native.zcparams');
     }
 
     if (!_checkList.rootDir ||
         !_checkList.provingKey ||
         !_checkList.verifyingKey ||
         !_checkList.provingKeySize ||
-        !_checkList.verifyingKeySize ||
-        !_checkList.spendKey ||
-        !_checkList.outputKey ||
-        !_checkList.groth16Key ||
-        !_checkList.outputKeySize ||
-        !_checkList.spendKeySize ||
-        !_checkList.groth16KeySize) {
+        !_checkList.verifyingKeySize) {
       _checkList.errors = true;
     }
 
-    _inMemCheckList = _checkList;
     return _checkList;
   }
 
   api.zcashParamsExistPromise = () => {
     return new Promise((resolve, reject) => {
       const _verify = api.zcashParamsExist();
-      resolve(_verify);
+      resolve(_verify, 'native.zcparams');
     });
   };
 
@@ -125,143 +75,71 @@ module.exports = (api) => {
       // const dlLocation = api.zcashParamsDir + '/test';
       const dlLocation = api.zcashParamsDir;
       const dlOption = req.query.dloption;
-      let _keysProgress = {
-        proving: 0,
-        verifying: 0,
-        output: 0,
-        spend: 0,
-        groth16: 0,
-      };
 
-      const successObj = {
+      const retObj = {
         msg: 'success',
         result: 'zcash params dl started',
       };
 
-      res.end(JSON.stringify(successObj));
-
-      const checkProgress = () => {
-        return [
-          _keysProgress.proving,
-          _keysProgress.verifying,
-          _keysProgress.output,
-          _keysProgress.spend,
-          _keysProgress.groth16
-        ].reduce((a, b) => a + b, 0);
-      };
+      res.end(JSON.stringify(retObj));
 
       for (let key in api.zcashParamsDownloadLinks[dlOption]) {
-        if (!_inMemCheckList[`${key}Key`] ||
-            (_inMemCheckList[`${key}Key`] && !_inMemCheckList[`${key}KeySize`])) {
-          api.downloadFile({
-            remoteFile: api.zcashParamsDownloadLinks[dlOption][key],
-            localFile: key === 'spend' || key === 'output' || key === 'groth16' ? `${dlLocation}/sapling-${key}.params` : `${dlLocation}/sprout-${key}.key`,
-            onProgress: (received, total) => {
-              const percentage = (received * 100) / total;
+        api.downloadFile({
+          remoteFile: api.zcashParamsDownloadLinks[dlOption][key],
+          localFile: `${dlLocation}/sprout-${key}.key`,
+          onProgress: (received, total) => {
+            const percentage = (received * 100) / total;
 
-              if (percentage.toString().indexOf('.10') > -1) {
-                api.io.emit('zcparams', {
-                  msg: {
-                    type: 'zcpdownload',
-                    status: 'progress',
-                    file: key,
-                    bytesTotal: total,
-                    bytesReceived: received,
-                    progress: percentage,
-                  },
-                });
-                // api.log(`${key} ${percentage}% | ${received} bytes out of ${total} bytes.`);
-              }
-            }
-          })
-          .then(() => {
-            const checkZcashParams = api.zcashParamsExist();
-
-            api.log(`${key} dl done, run size check`);
-
-            if (checkZcashParams.error) {
+            if (percentage.toString().indexOf('.10') > -1) {
               api.io.emit('zcparams', {
                 msg: {
                   type: 'zcpdownload',
+                  status: 'progress',
                   file: key,
-                  status: 'error',
-                  message: 'size mismatch',
-                  progress: 100,
+                  bytesTotal: total,
+                  bytesReceived: received,
+                  progress: percentage,
                 },
               });
-              _keysProgress[key] = 100;
-
-              if (checkProgress() === 500) {
-                api.io.emit('zcparams', {
-                  msg: {
-                    type: 'zcpdownload',
-                    file: 'all',
-                    progress: 100,
-                    status: 'done',
-                  },
-                });
-                api.log(`zcash params downloaded`, 'native.zcashParams');
-              }
-              api.log(`zcash params dl progress ${checkProgress() / 50}%`, 'native.zcashParams');
-            } else {
-              api.io.emit('zcparams', {
-                msg: {
-                  type: 'zcpdownload',
-                  file: key,
-                  progress: 100,
-                  status: 'done',
-                },
-              });
-              _keysProgress[key] = 100;
-
-              if (checkProgress() === 500) {
-                api.io.emit('zcparams', {
-                  msg: {
-                    type: 'zcpdownload',
-                    file: 'all',
-                    progress: 100,
-                    status: 'done',
-                  },
-                });
-                api.log(`zcash params downloaded`, 'native.zcashParams');
-              }
-              api.log(`zcash params dl progress ${checkProgress() / 50}%`, 'native.zcashParams');
-              api.log(`file ${key} succesfully downloaded`, 'native.zcashParams');
+              // api.log(`${key} ${percentage}% | ${received} bytes out of ${total} bytes.`);
             }
-          });
-        } else {
-          api.io.emit('zcparams', {
-            msg: {
-              type: 'zcpdownload',
-              file: key,
-              progress: 100,
-              status: 'done',
-            },
-          });
-          _keysProgress[key] = 100;
+          }
+        })
+        .then(() => {
+          const checkZcashParams = api.zcashParamsExist();
 
-          if (checkProgress() === 500) {
+          api.log(`${key} dl done`, 'native.zcparams');
+
+          if (checkZcashParams.error) {
             api.io.emit('zcparams', {
               msg: {
                 type: 'zcpdownload',
-                file: 'all',
+                file: key,
+                status: 'error',
+                message: 'size mismatch',
+                progress: 100,
+              },
+            });
+          } else {
+            api.io.emit('zcparams', {
+              msg: {
+                type: 'zcpdownload',
+                file: key,
                 progress: 100,
                 status: 'done',
               },
             });
-            api.log(`zcash params downloaded`, 'native.zcashParams');
+            api.log(`file ${key} succesfully downloaded`, 'native.zcparams');
           }
-          api.log(`zcash params dl progress ${checkProgress() / 50}%`, 'native.zcashParams');
-          api.log('skip dl ' + key, 'native.zcashParams');
-        }
+        });
       }
     } else {
-      const errorObj = {
+      const retObj = {
         msg: 'error',
         result: 'unauthorized access',
       };
 
-      res.end(JSON.stringify(errorObj));
+      res.end(JSON.stringify(retObj));
     }
   });
 

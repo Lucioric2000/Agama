@@ -11,7 +11,7 @@ const chainParams = {
 	PANGEA: {
 		ac_supply: 999999,
 	},
-	PGT: {
+  PGT: {
 		ac_supply: 10000000,
 		ac_end: 1,
 	},
@@ -133,6 +133,17 @@ const chainParams = {
 		addnode: '142.93.27.180',
 		genproclimit: true,
 	},
+	CALL: {
+		ac_supply: 52500000,
+		ac_reward: 1250000000,
+		ac_end: 4200000,
+		ac_halving: 1400000,
+		addnode: [
+			'185.162.65.14',
+			'185.162.65.15',
+		],
+		genproclimit: true,
+	},
 	CCL: {
 		ac_supply: 200000000,
 		ac_end: 1,
@@ -172,6 +183,7 @@ const chainParams = {
 		ac_supply: 12000000,
 		ac_reward: 1500000000,
 		ac_staked: 50,
+		ac_pubkey: '0359e2ee32833398c26378a2bb0962f98a7d77f3f6e6e4d27316bcb85542f23c61',
 		ac_end: 12000000,
 		addnode: '142.11.199.63',
 		genproclimit: true,

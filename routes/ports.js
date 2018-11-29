@@ -40,11 +40,12 @@ const assetChainPorts = {
   ZILLA: 10041,
   DSEC: 11557,
   MGNX: 20731,
+  CALL: 19609,
   PIRATE: 45453,
   CCL: 20849,
   KOIN: 10702,
   DION: 23895,
-  PTX: 61939,
+  PTX: 26436,
   ZEX: 26476,
 };
 

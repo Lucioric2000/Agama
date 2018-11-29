@@ -74,7 +74,6 @@ module.exports = (api) => {
       const retObj = {
         msg: 'success',
         result: api.elections.pub,
-        priv: api.elections.priv,
       };
 
       res.end(JSON.stringify(retObj));
@@ -153,7 +152,7 @@ module.exports = (api) => {
             timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
           };
 
-          resolve(api.parseTransactionAddresses(_parsedTx, address, network.toLowerCase() === 'kmd', { skipTargetAddress: true }));
+          resolve(api.parseTransactionAddresses(_parsedTx, address, network, true));
         });
       } else {
         const _parsedTx = {
@@ -165,7 +164,7 @@ module.exports = (api) => {
           timestamp: Number(transaction.height) === 0 ? Math.floor(Date.now() / 1000) : blockInfo.timestamp,
         };
 
-        resolve(api.parseTransactionAddresses(_parsedTx, address, network.toLowerCase() === 'kmd'));
+        resolve(api.parseTransactionAddresses(_parsedTx, address, network));
       }
     });
   };

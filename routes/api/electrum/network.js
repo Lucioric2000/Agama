@@ -1,5 +1,10 @@
 const { isKomodoCoin } = require('agama-wallet-lib/src/coin-helpers');
-const _txDecoder = require('agama-wallet-lib/src/transaction-decoder');
+
+const txDecoder = {
+  default: require('../../electrumjs/electrumjs.txdecoder.js'),
+  zcash: require('../../electrumjs/electrumjs.txdecoder-2bytes.js'),
+  pos: require('../../electrumjs/electrumjs.txdecoder-pos.js'),
+};
 
 module.exports = (api) => {
   api.isZcash = (network) => {
@@ -21,7 +26,16 @@ module.exports = (api) => {
   };
 
   api.electrumJSTxDecoder = (rawtx, networkName, network, insight) => {
-    return _txDecoder(rawtx, network);
+    if (api.isZcash(networkName) &&
+        network.overwinter) {
+      return txDecoder.zcash(rawtx, network);
+    } else if (api.isPos(networkName)) {
+      return txDecoder.pos(rawtx, network);
+    } else if (insight) {
+      console.log('insight decoder');
+    } else {
+      return txDecoder.default(rawtx, network);
+    }
   };
 
   api.getNetworkData = (network) => {

@@ -7,8 +7,9 @@ then
     cd Agama
 fi
 
-git checkout dev
+git checkout fullapidev
 git pull upstream dev
+git merge dev
 npm install
 npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
