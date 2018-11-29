@@ -42,76 +42,82 @@ module.exports = (api) => {
 
   api.verifyMerkle = (txid, height, serverList, mainServer, network) => {
     // select random server
-    const _rnd = getRandomIntInclusive(0, serverList.length - 1);
-    const randomServer = serverList[_rnd];
-    const _randomServer = randomServer.split(':');
-    const _mainServer = mainServer.split(':');
+    if (serverList.length === 0) {
+      return new Promise((resolve, reject) => {
+        resolve(false);
+      });
+    } else {
+      const _rnd = getRandomIntInclusive(0, serverList.length - 1);
+      const randomServer = serverList[_rnd];
+      const _randomServer = randomServer.split(':');
+      const _mainServer = mainServer.split(':');
 
-    let ecl = api.ecl(network, {
-      ip: _mainServer[0],
-      port: _mainServer[1],
-      proto: _mainServer[2],
-    });
+      let ecl = api.ecl(network, {
+        ip: _mainServer[0],
+        port: _mainServer[1],
+        proto: _mainServer[2],
+      });
 
-    return new Promise((resolve, reject) => {
-      api.log(`main server: ${mainServer}`, 'spv.merkle');
-      api.log(`verification server: ${randomServer}`, 'spv.merkle');
+      return new Promise((resolve, reject) => {
+        api.log(`main server: ${mainServer}`, 'spv.merkle');
+        api.log(`verification server: ${randomServer}`, 'spv.merkle');
 
-      ecl.connect();
-      ecl.blockchainTransactionGetMerkle(txid, height)
-      .then((merkleData) => {
-        if (merkleData &&
-            merkleData.merkle &&
-            merkleData.pos) {
-          api.log('electrum getmerkle =>', 'spv.merkle');
-          api.log(merkleData, 'spv.merkle');
-          ecl.close();
+        ecl.connect();
+        ecl.blockchainTransactionGetMerkle(txid, height)
+        .then((merkleData) => {
+          if (merkleData &&
+              merkleData.merkle &&
+              merkleData.pos) {
+            api.log('electrum getmerkle =>', 'spv.merkle');
+            api.log(merkleData, 'spv.merkle');
+            ecl.close();
 
-          const _res = api.getMerkleRoot(
-            txid,
-            merkleData.merkle,
-            merkleData.pos
-          );
-          api.log(_res, 'spv.merkle');
+            const _res = api.getMerkleRoot(
+              txid,
+              merkleData.merkle,
+              merkleData.pos
+            );
+            api.log(_res, 'spv.merkle');
 
-          ecl = api.ecl(network, {
-            ip: _randomServer[0],
-            port: _randomServer[1],
-            proto: _randomServer[2],
-          });
-          ecl.connect();
+            ecl = api.ecl(network, {
+              ip: _randomServer[0],
+              port: _randomServer[1],
+              proto: _randomServer[2],
+            });
+            ecl.connect();
 
-          api.getBlockHeader(height, network, ecl)
-          .then((blockInfo) => {
-            if (blockInfo &&
-                blockInfo.merkle_root) {
-              ecl.close();
-              api.log('blockinfo =>', 'spv.merkle');
-              api.log(blockInfo, 'spv.merkle');
-              api.log(blockInfo.merkle_root, 'spv.merkle');
-
+            api.getBlockHeader(height, network, ecl)
+            .then((blockInfo) => {
               if (blockInfo &&
                   blockInfo.merkle_root) {
-                if (_res === blockInfo.merkle_root) {
-                  resolve(true);
+                ecl.close();
+                api.log('blockinfo =>', 'spv.merkle');
+                api.log(blockInfo, 'spv.merkle');
+                api.log(blockInfo.merkle_root, 'spv.merkle');
+
+                if (blockInfo &&
+                    blockInfo.merkle_root) {
+                  if (_res === blockInfo.merkle_root) {
+                    resolve(true);
+                  } else {
+                    resolve(false);
+                  }
                 } else {
-                  resolve(false);
+                  ecl.close();
+                  resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
                 }
               } else {
                 ecl.close();
                 resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
               }
-            } else {
-              ecl.close();
-              resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-            }
-          });
-        } else {
-          ecl.close();
-          resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-        }
+            });
+          } else {
+            ecl.close();
+            resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+          }
+        });
       });
-    });
+    }
   }
 
   api.verifyMerkleByCoin = (coin, txid, height) => {

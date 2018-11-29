@@ -1,236 +1,11 @@
-const bitcoinJS = require('bitcoinjs-lib');
-const bitcoinJSForks = require('bitcoinforksjs-lib');
-const bitcoinZcash = require('bitgo-utxo-lib');
-const bitcoinPos = require('bitcoinjs-lib-pos');
 const coinSelect = require('coinselect');
 const { estimateTxSize } = require('agama-wallet-lib/src/utils');
+const { transaction } = require('agama-wallet-lib/src/transaction-builder');
 
 // TODO: - account for 1000 sats opreturn in tx calc
-//       - use agama-wallet-lib
+//       - use agama-wallet-lib for utxo selection
 
 module.exports = (api) => {
-  // unsigned tx
-  api.buildUnsignedTx = (sendTo, changeAddress, network, utxo, changeValue, spendValue) => {
-    let tx;
-
-    // TODO: finish unsigned for zcash, btc forks and pos coins
-    if (network === 'btg') {
-      tx = new bitcoinJSForks.TransactionBuilder(api.getNetworkData(network));
-      tx.enableBitcoinGold(true);
-      api.log('enable btg', 'spv.createrawtx');
-    } else {
-      tx = new bitcoinJS.TransactionBuilder(api.getNetworkData(network));
-    }
-
-    api.log('buildSignedTx', 'spv.createrawtx');
-    // console.log(`buildSignedTx priv key ${wif}`);
-    api.log(`buildSignedTx pub key ${changeAddress}`, 'spv.createrawtx');
-    // console.log('buildSignedTx std tx fee ' + api.electrumServers[network].txfee);
-
-    for (let i = 0; i < utxo.length; i++) {
-      tx.addInput(utxo[i].txid, utxo[i].vout);
-    }
-
-    tx.addOutput(sendTo, Number(spendValue));
-
-    if (changeValue > 0) {
-      tx.addOutput(changeAddress, Number(changeValue));
-    }
-
-    if (network === 'komodo' ||
-        network.toUpperCase() === 'KMD') {
-      const _locktime = Math.floor(Date.now() / 1000) - 777;
-      tx.setLockTime(_locktime);
-      api.log(`kmd tx locktime set to ${_locktime}`, 'spv.createrawtx');
-    }
-
-    api.log('buildSignedTx unsigned tx data vin', 'spv.createrawtx');
-    api.log(tx.tx.ins, true);
-    api.log('buildSignedTx unsigned tx data vout', 'spv.createrawtx');
-    api.log(tx.tx.outs, true);
-    api.log('buildSignedTx unsigned tx data', 'spv.createrawtx');
-    api.log(tx, true);
-
-    const rawtx = tx.buildIncomplete().toHex();
-
-    api.log('buildUnsignedTx tx hex', 'spv.createrawtx');
-    api.log(rawtx, 'spv.createrawtx');
-
-    return rawtx;
-  }
-
-  // single sig
-  api.buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn) => {
-    let key = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, api.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, api.getNetworkData(network));
-    let tx;
-    
-    if (api.isZcash(network) &&
-        api.getNetworkData(network).overwinter) {
-      tx = new bitcoinZcash.TransactionBuilder(api.getNetworkData(network));
-    } else if (api.isPos(network)) {
-      tx = new bitcoinPos.TransactionBuilder(api.getNetworkData(network));
-    } else {
-      tx = new bitcoinJS.TransactionBuilder(api.getNetworkData(network));
-    }
-    
-    api.log('buildSignedTx', 'spv.createrawtx');
-    // console.log(`buildSignedTx priv key ${wif}`);
-    api.log(`buildSignedTx pub key ${key.getAddress().toString()}`, 'spv.createrawtx');
-    // console.log('buildSignedTx std tx fee ' + api.electrumServers[network].txfee);
-
-    for (let i = 0; i < utxo.length; i++) {
-      tx.addInput(utxo[i].txid, utxo[i].vout);
-    }
-
-    if (api.isPos(network)) {
-      tx.addOutput(
-        sendTo,
-        Number(spendValue),
-        api.getNetworkData(network)
-      );
-    } else {
-      tx.addOutput(sendTo, Number(spendValue));
-    }
-
-    if (changeValue > 0) {
-      if (api.isPos(network)) {
-        tx.addOutput(
-          changeAddress,
-          Number(changeValue),
-          api.getNetworkData(network)
-        );
-      } else {
-        tx.addOutput(changeAddress, Number(changeValue));
-      }
-    }
-
-    if (opreturn) {
-      const data = Buffer.from(opreturn, 'utf8');
-      const dataScript = api.bitcoinJS.script.nullData.output.encode(data);
-      tx.addOutput(dataScript, 1000);
-      api.log(`opreturn ${opreturn}`, 'spv.createrawtx');
-    }
-
-    if (network === 'komodo' ||
-        network.toUpperCase() === 'KMD') {
-      const _locktime = Math.floor(Date.now() / 1000) - 777;
-      tx.setLockTime(_locktime);
-      api.log(`kmd tx locktime set to ${_locktime}`, 'spv.createrawtx');
-    }
-
-    api.log('buildSignedTx unsigned tx data vin', 'spv.createrawtx');
-    api.log(tx.tx.ins, 'spv.createrawtx');
-    api.log('buildSignedTx unsigned tx data vout', 'spv.createrawtx');
-    api.log(tx.tx.outs, 'spv.createrawtx');
-    api.log('buildSignedTx unsigned tx data', 'spv.createrawtx');
-    api.log(tx, 'spv.createrawtx');
-
-    let versionNum;
-    if ((utxo[0].currentHeight >= 419200 && network === 'zec') || 
-        (utxo[0].currentHeight >= 227520 && network === 'vrsc')){
-      versionNum = 4;
-    } else {
-      if (network === 'zec') {
-        versionNum = 3;
-      } else {
-        versionNum = 1;
-      }
-    }
-
-    if (versionNum) {
-      tx.setVersion(versionNum);
-    }
-
-    for (let i = 0; i < utxo.length; i++) {
-      if (api.isPos(network)) {
-        tx.sign(
-          api.getNetworkData(network),
-          i,
-          key
-        );
-      } else {
-        if (network === 'zec' ||
-            network === 'vrsc') {
-          tx.sign(i, key, '', null, utxo[i].value);
-        } else {
-          tx.sign(i, key);
-        }
-      }
-    }
-
-    const rawtx = tx.build().toHex();
-
-    api.log('buildSignedTx signed tx hex', 'spv.createrawtx');
-    api.log(rawtx, 'spv.createrawtx');
-
-    return rawtx;
-  }
-
-  // btg
-  api.buildSignedTxForks = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue) => {
-    let tx;
-
-    if (network === 'btg' ||
-        network === 'bch') {
-      tx = new bitcoinJSForks.TransactionBuilder(api.getNetworkData(network));
-    }
-
-    const keyPair = bitcoinJSForks.ECPair.fromWIF(wif, api.getNetworkData(network));
-    const pk = bitcoinJSForks.crypto.hash160(keyPair.getPublicKeyBuffer());
-    const spk = bitcoinJSForks.script.pubKeyHash.output.encode(pk);
-
-    api.log(`buildSignedTx${network.toUpperCase()}`, 'spv.createrawtx');
-
-    for (let i = 0; i < utxo.length; i++) {
-      tx.addInput(
-        utxo[i].txid,
-        utxo[i].vout,
-        bitcoinJSForks.Transaction.DEFAULT_SEQUENCE,
-        spk
-      );
-    }
-
-    tx.addOutput(sendTo, Number(spendValue));
-
-    if (changeValue > 0) {
-      tx.addOutput(changeAddress, Number(changeValue));
-    }
-
-    if (network === 'btg') {
-      tx.enableBitcoinGold(true);
-    } else if (network === 'bch') {
-      tx.enableBitcoinCash(true);
-    }
-
-    tx.setVersion(2);
-
-    api.log('buildSignedTx unsigned tx data vin', 'spv.createrawtx');
-    api.log(tx.tx.ins, 'spv.createrawtx');
-    api.log('buildSignedTx unsigned tx data vout', 'spv.createrawtx');
-    api.log(tx.tx.outs, 'spv.createrawtx');
-    api.log('buildSignedTx unsigned tx data', 'spv.createrawtx');
-    api.log(tx, 'spv.createrawtx');
-
-    const hashType = bitcoinJSForks.Transaction.SIGHASH_ALL | bitcoinJSForks.Transaction.SIGHASH_BITCOINCASHBIP143;
-
-    for (let i = 0; i < utxo.length; i++) {
-      tx.sign(
-        i,
-        keyPair,
-        null,
-        hashType,
-        utxo[i].value
-      );
-    }
-
-    const rawtx = tx.build().toHex();
-
-    api.log('buildSignedTx signed tx hex', 'spv.createrawtx');
-    api.log(rawtx, 'spv.createrawtx');
-
-    return rawtx;
-  }
-
   api.maxSpendBalance = (utxoList, fee) => {
     let maxSpendBalance = 0;
 
@@ -585,39 +360,27 @@ module.exports = (api) => {
                 res.end(JSON.stringify(retObj));
               } else {
                 if (req[reqType].unsigned) {
-                  _rawtx = api.buildUnsignedTx(
+                  _rawtx = transaction(
                     outputAddress,
                     changeAddress,
-                    network,
+                    api.getNetworkData(network),
                     inputs,
                     _change,
-                    value
+                    value,
+                    { unsigned: true }
                   );
                 } else {
                   if (!req[reqType].offline) {
-                    if (network === 'btg' ||
-                        network === 'bch') {
-                      _rawtx = api.buildSignedTxForks(
-                        outputAddress,
-                        changeAddress,
-                        wif,
-                        network,
-                        inputs,
-                        _change,
-                        value
-                      );
-                    } else {
-                      _rawtx = api.buildSignedTx(
-                        outputAddress,
-                        changeAddress,
-                        wif,
-                        network,
-                        inputs,
-                        _change,
-                        value,
-                        opreturn,
-                      );
-                    }
+                    _rawtx = transaction(
+                      outputAddress,
+                      changeAddress,
+                      wif,
+                      api.getNetworkData(network),
+                      inputs,
+                      _change,
+                      value,
+                      opreturn ? { opreturn } : null,
+                    );
                   }
                 }
 
