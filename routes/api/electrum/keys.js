@@ -427,7 +427,7 @@ module.exports = (api) => {
 
         const retObj = {
           msg: Object.keys(_electrumKeys).length ? 'success' : 'error',
-          result: Object.keys(_electrumKeys).length ? _electrumKeys : false,
+          result: Object.keys(_electrumKeys).length ? { keys: _electrumKeys, seed: api.seed } : false,
         };
 
         res.end(JSON.stringify(retObj));
