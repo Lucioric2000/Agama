@@ -23,6 +23,8 @@ else
 	git clone https://github.com/Lucioric2000/EasyDEX-GUI
 	cd EasyDEX-GUI/react
 fi
+echo edx en
+pwd
 git checkout dev
 git pull upstream dev
 #npm install electron-packager electron-prebuilt
@@ -32,7 +34,9 @@ npm install
 cd src
 npm install
 #npm start
-cd ../../../../
+cd ../../../
+echo entonces en
+pwd
 #npm install electron-prebuilt
 #Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}

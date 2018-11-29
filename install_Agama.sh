@@ -22,7 +22,7 @@ else
 	git clone https://github.com/komodoplatform/EasyDEX-GUI
 	cd EasyDEX-GUI/react
 fi
-cd EasyDEX-GUI/react
+echo edex en:
 git checkout dev
 git pull upstream dev
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
@@ -30,7 +30,7 @@ npm install electron
 npm install
 cd src
 npm install
-cd ../../../../
+cd ../../../
 #Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}
 
