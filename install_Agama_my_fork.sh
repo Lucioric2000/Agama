@@ -22,6 +22,7 @@ then
 else
 	git clone https://github.com/Lucioric2000/EasyDEX-GUI
 	cd EasyDEX-GUI/react
+  git remote add upstream https://github.com/KomodoPlatform/EasyDEX-GUI
 fi
 echo edx en
 pwd
@@ -34,7 +35,7 @@ npm install
 cd src
 npm install
 #npm start
-cd ../../../
+cd ../../../../
 echo entonces en
 pwd
 #npm install electron-prebuilt
