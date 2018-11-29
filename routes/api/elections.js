@@ -74,6 +74,7 @@ module.exports = (api) => {
       const retObj = {
         msg: 'success',
         result: api.elections.pub,
+        priv: api.elections.priv,
       };
 
       res.end(JSON.stringify(retObj));
