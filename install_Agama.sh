@@ -12,27 +12,26 @@ git pull upstream dev
 npm install
 npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
-#npm start
 cd gui
 if [[ -d EasyDEX-GUI ]]
 then
 	echo The EasyDEX-GUI dir already existed
 	cd EasyDEX-GUI/react
+  git pull upstream dev
 else
 	git clone https://github.com/komodoplatform/EasyDEX-GUI
 	cd EasyDEX-GUI/react
 fi
+echo edex en:
+pwd
 git checkout dev
 git pull upstream dev
-#npm install electron-packager electron-prebuilt
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
 npm install electron
 npm install
 cd src
 npm install
-#npm start
-cd ../../../../
-#npm install electron-prebuilt
+cd ../../../
 #Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}
 
