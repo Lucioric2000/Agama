@@ -171,7 +171,7 @@ module.exports = (api) => {
                                 const formattedTx = api.parseTransactionAddresses(
                                   _parsedTx,
                                   _address,
-                                  network
+                                  network.toLowerCase() === 'kmd'
                                 );
 
                                 if (formattedTx.type) {
@@ -280,7 +280,7 @@ module.exports = (api) => {
                           const formattedTx = api.parseTransactionAddresses(
                             _parsedTx,
                             _address,
-                            network
+                            network.toLowerCase() === 'kmd'
                           );
                           _rawtx.push(formattedTx);
                           index++;
@@ -324,7 +324,7 @@ module.exports = (api) => {
                       const formattedTx = api.parseTransactionAddresses(
                         _parsedTx,
                         _address,
-                        network
+                        network.toLowerCase() === 'kmd'
                       );
                       _rawtx.push(formattedTx);
                       index++;
