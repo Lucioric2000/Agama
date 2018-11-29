@@ -32,6 +32,7 @@ git pull upstream dev
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
 npm install electron
 npm install
+pwd
 cd src
 npm install
 #npm start
