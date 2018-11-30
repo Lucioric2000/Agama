@@ -1,3 +1,6 @@
 [submodule "gui/EasyDEX-GUI"]
 	path = gui/EasyDEX-GUI
 	url = https://github.com/KomodoPlatform/EasyDEX-GUI.git
+[submodule "EasyDEX-GUI"]
+	path = EasyDEX-GUI
+	url = https://github.com/Lucioric2000/EasyDEX-GUI
