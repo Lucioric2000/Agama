@@ -25,9 +25,9 @@ then
 else
 	git clone https://github.com/Lucioric2000/EasyDEX-GUI
 	cd EasyDEX-GUI/react
-  git remote add upstream https://github.com/KomodoPlatform/EasyDEX-GUI
 fi
 echo edx en $(pwd)
+git remote add upstream https://github.com/KomodoPlatform/EasyDEX-GUI
 git checkout dev
 git pull upstream dev
 #npm install electron-packager electron-prebuilt
