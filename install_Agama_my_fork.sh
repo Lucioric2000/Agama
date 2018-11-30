@@ -5,6 +5,7 @@ if [[ -z $agamamatch ]]
 then
     git clone --recursive https://github.com/Lucioric2000/Agama
     cd Agama
+    git remote add upstream https://github.com/KomodoPlatform/Agama
 fi
 
 git checkout fullapidev
