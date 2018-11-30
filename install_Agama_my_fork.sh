@@ -5,12 +5,12 @@ if [[ -z $agamamatch ]]
 then
     git clone --recursive https://github.com/Lucioric2000/Agama
     cd Agama
-    git remote add upstream https://github.com/KomodoPlatform/Agama
 fi
-
+git remote add upstream https://github.com/KomodoPlatform/Agama
 git checkout fullapidev
 git pull upstream dev
 git merge dev
+echo estamos en $(pwd)
 npm install
 npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
