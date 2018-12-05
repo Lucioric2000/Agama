@@ -48,11 +48,11 @@ module.exports = (api) => {
 		}
 		walletinfo.randomSeedConfirm=walletinfo.randomSeed;
 		//walletinfo.ipassphrasegenerationattempt=itime;
-		walletinfo.msg="success";
+		//walletinfo.msg="success";
 	    //res.end(JSON.stringify(walletinfo));
 		const isIguana=true;
 		const _wifError = api.auth(walletinfo.randomSeed, isIguana);
-		logininfo={"seed":walletinfo.randomSeed,"result":_wifError?"error":"success"}
+		logininfo={"seed":walletinfo.randomSeed,"msg":_wifError?"error":"success"}
 		res.end(JSON.stringify(logininfo));
 	} else {
         const retObj = {
