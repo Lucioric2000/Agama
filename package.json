@@ -8,7 +8,8 @@
     "start": "cross-env NODE_ENV=development electron .",
     "make-patch": "./make-patch.sh",
     "make-rpm": "node make-rpm.js",
-    "make-deb": "node make-deb.js"
+    "make-deb": "node make-deb.js",
+    "update-agamalib": "rm -rf node_modules/agama-wallet-lib/ && npm install"
   },
   "repository": "https://github.com/KomodoPlatform/Agama/",
   "homepage": "http://komodoplatform.com",
