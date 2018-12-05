@@ -186,6 +186,17 @@ const chainParams = {
 		ac_founders: 1,
 		addnode: '5.9.102.210',
 	},
+	SPLTEST: {
+		ac_supply: 5555555,
+		ac_reward: 10000000000000,
+		ac_cc: 2,
+		addressindex: 1,
+		spentindex: 1,
+		addnode: [
+			'54.36.126.42',
+			'94.130.224.11',
+		],
+	},
 };
 
 module.exports = chainParams;
