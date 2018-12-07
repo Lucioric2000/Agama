@@ -53,7 +53,7 @@ module.exports = (api) => {
         api.log(`found another ${processName} process(es)`, 'native.process');
         api.writeLog(`found another ${processName} process(es)`);
 
-        api.exec(pkillCmd, (error, stdout, stderr) => {
+        exec(pkillCmd, (error, stdout, stderr) => {
           api.log(`${pkillCmd} is issued`, 'native.process');
           api.writeLog(`${pkillCmd} is issued`);
 
