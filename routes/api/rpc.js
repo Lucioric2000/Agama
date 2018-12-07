@@ -73,13 +73,13 @@ module.exports = (api) => {
         };
 
         res.end(JSON.stringify(retObj));
-      } else if (!payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
+      /*} else if (!payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
         const retObj = {
           msg: 'error',
           result: 'wrong cli string format',
         };
 
-        res.end(JSON.stringify(retObj));
+        res.end(JSON.stringify(retObj));*/
       } else {
         const _mode = payload.mode === 'passthru' ? 'passthru' : 'default';
         const _chain = payload.chain === 'KMD' ? null : payload.chain;
