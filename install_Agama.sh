@@ -6,12 +6,13 @@ then
     git clone --recursive https://github.com/komodoplatform/Agama
     cd Agama
 fi
-
 git checkout dev
 git pull upstream dev
+
 npm install
 npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
+
 cd gui
 if [[ -d EasyDEX-GUI ]]
 then
@@ -30,7 +31,7 @@ npm install electron
 npm install
 cd src
 npm install
-cd ../../../
+cd ../../../../
 #Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}
 
@@ -44,7 +45,7 @@ case "$os" in
 	;;
   linux)
     echo "Building on Linux"
-	./build-linux.sh 0.2.44-beta
+	./build-linux.sh $(python ../buildscripts/devversion.py version)
 	;;
   *)
 
