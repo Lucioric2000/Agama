@@ -1,7 +1,7 @@
 #!/bin/bash
 agamamatch=`expr match "$(pwd)" '.*\([Aa]gama\)'`
 if [[ -z $agamamatch ]]
-	#This IS NOT INTENDED to be run in any other submodule
+  #This IS NOT INTENDED to be run in any other submodule
 then
     git clone --recursive https://github.com/Lucioric2000/Agama
     cd Agama
@@ -19,12 +19,12 @@ cd gui
 echo cdggui in $(pwd)
 if [[ -d EasyDEX-GUI ]]
 then
-	echo The EasyDEX-GUI dir already existed
-	cd EasyDEX-GUI/react
+  echo The EasyDEX-GUI dir already existed
+  cd EasyDEX-GUI/react
   echo edx0 en $(pwd)
 else
-	git clone https://github.com/Lucioric2000/EasyDEX-GUI
-	cd EasyDEX-GUI/react
+  git clone https://github.com/Lucioric2000/EasyDEX-GUI
+  cd EasyDEX-GUI/react
 fi
 echo edx en $(pwd)
 git remote add upstream https://github.com/KomodoPlatform/EasyDEX-GUI
@@ -52,11 +52,11 @@ case "$os" in
 
   msys)
     echo "I'm Windows using git bash. ¿Do I need to run more steps?.";
-	;;
+  ;;
   linux)
     echo "Building on Linux"
-	./build-linux.sh 0.2.44-beta
-	;;
+    ./build-linux.sh $(python ../buildscripts/devversion.py version)
+    ;;
   *)
 
   echo "Unknown Operating system $OSTYPE"
