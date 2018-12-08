@@ -36,11 +36,11 @@
     "async": "^2.6.0",
     "bigi": "^1.4.2",
     "bip39": "^2.5.0",
-    "bitgo-utxo-lib": "git+https://github.com/pbca26/bitgo-utxo-lib.git",
     "bitcoinforksjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib#opt-in-bitcoincash-sighash",
     "bitcoinjs-lib": "git://github.com/SuperNETorg/bitcoinjs-lib.git",
     "bitcoinjs-lib-pos": "git://github.com/KomodoPlatform/bitcoinjs-lib-pos",
     "bitcoinjs-lib-zcash": "git://github.com/pbca26/bitcoinjs-lib#zcash",
+    "bitgo-utxo-lib": "git+https://github.com/pbca26/bitgo-utxo-lib.git",
     "bluebird": "^3.4.7",
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",
@@ -65,6 +65,8 @@
     "sha256": "^0.2.0",
     "socket.io": "^2.1.1",
     "tx-decoder": "git://github.com/pbca26/tx-decoder.git",
+    "webpack": "^3.0.0",
+    "webpack-cli": "^3.0.0",
     "wif": "^2.0.6",
     "winston": "^3.1.0"
   }
