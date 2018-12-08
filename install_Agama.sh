@@ -45,7 +45,7 @@ case "$os" in
 	;;
   linux)
     echo "Building on Linux"
-	./build-linux.sh $(python ../buildscripts/devversion.py version)
+	./build-linux.sh $(python buildscripts/devversion.py version)
 	;;
   *)
 
