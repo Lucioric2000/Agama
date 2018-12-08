@@ -375,7 +375,7 @@ module.exports = (api) => {
                       outputAddress,
                       changeAddress,
                       wif,
-                      api.getNetworkData(network),
+                      api.electrumJSNetworks[network] || api.getNetworkData(network),
                       inputs,
                       _change,
                       value,

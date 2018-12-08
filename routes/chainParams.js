@@ -75,6 +75,7 @@ const chainParams = {
 	EQL: {
 		ac_supply: 500000000,
 		addnode: '46.101.124.153',
+	        ac_ccactivate: 205000,
 	},
 	MNZ: {
 		ac_supply: 257142858,
@@ -98,6 +99,7 @@ const chainParams = {
 	},
 	OOT: {
 		ac_supply: 216000000,
+		ac_sapling: 5000000,
 		addnode: '174.138.107.226',
 	},
 	VOTE2018: {
@@ -183,6 +185,17 @@ const chainParams = {
 		ac_cc: 2,
 		ac_founders: 1,
 		addnode: '5.9.102.210',
+	},
+	SPLTEST: {
+		ac_supply: 5555555,
+		ac_reward: 10000000000000,
+		ac_cc: 2,
+		addressindex: 1,
+		spentindex: 1,
+		addnode: [
+			'54.36.126.42',
+			'94.130.224.11',
+		],
 	},
 };
 

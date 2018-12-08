@@ -51,7 +51,7 @@ module.exports = (api) => {
       spendKeySize: false,
       outputKey: _fs.existsSync(`${api.zcashParamsDir}/sapling-output.params`),
       outputKeySize: false,
-      groth16Key: _fs.existsSync(`${api.zcashParamsDir}/sapling-groth16.params`),
+      groth16Key: _fs.existsSync(`${api.zcashParamsDir}/sprout-groth16.params`),
       groth16KeySize: false,
       errors: false,
     };
@@ -67,7 +67,7 @@ module.exports = (api) => {
       const _verifyingKeySize = _checkList.verifyingKey ? fs.lstatSync(`${api.zcashParamsDir}/sprout-verifying.key`) : 0;
       const _spendKeySize = _checkList.spendKey ? fs.lstatSync(`${api.zcashParamsDir}/sapling-spend.params`) : 0;
       const _outputKeySize = _checkList.outputKey ? fs.lstatSync(`${api.zcashParamsDir}/sapling-output.params`) : 0;
-      const _groth16KeySize = _checkList.groth16Key ? fs.lstatSync(`${api.zcashParamsDir}/sapling-groth16.params`) : 0;
+      const _groth16KeySize = _checkList.groth16Key ? fs.lstatSync(`${api.zcashParamsDir}/sprout-groth16.params`) : 0;
       
       if (Number(_provingKeySize.size) === fileSizes.proving) { // bytes
         _checkList.provingKeySize = true;
@@ -155,7 +155,7 @@ module.exports = (api) => {
             (_inMemCheckList[`${key}Key`] && !_inMemCheckList[`${key}KeySize`])) {
           api.downloadFile({
             remoteFile: api.zcashParamsDownloadLinks[dlOption][key],
-            localFile: key === 'spend' || key === 'output' || key === 'groth16' ? `${dlLocation}/sapling-${key}.params` : `${dlLocation}/sprout-${key}.key`,
+            localFile: key === 'spend' || key === 'output' ? `${dlLocation}/sapling-${key}.params` : (key === 'groth16' ? `${dlLocation}/sprout-${key}.params` : `${dlLocation}/sprout-${key}.key`),
             onProgress: (received, total) => {
               const percentage = (received * 100) / total;
 
