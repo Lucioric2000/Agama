@@ -35,6 +35,10 @@ module.exports = (api) => {
         api.eth.wallet = mnemonicWallet;
       }
 
+      if (!api.eth.coins) {
+        api.eth.coins = {};
+      }
+
       if (_coin &&
           !api.eth.coins[_coinuc]) {
         if (api.eth.wallet.signingKey &&
