@@ -6,7 +6,11 @@ module.exports = (api) => {
   api.log = (msg, type) => {
     if (api.appConfig.dev ||
       api.appConfig.debug) {
-      console.log(msg);
+      if (type) {
+        console.log(`\x1b[94m${type}`, '\x1b[0m', msg);
+      } else {
+        console.log(msg);
+      }
     }
 
     api.appRuntimeLog.push({
