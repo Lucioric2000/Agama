@@ -119,7 +119,8 @@ const chainParams = {
 	},
 	ZILLA: {
 		ac_supply: 11000000,
-		addnode: '158.69.0.53',
+		ac_sapling: 5000000,
+		addnode: '51.68.215.104',
 	},
 	DSEC: {
 		ac_supply: 7000000,
