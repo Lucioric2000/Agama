@@ -54,7 +54,7 @@ module.exports = (api) => {
             //connect: api.eth.connect,
           };
 
-          api.log('tx data', 'eth.createtx');
+          console.log('eth.createtx: '+JSON.stringify(data));
           api.log(data, 'eth.createtx');
           
           const retObj = {
