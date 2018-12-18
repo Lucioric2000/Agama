@@ -25,16 +25,16 @@ module.exports = (api) => {
   };
 
   api.getNetworkData = (network) => {
+    if (api.electrumJSNetworks[network.toLowerCase()]) {
+      return api.electrumJSNetworks[network.toLowerCase()];
+    }
+  
     let coin = api.findNetworkObj(network) || api.findNetworkObj(network.toUpperCase()) || api.findNetworkObj(network.toLowerCase());
     const coinUC = coin ? coin.toUpperCase() : null;
 
     if (!coin &&
         !coinUC) {
       coin = network.toUpperCase();
-    }
-
-    if (network.toLowerCase() === 'vrsc') {
-      return api.electrumJSNetworks.vrsc;
     }
 
     if (isKomodoCoin(coin) ||
