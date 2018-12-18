@@ -36,6 +36,7 @@ pwd
 echo =========================================
 mkdir assets/bin
 mkdir assets/bin/osx
+mkdir assets/bin/win64
 echo Moving OSX komodo bins to assets/bin/osx
 wget https://supernetorg.bintray.com/binaries/kmd_osx_bins.zip
 checksum=`shasum -a 256 kmd_osx_bins.zip | awk '{ print $1 }'`
