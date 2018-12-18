@@ -21,6 +21,7 @@ tar xvfz komodo_linux_master.tar.gz
 mv -Tf src bins_linux/
 echo =========================================
 echo Step: Downloading latest WIN komodo binaries from github
+rm -f komodo_win64_master.zip*
 curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases \
   | grep browser_download_url \
   | grep win64_master \
