@@ -21,7 +21,9 @@ module.exports = (api) => {
   };
 
   api.electrumJSTxDecoder = (rawtx, networkName, network, insight) => {
-    return _txDecoder(rawtx, network);
+    try { 
+      return _txDecoder(rawtx, network);
+    } catch (e) {};
   };
 
   api.getNetworkData = (network) => {
