@@ -102,24 +102,28 @@ module.exports = (api) => {
           for (let i = 0; i < utxoList.length; i++) {
             if (network === 'komodo' ||
                 network.toLowerCase() === 'kmd') {
-              utxoListFormatted.push({
-                txid: utxoList[i].txid,
-                vout: utxoList[i].vout,
-                value: Number(utxoList[i].amountSats),
-                interestSats: Number(utxoList[i].interestSats),
-                verified: utxoList[i].verified ? utxoList[i].verified : false,
-                height: utxoList[i].height,
-                currentHeight: utxoList[i].currentHeight,
-              });
+              if (utxoList[i].confirmations > 0) {
+                utxoListFormatted.push({
+                  txid: utxoList[i].txid,
+                  vout: utxoList[i].vout,
+                  value: Number(utxoList[i].amountSats),
+                  interestSats: Number(utxoList[i].interestSats),
+                  verified: utxoList[i].verified ? utxoList[i].verified : false,
+                  height: utxoList[i].height,
+                  currentHeight: utxoList[i].currentHeight,
+                });
+              }
             } else {
-              utxoListFormatted.push({
-                txid: utxoList[i].txid,
-                vout: utxoList[i].vout,
-                value: Number(utxoList[i].amountSats),
-                verified: utxoList[i].verified ? utxoList[i].verified : false,
-                height: utxoList[i].height,
-                currentHeight: utxoList[i].currentHeight,
-              });
+              if (utxoList[i].confirmations > 0) {
+                utxoListFormatted.push({
+                  txid: utxoList[i].txid,
+                  vout: utxoList[i].vout,
+                  value: Number(utxoList[i].amountSats),
+                  verified: utxoList[i].verified ? utxoList[i].verified : false,
+                  height: utxoList[i].height,
+                  currentHeight: utxoList[i].currentHeight,
+                });
+              }
             }
           }
 
