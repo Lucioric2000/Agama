@@ -77,9 +77,6 @@ const _electrumServersExtend = {
   mnx: {
     txfee: 10000,
   },
-  lcc: {
-    txfee: 1000000,
-  },
   nlg: {
     txfee: 1000000,
   },
@@ -237,9 +234,6 @@ const _electrumServersExtend = {
     txfee: 10000,
   },
   slm: {
-    txfee: 10000,
-  },
-  axe: {
     txfee: 10000,
   },
   ppc: {

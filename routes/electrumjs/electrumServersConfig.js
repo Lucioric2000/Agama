@@ -3,7 +3,6 @@ const disableCoins = [
   'vot',
   'mac',
   'bdl',
-  'axe', // no servers
   'mzc', // no servers
   'zet', // no servers
   'jbs', // no servers
