@@ -9,7 +9,8 @@
     "make-patch": "./make-patch.sh",
     "make-rpm": "node make-rpm.js",
     "make-deb": "node make-deb.js",
-    "update-agamalib": "rm -rf node_modules/agama-wallet-lib/ && npm install"
+    "update-agamalib": "rm -rf node_modules/agama-wallet-lib/ && npm install",
+    "postinstall": "rm -rf bitcoinforksjs-lib/node_modules/create-hash && rm -rf bitcoinjs-lib/node_modules/create-hash && rm -rf bitcoinjs-lib-pos/node_modules/create-hash && rm -rf bitcoinjs-lib-zcash/node_modules/create-hash && rm -rf bitgo-utxo-lib/node_modules/create-hash"
   },
   "repository": "https://github.com/KomodoPlatform/Agama/",
   "homepage": "http://komodoplatform.com",
