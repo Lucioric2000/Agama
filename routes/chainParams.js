@@ -206,6 +206,7 @@ const chainParams = {
                 ac_reward: 470000000,
                 ac_halving: 2100000,
                 addnode: '149.202.84.141',
+                genproclimit: true,
         },
 };
 
