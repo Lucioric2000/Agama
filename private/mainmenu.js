@@ -100,6 +100,12 @@ const template = [
           focusedWindow.resetSettings();
         }
       },
+      {
+        label: 'Contact help desk',
+        click (item, focusedWindow) {
+          shell.openExternal('https://support.komodoplatform.com/support/tickets/new');
+        }
+      },
       // ref: https://github.com/sindresorhus/new-github-issue-url
       {
         label: 'Add Github issue',
