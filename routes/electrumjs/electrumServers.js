@@ -53,9 +53,6 @@ const _electrumServersExtend = {
   uno: {
     txfee: 10000,
   },
-  smart: {
-    txfee: 10000,
-  },
   rdd: {
     txfee: 10000,
   },
@@ -210,9 +207,6 @@ const _electrumServersExtend = {
     txfee: 100000,
   },
   brit: {
-    txfee: 10000,
-  },
-  xbc: {
     txfee: 10000,
   },
   bela: {

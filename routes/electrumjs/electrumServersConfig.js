@@ -11,7 +11,6 @@ const disableCoins = [
   'xwc', // needs kv edit
   'put', // needs kv edit
   'ecn', // needs kv edit
-  'smart', // wrong address
   'ac',
   'btcp', // sort out kv
   'blk',
@@ -66,7 +65,6 @@ const disableCoins = [
   'insn',
   'edrc',
   'ccn',
-  'xbc',
   'cmp',
 ];
 
