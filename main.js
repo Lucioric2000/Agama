@@ -369,6 +369,9 @@ function createAppCloseWindow() {
 						const crypto = require('crypto');
 						return crypto.createHash('sha256').update(data).digest();
 					},
+					randomBytes: (size) => {
+						return randomBytes(size || 32).toString('hex');
+					},
 				};
 				global.app = _global;
 				/*for (let i = 0; i < process.argv.length; i++) {
