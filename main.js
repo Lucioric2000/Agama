@@ -365,6 +365,10 @@ function createAppCloseWindow() {
 					electrumServers: api.electrumServersFlag,
 					getAddressVersion: api.getAddressVersion,
 					chainParams,
+					sha256: (data) => {
+						const crypto = require('crypto');
+						return crypto.createHash('sha256').update(data).digest();
+					},
 				};
 				global.app = _global;
 				/*for (let i = 0; i < process.argv.length; i++) {
