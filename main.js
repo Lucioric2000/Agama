@@ -1,6 +1,10 @@
 // main proc for Agama
 
 const electron = require('electron');
+const {
+	Menu,
+	ipcMain,
+} = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
@@ -9,7 +13,6 @@ const os = require('os');
 const { randomBytes } = require('crypto');
 const md5 = require('agama-wallet-lib/src/crypto/md5');
 const exec = require('child_process').exec;
-const { Menu } = require('electron');
 const portscanner = require('portscanner');
 const osPlatform = os.platform();
 const fixPath = require('fix-path');
@@ -19,9 +22,18 @@ const fsnode = require('fs');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
 const arch = require('arch');
-const bip39 = require('bip39');
 const chainParams = require('./routes/chainParams');
 const { formatBytes } = require('agama-wallet-lib/src/utils');
+
+let staticVar = {}; // static shared main -> renderer vars
+
+ipcMain.on('staticVar', (event, arg) => {
+	if (!arg) {
+  	event.sender.send('staticVar', staticVar);
+	} else {
+  	event.sender.send('staticVar', staticVar[arg]);
+	}
+});
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -318,24 +330,30 @@ function createAppCloseWindow() {
 
 				// load our index.html (i.e. Agama GUI)
 				api.writeLog('show agama gui');
-
 				const _assetChainPorts = require('./routes/ports.js');
+				
+				staticVar.arch = localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch();
+				staticVar.appBasicInfo = appBasicInfo;
+				staticVar.assetChainPorts = _assetChainPorts;
+				staticVar.appConfigSchema = api.appConfigSchema;
+				staticVar.zcashParamsDownloadLinks = api.zcashParamsDownloadLinks;
+				staticVar.argv = process.argv;
+				staticVar.isWindows = os.platform() === 'win32' ? true : false;
+				staticVar.spvFees = _spvFees;
+				staticVar.electrumServers = api.electrumServersFlag;
+				staticVar.chainParams = chainParams;
+
 				let _global = {
 					appConfig,
-					appConfigSchema: api.appConfigSchema,
 					arch: localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch(),
 					appBasicInfo,
 					appSessionHash,
-					assetChainPorts: _assetChainPorts,
-					agamaIcon,
 					testLocation: api.testLocation,
 					kmdMainPassiveMode: api.kmdMainPassiveMode,
 					getAppRuntimeLog: api.getAppRuntimeLog,
 					// nativeCoindList,
 					zcashParamsExist: _zcashParamsExist,
 					zcashParamsExistPromise: api.zcashParamsExistPromise,
-					zcashParamsDownloadLinks: api.zcashParamsDownloadLinks,
-					isWindows: os.platform() === 'win32' ? true : false, // obsolete(?)
 					appExit,
 					getMaxconKMDConf: api.getMaxconKMDConf,
 					setMaxconKMDConf: api.setMaxconKMDConf,
@@ -343,7 +361,6 @@ function createAppCloseWindow() {
 					activeSection: 'wallets', // temp deprecated
 					argv: process.argv,
 					getAssetChainPorts: api.getAssetChainPorts,
-					spvFees: _spvFees,
 					startSPV: api.startSPV,
 					startKMDNative: api.startKMDNative,
 					addressVersionCheck: api.addressVersionCheck,
@@ -356,15 +373,12 @@ function createAppCloseWindow() {
 					},
 					checkStringEntropy: api.checkStringEntropy,
 					pinAccess: false,
-					bip39,
 					isWatchOnly: api.isWatchOnly,
 					setPubkey: api.setPubkey,
 					getPubkeys: api.getPubkeys,
 					kvEncode: api.kvEncode,
 					kvDecode: api.kvDecode,
-					electrumServers: api.electrumServersFlag,
 					getAddressVersion: api.getAddressVersion,
-					chainParams,
 					sha256: (data) => {
 						const crypto = require('crypto');
 						return crypto.createHash('sha256').update(data).digest();
