@@ -52,6 +52,7 @@ const {
 } = require('./electrumjs/electrumServers.js');
 api.electrumServers = electrumServers;
 api.electrumServersFlag = electrumServersFlag;
+api.electrumServersV1_4 = {};
 
 api.CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
