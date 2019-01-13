@@ -162,6 +162,7 @@ class Client {
     this.id = 0;
     this.port = port;
     this.host = host;
+    this.protocolVersion = null;
     this.callbackMessageQueue = {};
     this.subscribe = new EventEmitter();
     this.conn = initSocket(this, protocol, socketTimeout, options);
@@ -169,6 +170,10 @@ class Client {
       this.onMessage(body, n);
     });
     this.status = 0;
+  }
+
+  setProtocolVersion(version) {
+    this.protocolVersion = version;
   }
 
   connect() {
@@ -299,28 +304,20 @@ class ElectrumJSCore extends Client {
     return this.request('server.peers.subscribe', []);
   }
 
-  blockchainAddressGetBalance(str, sh) {
-    return this.request(sh ? 'blockchain.address.get_balance' : 'blockchain.scripthash.get_balance', [str]);
+  blockchainAddressGetBalance(str) {
+    return this.request(this.protocolVersion && this.protocolVersion === '1.4' ? 'blockchain.scripthash.get_balance' : 'blockchain.address.get_balance', [str]);
   }
 
-  blockchainAddressGetHistory(address) {
-    return this.request('blockchain.address.get_history', [address]);
-  }
-
-  blockchainAddressGetHistory(str, sh) {
-    return this.request(sh ? 'blockchain.scripthash.get_history' : 'blockchain.address.get_history', [str]);
+  blockchainAddressGetHistory(str) {
+    return this.request(this.protocolVersion && this.protocolVersion === '1.4' ? 'blockchain.scripthash.get_history' : 'blockchain.address.get_history', [str]);
   }
 
   blockchainAddressGetMempool(address) {
     return this.request('blockchain.address.get_mempool', [address]);
   }
 
-  blockchainAddressListunspent(str, sh) {
-    return this.request(sh ? 'blockchain.scripthash.listunspent' : 'blockchain.address.listunspent', [str]);
-  }
-
-  blockchainAddressListunspent(address) {
-    return this.request('blockchain.scripthash.listunspent', [address]);
+  blockchainAddressListunspent(str) {
+    return this.request(this.protocolVersion && this.protocolVersion === '1.4' ? 'blockchain.scripthash.listunspent' : 'blockchain.address.listunspent', [str]);
   }
 
   blockchainBlockGetHeader(height) {
