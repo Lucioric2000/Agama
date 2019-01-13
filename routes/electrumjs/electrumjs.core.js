@@ -299,20 +299,28 @@ class ElectrumJSCore extends Client {
     return this.request('server.peers.subscribe', []);
   }
 
-  blockchainAddressGetBalance(address) {
-    return this.request('blockchain.address.get_balance', [address]);
+  blockchainAddressGetBalance(str, sh) {
+    return this.request(sh ? 'blockchain.address.get_balance' : 'blockchain.scripthash.get_balance', [str]);
   }
 
   blockchainAddressGetHistory(address) {
     return this.request('blockchain.address.get_history', [address]);
   }
 
+  blockchainAddressGetHistory(str, sh) {
+    return this.request(sh ? 'blockchain.scripthash.get_history' : 'blockchain.address.get_history', [str]);
+  }
+
   blockchainAddressGetMempool(address) {
     return this.request('blockchain.address.get_mempool', [address]);
   }
 
+  blockchainAddressListunspent(str, sh) {
+    return this.request(sh ? 'blockchain.scripthash.listunspent' : 'blockchain.address.listunspent', [str]);
+  }
+
   blockchainAddressListunspent(address) {
-    return this.request('blockchain.address.listunspent', [address]);
+    return this.request('blockchain.scripthash.listunspent', [address]);
   }
 
   blockchainBlockGetHeader(height) {
