@@ -1,6 +1,7 @@
 const { isKomodoCoin } = require('agama-wallet-lib/src/coin-helpers');
 const _txDecoder = require('agama-wallet-lib/src/transaction-decoder');
-const electrumMinVersionProtocolV1_4 = 190 // 1.9.0;
+const semverCmp = require('semver-compare');
+const electrumMinVersionProtocolV1_4 = '1.9.0';
 
 module.exports = (api) => {
   api.isZcash = (network) => {
@@ -147,27 +148,30 @@ module.exports = (api) => {
         ecl.serverVersion()
         .then((serverData) => {
           ecl.close();
-          let serverVersion;
-          api.log('getServerVersion non-cached');
+          let serverVersion = 0;
+          api.log('getServerVersion non-cached', 'electrum.version.check');
 
           if (serverData &&
               typeof serverData === 'string' &&
               serverData.indexOf('ElectrumX') > -1) {
-            serverVersion = serverData.split('ElectrumX')[1];
-            serverVersion = serverVersion.replace(/\./g, '').trim();
+            serverVersion = serverData.split('ElectrumX')[1].trim();
           } else if (
             serverData &&
             typeof serverData === 'object' &&
+            serverData[0] &&
             serverData[0].indexOf('ElectrumX') > -1
           ) {
-            serverVersion = serverData[0].split('ElectrumX')[1];
-            serverVersion = serverVersion.replace(/\./g, '').trim();
+            serverVersion = serverData[0].split('ElectrumX')[1].trim();
           }
-
-          if (serverVersion >= electrumMinVersionProtocolV1_4) {
-            api.electrumServersV1_4[`${ip}:${port}:${proto}`] = true;
-          } else {
-            api.electrumServersV1_4[`${ip}:${port}:${proto}`] = false;
+          
+          if (serverVersion) {
+            api.log(serverVersion + ' vs ' + electrumMinVersionProtocolV1_4 + ' ' + (semverCmp(serverVersion, electrumMinVersionProtocolV1_4) >=0 ? '1.4' : '< 1.4'), 'electrum.version.check');
+            
+            if (semverCmp(serverVersion, electrumMinVersionProtocolV1_4) >= 0) {
+              api.electrumServersV1_4[`${ip}:${port}:${proto}`] = true;
+            } else {
+              api.electrumServersV1_4[`${ip}:${port}:${proto}`] = false;
+            }
           }
 
           api.log(`getServerVersion cached ${`${ip}:${port}:${proto}`} isProtocolV1.4: ${api.electrumServersV1_4[`${ip}:${port}:${proto}`]}`, 'electrum.version.check');
