@@ -321,7 +321,7 @@ class ElectrumJSCore extends Client {
   }
 
   blockchainBlockGetHeader(height) {
-    return this.request('blockchain.block.get_header', [height]);
+    return this.request(this.protocolVersion && this.protocolVersion === '1.4' ? 'blockchain.block.header' : 'blockchain.block.get_header', [height]);
   }
 
   blockchainBlockGetChunk(index) {
