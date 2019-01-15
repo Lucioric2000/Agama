@@ -159,7 +159,7 @@ module.exports = (api) => {
           txid,
           height,
           _filteredServerList,
-          _server.ip + ':' + _server.port + ':' + (api.electrumCoins[coin] && api.electrumCoins[coin].server.proto || 'tcp'),
+          `${_server.ip}:${_server.port}:${(api.electrumCoins[coin] && api.electrumCoins[coin].server.proto || 'tcp')}`,
           coin
         )
         .then((proof) => {
