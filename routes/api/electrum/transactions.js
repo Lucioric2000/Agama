@@ -41,10 +41,10 @@ module.exports = (api) => {
         const _address = ecl.protocolVersion && ecl.protocolVersion === '1.4' ? pubToElectrumScriptHashHex(config.address, btcnetworks[network.toLowerCase()] || btcnetworks.kmd) : config.address;
 
         api.log('electrum listtransactions ==>', 'spv.listtransactions');
-
+        ecl.connect();
+        
         if (!config.full ||
             ecl.insight) {
-          ecl.connect();
           ecl.blockchainAddressGetHistory(_address)
           .then((json) => {
             ecl.close();
@@ -62,7 +62,6 @@ module.exports = (api) => {
           // !expensive call!
           // TODO: limit e.g. 1-10, 10-20 etc
           const MAX_TX = _maxlength || 10;
-          ecl.connect();
 
           api.electrumGetCurrentBlock(network)
           .then((currentHeight) => {
@@ -173,7 +172,7 @@ module.exports = (api) => {
 
                                   const formattedTx = api.parseTransactionAddresses(
                                     _parsedTx,
-                                    _address,
+                                    config.address,
                                     network.toLowerCase() === 'kmd'
                                   );
 
@@ -214,7 +213,7 @@ module.exports = (api) => {
                                     _rawtx.push(formattedTx[1]);
                                   }
                                   index++;
-
+                                  
                                   if (index === json.length) {
                                     ecl.close();
 
