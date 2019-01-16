@@ -159,19 +159,20 @@ module.exports = (api) => {
 
         ecl.blockchainBlockGetHeader(height)
         .then((_rawtxJSON) => {
-          if (typeof _rawtxJSON === 'string') {btcnetworks
-            _rawtxJSON = parseBlock(_rawtxJSON, btcnetworks[network]);
+          if (typeof _rawtxJSON === 'string') {            
+            _rawtxJSON = parseBlock(_rawtxJSON, btcnetworks[network] || btcnetworks.kmd);
 
             if (_rawtxJSON.merkleRoot) {
               _rawtxJSON.merkle_root = electrumMerkleRoot(_rawtxJSON);
             }
           }
           api.electrumCache[network].blockHeader[height] = _rawtxJSON;
+          api.log(api.electrumCache[network].blockHeader[height], 'spv.cache');
           resolve(_rawtxJSON);
         });
       } else {
         api.log(`electrum cached raw block ${height}`, 'spv.cache');
-        api.log(api.electrumCache[network].blockHeader[height], 'spv.cache.block');
+        api.log(api.electrumCache[network].blockHeader[height], 'spv.cache');
         resolve(api.electrumCache[network].blockHeader[height]);
       }
     });
