@@ -165,7 +165,7 @@ module.exports = (api) => {
           }
           
           if (serverVersion) {
-            api.log(serverVersion + ' vs ' + electrumMinVersionProtocolV1_4 + ' ' + (semverCmp(serverVersion, electrumMinVersionProtocolV1_4) >=0 ? '1.4' : '< 1.4'), 'electrum.version.check');
+            api.log(`${serverVersion} vs ${electrumMinVersionProtocolV1_4} ${(semverCmp(serverVersion, electrumMinVersionProtocolV1_4) >=0 ? '1.4' : '< 1.4')}`, 'electrum.version.check');
             
             if (semverCmp(serverVersion, electrumMinVersionProtocolV1_4) >= 0) {
               api.electrumServersV1_4[`${ip}:${port}:${proto}`] = true;
@@ -183,61 +183,64 @@ module.exports = (api) => {
 
   api.get('/electrum/servers/test', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      const ecl = api.ecl(null, {
-        port: req.query.port,
-        ip: req.query.address,
-        proto: req.query.proto,
-      });
+      async function _serverTest() {
+        const ecl = await api.ecl(null, {
+          port: req.query.port,
+          ip: req.query.address,
+          proto: req.query.proto,
+        });
 
-      ecl.connect();
-      ecl.serverVersion()
-      .then((serverData) => {
-        ecl.close();
-        api.log('serverData', 'spv.server.test');
-        api.log(serverData, 'spv.server,test');
+        ecl.connect();
+        ecl.serverVersion()
+        .then((serverData) => {
+          ecl.close();
+          api.log('serverData', 'spv.server.test');
+          api.log(serverData, 'spv.server,test');
 
-        if (serverData &&
-            typeof serverData === 'string' &&
-            serverData.indexOf('Electrum') > -1) {
-          const retObj = {
-            msg: 'success',
-            result: true,
-          };
+          if (serverData &&
+              typeof serverData === 'string' &&
+              serverData.indexOf('Electrum') > -1) {
+            const retObj = {
+              msg: 'success',
+              result: true,
+            };
 
-          res.end(JSON.stringify(retObj));
-        } else if (
-          serverData &&
-          typeof serverData === 'object'
-        ) {
-          for (let i = 0; i < serverData.length; i++) {
-            if (serverData[i].indexOf('Electrum') > -1) {
-              const retObj = {
-                msg: 'success',
-                result: true,
-              };
+            res.end(JSON.stringify(retObj));
+          } else if (
+            serverData &&
+            typeof serverData === 'object'
+          ) {
+            for (let i = 0; i < serverData.length; i++) {
+              if (serverData[i].indexOf('Electrum') > -1) {
+                const retObj = {
+                  msg: 'success',
+                  result: true,
+                };
 
-              res.end(JSON.stringify(retObj));
+                res.end(JSON.stringify(retObj));
 
-              break;
-              return true;
+                break;
+                return true;
+              }
             }
+
+            const retObj = {
+              msg: 'error',
+              result: false,
+            };
+
+            res.end(JSON.stringify(retObj));
+          } else {
+            const retObj = {
+              msg: 'error',
+              result: false,
+            };
+
+            res.end(JSON.stringify(retObj));
           }
-
-          const retObj = {
-            msg: 'error',
-            result: false,
-          };
-
-          res.end(JSON.stringify(retObj));
-        } else {
-          const retObj = {
-            msg: 'error',
-            result: false,
-          };
-
-          res.end(JSON.stringify(retObj));
-        }
-      });
+        });
+      };
+      _serverTest();
     } else {
       const retObj = {
         msg: 'error',

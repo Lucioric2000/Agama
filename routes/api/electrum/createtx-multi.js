@@ -17,11 +17,7 @@ module.exports = (api) => {
       // 2) check targets integrity
       async function _createRawTxMultOut() {
         const network = req.body.network || api.findNetworkObj(req.body.coin);
-        const ecl = await new api.electrumJSCore(
-          api.electrumServers[network].port,
-          api.electrumServers[network].address,
-          api.electrumServers[network].proto
-        ); // tcp or tls
+        const ecl = await api.ecl(network);
         const initTargets = JSON.parse(JSON.stringify(req.body.targets));
         const changeAddress = req.body.change;
         const push = req.body.push;
@@ -354,82 +350,80 @@ module.exports = (api) => {
 
                   res.end(JSON.stringify(retObj));
                 } else {
-                  const ecl = new api.electrumJSCore(
-                    api.electrumServers[network].port,
-                    api.electrumServers[network].address,
-                    api.electrumServers[network].proto
-                  ); // tcp or tls
+                  async function _pushtx() {
+                    const ecl = await api.ecl(network);
 
-                  ecl.connect();
-                  ecl.blockchainTransactionBroadcast(_rawtx)
-                  .then((txid) => {
-                    ecl.close();
+                    ecl.connect();
+                    ecl.blockchainTransactionBroadcast(_rawtx)
+                    .then((txid) => {
+                      ecl.close();
 
-                    const _rawObj = {
-                      utxoSet: inputs,
-                      change: _change,
-                      changeAdjusted: _change,
-                      totalInterest,
-                      fee,
-                      value,
-                      outputAddress,
-                      changeAddress,
-                      network,
-                      rawtx: _rawtx,
-                      txid,
-                      utxoVerified,
-                    };
-
-                    if (txid &&
-                        txid.indexOf('bad-txns-inputs-spent') > -1) {
-                      const retObj = {
-                        msg: 'error',
-                        result: 'Bad transaction inputs spent',
-                        raw: _rawObj,
+                      const _rawObj = {
+                        utxoSet: inputs,
+                        change: _change,
+                        changeAdjusted: _change,
+                        totalInterest,
+                        fee,
+                        value,
+                        outputAddress,
+                        changeAddress,
+                        network,
+                        rawtx: _rawtx,
+                        txid,
+                        utxoVerified,
                       };
 
-                      res.end(JSON.stringify(retObj));
-                    } else {
                       if (txid &&
-                          txid.length === 64) {
-                        if (txid.indexOf('bad-txns-in-belowout') > -1) {
-                          const retObj = {
-                            msg: 'error',
-                            result: 'Bad transaction inputs spent',
-                            raw: _rawObj,
-                          };
+                          txid.indexOf('bad-txns-inputs-spent') > -1) {
+                        const retObj = {
+                          msg: 'error',
+                          result: 'Bad transaction inputs spent',
+                          raw: _rawObj,
+                        };
 
-                          res.end(JSON.stringify(retObj));
-                        } else {
-                          const retObj = {
-                            msg: 'success',
-                            result: _rawObj,
-                          };
-
-                          res.end(JSON.stringify(retObj));
-                        }
+                        res.end(JSON.stringify(retObj));
                       } else {
                         if (txid &&
-                            txid.indexOf('bad-txns-in-belowout') > -1) {
-                          const retObj = {
-                            msg: 'error',
-                            result: 'Bad transaction inputs spent',
-                            raw: _rawObj,
-                          };
+                            txid.length === 64) {
+                          if (txid.indexOf('bad-txns-in-belowout') > -1) {
+                            const retObj = {
+                              msg: 'error',
+                              result: 'Bad transaction inputs spent',
+                              raw: _rawObj,
+                            };
 
-                          res.end(JSON.stringify(retObj));
+                            res.end(JSON.stringify(retObj));
+                          } else {
+                            const retObj = {
+                              msg: 'success',
+                              result: _rawObj,
+                            };
+
+                            res.end(JSON.stringify(retObj));
+                          }
                         } else {
-                          const retObj = {
-                            msg: 'error',
-                            result: 'Can\'t broadcast transaction',
-                            raw: _rawObj,
-                          };
+                          if (txid &&
+                              txid.indexOf('bad-txns-in-belowout') > -1) {
+                            const retObj = {
+                              msg: 'error',
+                              result: 'Bad transaction inputs spent',
+                              raw: _rawObj,
+                            };
 
-                          res.end(JSON.stringify(retObj));
+                            res.end(JSON.stringify(retObj));
+                          } else {
+                            const retObj = {
+                              msg: 'error',
+                              result: 'Can\'t broadcast transaction',
+                              raw: _rawObj,
+                            };
+
+                            res.end(JSON.stringify(retObj));
+                          }
                         }
                       }
-                    }
-                  });
+                    });
+                  }
                 }
               }
             }
