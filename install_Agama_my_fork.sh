@@ -10,13 +10,13 @@ git remote add upstream https://github.com/KomodoPlatform/Agama
 git checkout fullapidev
 git pull upstream dev
 git merge dev
-echo estamos en $(pwd)
+#echo estamos en $(pwd)
 npm install
 npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
 #npm start
 cd gui
-echo cdggui in $(pwd)
+#echo cdggui in $(pwd)
 if [[ -d EasyDEX-GUI ]]
 then
   echo The EasyDEX-GUI dir already existed
@@ -26,7 +26,7 @@ else
   git clone https://github.com/Lucioric2000/EasyDEX-GUI
   cd EasyDEX-GUI/react
 fi
-echo edx en $(pwd)
+#echo edx en $(pwd)
 git remote add upstream https://github.com/KomodoPlatform/EasyDEX-GUI
 git checkout dev
 git pull upstream dev
@@ -34,13 +34,13 @@ git pull upstream dev
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
 npm install electron
 npm install
-pwd
+#pwd
 cd src
 npm install
 #npm start
 cd ../../../../
-echo entonces en
-pwd
+#echo entonces en
+#pwd
 #npm install electron-prebuilt
 #Detect OS and run the adequate builder
 os=${OSTYPE//[0-9.-]*/}
