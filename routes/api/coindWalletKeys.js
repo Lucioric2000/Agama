@@ -69,7 +69,7 @@ module.exports = (api) => {
 
                     const keyPair = bitcoinJS.ECPair.fromWIF(
                       wifKey,
-                      api.electrumJSNetworks.komodo
+                      api.electrumJSNetworks.kmd
                     );
                     const _keyPair = {
                       priv: keyPair.toWIF(),

@@ -1,6 +1,10 @@
 // main proc for Agama
 
 const electron = require('electron');
+const {
+	Menu,
+	ipcMain,
+} = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
@@ -9,7 +13,6 @@ const os = require('os');
 const { randomBytes } = require('crypto');
 const md5 = require('agama-wallet-lib/src/crypto/md5');
 const exec = require('child_process').exec;
-const { Menu } = require('electron');
 const portscanner = require('portscanner');
 const osPlatform = os.platform();
 const fixPath = require('fix-path');
@@ -19,9 +22,14 @@ const fsnode = require('fs');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
 const arch = require('arch');
-const bip39 = require('bip39');
 const chainParams = require('./routes/chainParams');
 const { formatBytes } = require('agama-wallet-lib/src/utils');
+
+let staticVar = {}; // static shared main -> renderer vars
+
+ipcMain.on('staticVar', (event, arg) => {
+	event.sender.send('staticVar', !arg ? staticVar : staticVar[arg]);
+});
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -40,12 +48,7 @@ api.setVar('nativeCoindList', nativeCoindList);*/
 
 let localVersion;
 let localVersionFile = api.readVersionFile();
-
-if (localVersionFile.indexOf('\r\n') > -1) {
-  localVersion = localVersionFile.split('\r\n');
-} else {
-  localVersion = localVersionFile.split('\n');
-}
+localVersion = localVersionFile.split(localVersionFile.indexOf('\r\n') > -1 ? '\r\n' : '\n');
 
 const appBasicInfo = {
 	name: 'Agama',
@@ -74,10 +77,10 @@ for (let i = 0; i < process.argv.length; i++) {
   if (!_argv.nogui) {
   	_argv = {};
   } else {
-  	api.argv = _argv;
   	api.log('arguments', 'init');
-  	api.log(_argv, 'init');
-  }
+		api.log(_argv, 'init');
+		api.argv = _argv;
+	}
 }
 
 const appSessionHash = _argv.token ? _argv.token : randomBytes(32).toString('hex');
@@ -183,6 +186,22 @@ let forceQuitApp = false;
 
 // apply parsed argv
 if (api.argv) {
+	if (api.argv.servers) {
+		api.log('set electrum servers from argv', 'argv');
+
+		try {
+			const _servers = JSON.parse(api.argv.servers);
+
+			for (let key in _servers) {
+				if (api.electrumServers[key]) {
+					api.electrumServers[key].serverList = _servers[key];
+				}
+			}
+		} catch (e) {
+			api.log('error: malformatted servers argv', 'argv');
+		}
+	}
+
 	if (api.argv.coins) {
 		const _coins = api.argv.coins.split(',');
 
@@ -318,24 +337,30 @@ function createAppCloseWindow() {
 
 				// load our index.html (i.e. Agama GUI)
 				api.writeLog('show agama gui');
-
 				const _assetChainPorts = require('./routes/ports.js');
+				
+				staticVar.arch = localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch();
+				staticVar.appBasicInfo = appBasicInfo;
+				staticVar.assetChainPorts = _assetChainPorts;
+				staticVar.appConfigSchema = api.appConfigSchema;
+				staticVar.zcashParamsDownloadLinks = api.zcashParamsDownloadLinks;
+				staticVar.argv = process.argv;
+				staticVar.isWindows = os.platform() === 'win32' ? true : false;
+				staticVar.spvFees = _spvFees;
+				staticVar.electrumServers = api.electrumServersFlag;
+				staticVar.chainParams = chainParams;
+
 				let _global = {
 					appConfig,
-					appConfigSchema: api.appConfigSchema,
 					arch: localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch(),
 					appBasicInfo,
 					appSessionHash,
-					assetChainPorts: _assetChainPorts,
-					agamaIcon,
 					testLocation: api.testLocation,
 					kmdMainPassiveMode: api.kmdMainPassiveMode,
 					getAppRuntimeLog: api.getAppRuntimeLog,
 					// nativeCoindList,
 					zcashParamsExist: _zcashParamsExist,
 					zcashParamsExistPromise: api.zcashParamsExistPromise,
-					zcashParamsDownloadLinks: api.zcashParamsDownloadLinks,
-					isWindows: os.platform() === 'win32' ? true : false, // obsolete(?)
 					appExit,
 					getMaxconKMDConf: api.getMaxconKMDConf,
 					setMaxconKMDConf: api.setMaxconKMDConf,
@@ -343,7 +368,6 @@ function createAppCloseWindow() {
 					activeSection: 'wallets', // temp deprecated
 					argv: process.argv,
 					getAssetChainPorts: api.getAssetChainPorts,
-					spvFees: _spvFees,
 					startSPV: api.startSPV,
 					startKMDNative: api.startKMDNative,
 					addressVersionCheck: api.addressVersionCheck,
@@ -356,15 +380,19 @@ function createAppCloseWindow() {
 					},
 					checkStringEntropy: api.checkStringEntropy,
 					pinAccess: false,
-					bip39,
 					isWatchOnly: api.isWatchOnly,
 					setPubkey: api.setPubkey,
 					getPubkeys: api.getPubkeys,
 					kvEncode: api.kvEncode,
 					kvDecode: api.kvDecode,
-					electrumServers: api.electrumServersFlag,
 					getAddressVersion: api.getAddressVersion,
-					chainParams,
+					sha256: (data) => {
+						const crypto = require('crypto');
+						return crypto.createHash('sha256').update(data).digest();
+					},
+					randomBytes: (size) => {
+						return randomBytes(size || 32).toString('hex');
+					},
 				};
 				global.app = _global;
 				/*for (let i = 0; i < process.argv.length; i++) {
