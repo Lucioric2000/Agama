@@ -5,7 +5,7 @@ const { secondsToString } = require('agama-wallet-lib/src/time');
 module.exports = (api) => {
   api.log = (msg, type) => {
     if (api.appConfig.dev ||
-      api.appConfig.debug) {
+        api.appConfig.debug) {
       if (type) {
         console.log(`\x1b[94m${type}`, '\x1b[0m', msg);
       } else {
@@ -95,27 +95,35 @@ module.exports = (api) => {
 
   api.get('/log/runtime/dump', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      const _log = JSON.parse(JSON.stringify(api.appRuntimeLog));
-      const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
-
-      const err = fs.writeFileSync(
-        `${api.agamaDir}/shepherd/log/log-${_time}.json`,
-        JSON.stringify(_log),
-        'utf8'
-      );
-
-      if (err) {
+      if (req.query.stringify) {
         const retObj = {
-          msg: 'error',
-          result: 'can\'t create a file',
+          msg: 'success',
+          result: JSON.stringify(api.appRuntimeLog),
         };
         res.end(JSON.stringify(retObj));
       } else {
-        const retObj = {
-          msg: 'success',
-          result: `${api.agamaDir}/shepherd/log/log-${_time}.json`,
-        };
-        res.end(JSON.stringify(retObj));
+        const _log = JSON.parse(JSON.stringify(api.appRuntimeLog));
+        const _time = secondsToString(Date.now() / 1000).replace(/\s+/g, '-');
+
+        const err = fs.writeFileSync(
+          `${api.agamaDir}/shepherd/log/log-${_time}.json`,
+          JSON.stringify(_log),
+          'utf8'
+        );
+
+        if (err) {
+          const retObj = {
+            msg: 'error',
+            result: 'can\'t create a file',
+          };
+          res.end(JSON.stringify(retObj));
+        } else {
+          const retObj = {
+            msg: 'success',
+            result: `${api.agamaDir}/shepherd/log/log-${_time}.json`,
+          };
+          res.end(JSON.stringify(retObj));
+        }
       }
     } else {
       const retObj = {

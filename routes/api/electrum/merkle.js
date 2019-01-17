@@ -42,98 +42,115 @@ module.exports = (api) => {
 
   api.verifyMerkle = (txid, height, serverList, mainServer, network) => {
     // select random server
-    if (serverList.length === 0) {
-      return new Promise((resolve, reject) => {
-        resolve(false);
-      });
-    } else {
-      const _rnd = getRandomIntInclusive(0, serverList.length - 1);
-      const randomServer = serverList[_rnd];
-      const _randomServer = randomServer.split(':');
-      const _mainServer = mainServer.split(':');
+    return new Promise((resolve, reject) => {
+      async function _verifyMerkle() {
+        if (serverList.length === 0) {
+          resolve(false);
+        } else {
+          const _rnd = getRandomIntInclusive(0, serverList.length - 1);
+          const randomServer = serverList[_rnd];
+          const _randomServer = randomServer.split(':');
+          const _mainServer = mainServer.split(':');
 
-      let ecl = api.ecl(network, {
-        ip: _mainServer[0],
-        port: _mainServer[1],
-        proto: _mainServer[2],
-      });
+          let ecl = await api.ecl(network, {
+            ip: _mainServer[0],
+            port: _mainServer[1],
+            proto: _mainServer[2],
+          });
 
-      return new Promise((resolve, reject) => {
-        api.log(`main server: ${mainServer}`, 'spv.merkle');
-        api.log(`verification server: ${randomServer}`, 'spv.merkle');
+          api.log(`main server: ${mainServer}`, 'spv.merkle');
+          api.log(`verification server: ${randomServer}`, 'spv.merkle');
 
-        ecl.connect();
-        ecl.blockchainTransactionGetMerkle(txid, height)
-        .then((merkleData) => {
-          if (merkleData &&
-              merkleData.merkle &&
-              merkleData.pos) {
-            api.log('electrum getmerkle =>', 'spv.merkle');
-            api.log(merkleData, 'spv.merkle');
+          ecl.connect();
+          ecl.blockchainTransactionGetMerkle(txid, height)
+          .then((merkleData) => {
             ecl.close();
 
-            const _res = api.getMerkleRoot(
-              txid,
-              merkleData.merkle,
-              merkleData.pos
-            );
-            api.log(_res, 'spv.merkle');
+            async function __verifyMerkle() {
+              if (merkleData &&
+                  merkleData.merkle &&
+                  merkleData.pos) {
+                api.log('electrum getmerkle =>', 'spv.merkle');
+                api.log(merkleData, 'spv.merkle');
 
-            ecl = api.ecl(network, {
-              ip: _randomServer[0],
-              port: _randomServer[1],
-              proto: _randomServer[2],
-            });
-            ecl.connect();
+                const _res = api.getMerkleRoot(
+                  txid,
+                  merkleData.merkle,
+                  merkleData.pos
+                );
+                api.log(_res, 'spv.merkle');
 
-            api.getBlockHeader(height, network, ecl)
-            .then((blockInfo) => {
-              if (blockInfo &&
-                  blockInfo.merkle_root) {
-                ecl.close();
-                api.log('blockinfo =>', 'spv.merkle');
-                api.log(blockInfo, 'spv.merkle');
-                api.log(blockInfo.merkle_root, 'spv.merkle');
+                ecl = await api.ecl(network, {
+                  ip: _randomServer[0],
+                  port: _randomServer[1],
+                  proto: _randomServer[2],
+                });
+                ecl.connect();
 
-                if (blockInfo &&
-                    blockInfo.merkle_root) {
-                  if (_res === blockInfo.merkle_root) {
-                    resolve(true);
-                  } else {
-                    resolve(false);
-                  }
-                } else {
+                api.getBlockHeader(height, network, ecl)
+                .then((blockInfo) => {
                   ecl.close();
-                  resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-                }
+
+                  if (JSON.stringify(blockInfo).indexOf('error') > -1) {
+                    resolve(false);
+                  } else {
+                    if (blockInfo &&
+                        blockInfo.merkle_root) {
+                      api.log('blockinfo =>', 'spv.merkle');
+                      api.log(blockInfo, 'spv.merkle');
+                      api.log(blockInfo.merkle_root, 'spv.merkle');
+
+                      if (blockInfo &&
+                          blockInfo.merkle_root) {
+                        if (_res === blockInfo.merkle_root) {
+                          resolve(true);
+                        } else {
+                          resolve(false);
+                        }
+                      } else {
+                        resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+                      }
+                    } else {
+                      resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
+                    }
+                  }
+                });
               } else {
                 ecl.close();
                 resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
               }
-            });
-          } else {
-            ecl.close();
-            resolve(api.CONNECTION_ERROR_OR_INCOMPLETE_DATA);
-          }
-        });
-      });
-    }
+            };
+            __verifyMerkle();
+          });
+        }
+      };
+      _verifyMerkle();
+    });
   }
 
   api.verifyMerkleByCoin = (coin, txid, height) => {
-    const _serverList = api.electrumCoins[coin].serverList;
-    const _server = api.electrumCoins[coin].server;
+    const _serverList = api.electrumCoins[coin] ? api.electrumCoins[coin].serverList : api.electrumServers[coin].serverList;
+    let _server = api.electrumCoins[coin] ? api.electrumCoins[coin].server : api.electrumServers[coin].serverList[0];
+
+    if (typeof _server === 'string') {
+      const __server = _server.split(':');
+      _server = {
+        ip: __server[0],
+        port: __server[1],
+        proto: __server[2],
+      };
+    }
 
     api.log('verifyMerkleByCoin', 'spv.merkle');
     api.log(_server, 'spv.merkle');
-    api.log(api.electrumCoins[coin].serverList, 'spv.merkle');
+    api.log(_serverList, 'spv.merkle');
 
     return new Promise((resolve, reject) => {
       if (_serverList !== 'none') {
         let _filteredServerList = [];
 
         for (let i = 0; i < _serverList.length; i++) {
-          if (_serverList[i] !== _server.ip + ':' + _server.port + ':' + _server.proto) {
+          if (_serverList[i] !== `${_server.ip}:${_server.port}:${_server.proto}`) {
             _filteredServerList.push(_serverList[i]);
           }
         }
@@ -142,7 +159,7 @@ module.exports = (api) => {
           txid,
           height,
           _filteredServerList,
-          _server.ip + ':' + _server.port + ':' + (api.electrumCoins[coin.toLowerCase() === 'kmd' ? 'kmd' : coin].server.proto || 'tcp'),
+          `${_server.ip}:${_server.port}:${(api.electrumCoins[coin] && api.electrumCoins[coin].server.proto || 'tcp')}`,
           coin
         )
         .then((proof) => {
