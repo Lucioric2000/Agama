@@ -12,7 +12,7 @@ git pull upstream dev
 git merge dev
 #echo estamos en $(pwd)
 npm install
-npm install webpack@3.0.0 webpack-cli@3.0.0
+#npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
 #npm start
 cd gui

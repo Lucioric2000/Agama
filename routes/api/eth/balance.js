@@ -8,7 +8,6 @@ module.exports = (api) => {
   api.get('/eth/balance', (req, res, next) => {
     const address = req.query.address;
     const symbol = req.query.symbol;
-
     if (symbol) {
       if (symbol === 'all') {
         api.eth._balanceERC20All(address)
