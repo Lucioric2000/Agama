@@ -2,17 +2,20 @@
 
 const Promise = require('bluebird');
 const { checkTimestamp } = require('agama-wallet-lib/src/time');
+const { pubToElectrumScriptHashHex } = require('agama-wallet-lib/src/keys');
+const btcnetworks = require('agama-wallet-lib/src/bitcoinjs-networks');
 const UTXO_1MONTH_THRESHOLD_SECONDS = 2592000;
 
 module.exports = (api) => {
   api.listunspent = (ecl, address, network, full, verify) => {
+    const _address = ecl.protocolVersion && ecl.protocolVersion === '1.4' ? pubToElectrumScriptHashHex(address, btcnetworks[network.toLowerCase()] || btcnetworks.kmd) : address;
     let _atLeastOneDecodeTxFailed = false;
 
     if (full &&
         !ecl.insight) {
       return new Promise((resolve, reject) => {
         ecl.connect();
-        ecl.blockchainAddressListunspent(address)
+        ecl.blockchainAddressListunspent(_address)
         .then((_utxoJSON) => {
           if (_utxoJSON &&
               _utxoJSON.length) {
@@ -185,7 +188,7 @@ module.exports = (api) => {
     } else {
       return new Promise((resolve, reject) => {
         ecl.connect();
-        ecl.blockchainAddressListunspent(address)
+        ecl.blockchainAddressListunspent(_address)
         .then((json) => {
           ecl.close();
 
@@ -202,42 +205,45 @@ module.exports = (api) => {
 
   api.get('/electrum/listunspent', (req, res, next) => {
     if (api.checkToken(req.query.token)) {
-      const network = req.query.network || api.findNetworkObj(req.query.coin);
-      const ecl = api.ecl(network);
+      async function _getListunspent() {
+        const network = req.query.network || api.findNetworkObj(req.query.coin);
+        const ecl = await api.ecl(network);
 
-      if (req.query.full &&
-          req.query.full === 'true') {
-            api.listunspent(
-          ecl,
-          req.query.address,
-          network,
-          true,
-          req.query.verify
-        )
-        .then((listunspent) => {
-          api.log('electrum listunspent ==>', 'spv.listunspent');
+        if (req.query.full &&
+            req.query.full === 'true') {
+          api.listunspent(
+            ecl,
+            req.query.address,
+            network,
+            true,
+            req.query.verify
+          )
+          .then((listunspent) => {
+            api.log('electrum listunspent ==>', 'spv.listunspent');
 
-          const retObj = {
-            msg: 'success',
-            result: listunspent,
-          };
+            const retObj = {
+              msg: 'success',
+              result: listunspent,
+            };
 
-          res.end(JSON.stringify(retObj));
-        });
-      } else {
-        api.listunspent(ecl, req.query.address, network)
-        .then((listunspent) => {
-          ecl.close();
-          api.log('electrum listunspent ==>', 'spv.listunspent');
+            res.end(JSON.stringify(retObj));
+          });
+        } else {
+          api.listunspent(ecl, req.query.address, network)
+          .then((listunspent) => {
+            ecl.close();
+            api.log('electrum listunspent ==>', 'spv.listunspent');
 
-          const retObj = {
-            msg: 'success',
-            result: listunspent,
-          };
+            const retObj = {
+              msg: 'success',
+              result: listunspent,
+            };
 
-          res.end(JSON.stringify(retObj));
-        });
-      }
+            res.end(JSON.stringify(retObj));
+          });
+        }
+      };
+      _getListunspent();
     } else {
       const retObj = {
         msg: 'error',
