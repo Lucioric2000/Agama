@@ -91,8 +91,10 @@ module.exports = (api) => {
         }
 
         if (_mode === 'default') {
-          if (payload.rpc2cli) {
+          if (payload.rpc2cli === true) {
             let _coindCliBin = api.komodocliBin;
+
+            api.log(`${payload.chain} ${payload.cmd} ${payload.rpc2cli}`, 'native.rpc2cli');
 
             if (api.nativeCoindList &&
                 _chain &&
@@ -116,7 +118,9 @@ module.exports = (api) => {
               _arg = `${_arg} -datadir=${api.appConfig.native.dataDir  + (_chain ? '/' + key : '')}`;
             }
 
-            exec(`"${_coindCliBin}" ${_arg}`, (error, stdout, stderr) => {
+            exec(`"${_coindCliBin}" ${_arg}`, {
+              maxBuffer: 1024 * 1000000 // 1000 mb
+            }, (error, stdout, stderr) => {
               // api.log(`stdout: ${stdout}`, 'native.debug');
               // api.log(`stderr: ${stderr}`, 'native.debug');
 
@@ -139,7 +143,14 @@ module.exports = (api) => {
 
                 if ((stderr.indexOf('{') > -1 && stderr.indexOf('}') > -1) ||
                     (stderr.indexOf('[') > -1 && stderr.indexOf(']') > -1)) {
-                  _res = JSON.parse(stderr);
+                  try {
+                    _res = JSON.parse(stderr);
+                  } catch (e) {
+                    _error = {
+                      code: -777,
+                      message: 'can\'t parse json, max buffer size is exceeded?',
+                    };
+                  }
                 } else {
                   _res = stderr.trim();
                 }
@@ -173,7 +184,14 @@ module.exports = (api) => {
 
                 if ((stdout.indexOf('{') > -1 && stdout.indexOf('}') > -1) ||
                     (stdout.indexOf('[') > -1 && stdout.indexOf(']') > -1)) {
-                  _res = JSON.parse(stdout);
+                  try {
+                    _res = JSON.parse(stdout);
+                  } catch (e) {
+                    _error = {
+                      code: -777,
+                      message: 'can\'t parse json, max buffer size is exceeded?',
+                    };
+                  }
                 } else {
                   _res = stdout.trim();
                 }
@@ -306,7 +324,9 @@ module.exports = (api) => {
           }
 
           _arg = _arg.trim().split(' ');
-          execFile(_coindCliBin, _arg, (error, stdout, stderr) => {
+          execFile(_coindCliBin, _arg, {
+            maxBuffer: 1024 * 1000000 // 1000 mb
+          }, (error, stdout, stderr) => {
             api.log(`stdout: ${stdout}`, 'native.debug');
             api.log(`stderr: ${stderr}`, 'native.debug');
 

@@ -5,7 +5,8 @@ const { secondsToString } = require('agama-wallet-lib/src/time');
 module.exports = (api) => {
   api.log = (msg, type) => {
     if (api.appConfig.dev ||
-        api.appConfig.debug) {
+        api.appConfig.debug ||
+        process.argv.indexOf('devmode') > -1) {
       if (type) {
         console.log(`\x1b[94m${type}`, '\x1b[0m', msg);
       } else {

@@ -255,9 +255,9 @@ module.exports = (api) => {
   api.ecl = async function(network, customElectrum) {
     if (!network) {
       const IsElectrumProtocolV1_4 = await api.getServerVersion(
-        electrum.port,
-        electrum.ip,
-        electrum.proto
+        customElectrum.port,
+        customElectrum.ip,
+        customElectrum.proto
       );
       let _ecl = new api.electrumJSCore(
         customElectrum.port,

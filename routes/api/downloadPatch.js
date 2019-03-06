@@ -65,13 +65,14 @@ module.exports = (api) => {
           api.log('patch succesfully downloaded', 'update.patch');
           api.log('extracting contents', 'update.patch');
 
-          if (api.appConfig.dev) {
+          if (api.appConfig.dev ||
+              process.argv.indexOf('devmode') > -1) {
             if (!fs.existsSync(`${rootLocation}/patch`)) {
               fs.mkdirSync(`${rootLocation}/patch`);
             }
           }
 
-          zip.extractAllTo(/*target path*/rootLocation + (api.appConfig.dev ? '/patch' : ''), /*overwrite*/true);
+          zip.extractAllTo(/*target path*/rootLocation + (api.appConfig.dev || process.argv.indexOf('devmode') > -1 ? '/patch' : ''), /*overwrite*/true);
           // TODO: extract files in chunks
           api.io.emit('patch', {
             msg: {

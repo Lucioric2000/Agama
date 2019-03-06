@@ -20,7 +20,7 @@ module.exports = (api) => {
       let key = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, api.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, api.getNetworkData(network));
       let tx;
 
-      console.log(key.toWIF());
+      // console.log(key.toWIF());
 
       if (api.isZcash(network) &&
           api.getNetworkData(network).overwinter) {

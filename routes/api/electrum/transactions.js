@@ -17,6 +17,7 @@ module.exports = (api) => {
         kv: req.query.kv,
         maxlength: api.appConfig.spv.listtransactionsMaxLength,
         full: req.query.full,
+        txid: req.query.txid,
       })
       .then((txhistory) => {
         res.end(JSON.stringify(txhistory));
@@ -71,11 +72,55 @@ module.exports = (api) => {
               .then((json) => {
                 if (json &&
                     json.length) {
+                  const _pendingTxs = api.findPendingTxByAddress(network, config.address);
                   let _rawtx = [];
-
+                  let _flatTxHistory = [];
+                  let _flatTxHistoryFull = {};
+                  
                   json = api.sortTransactions(json);
-                  json = json.length > MAX_TX ? json.slice(0, MAX_TX) : json;
 
+                  for (let i = 0; i < json.length; i++) {
+                    _flatTxHistory.push(json[i].tx_hash);
+                    _flatTxHistoryFull[json[i].tx_hash] = json[i];
+                  }
+
+                  if (config.txid) {
+                    if (_flatTxHistoryFull[config.txid]) {
+                      api.log(`found txid match ${_flatTxHistoryFull[config.txid].tx_hash}`, 'spv.transactions.txid');
+                      json = [_flatTxHistoryFull[config.txid]];
+                    } else {
+                      json = json.length > MAX_TX ? json.slice(0, MAX_TX) : json;
+                    }
+                  } else {
+                    json = json.length > MAX_TX ? json.slice(0, MAX_TX) : json;
+                  }
+
+                  if (_pendingTxs &&
+                      _pendingTxs.length) {
+                    api.log(`found ${_pendingTxs.length} pending txs in cache`, 'spv.transactions.pending.cache');
+
+                    for (let i = 0; i < _pendingTxs.length; i++) {
+                      if (_flatTxHistory.indexOf(_pendingTxs[i].txid) > -1) {
+                        api.log(`found ${_pendingTxs[i].txid} pending txs in cache for removal at pos ${_flatTxHistory.indexOf(_pendingTxs[i].txid)}`, 'spv.transactions.pending.cache');
+
+                        api.updatePendingTxCache(
+                          network,
+                          _pendingTxs[i].txid,
+                          {
+                            remove: true,
+                          }
+                        );
+                      } else {
+                        api.log(`push ${_pendingTxs[i].txid} from pending txs in cache to transactions history`, 'spv.transactions.pending.cache');
+                        
+                        json.unshift({
+                          height: 'pending',
+                          tx_hash: _pendingTxs[i].txid,
+                        });
+                      }
+                    }
+                  }
+                  
                   api.log(json.length, 'spv.listtransactions');
                   let index = 0;
 
@@ -95,6 +140,8 @@ module.exports = (api) => {
                           ecl
                         )
                         .then((_rawtxJSON) => {
+                          if (transaction.height === 'pending') transaction.height = currentHeight;
+                          
                           api.log('electrum gettransaction ==>', 'spv.listtransactions');
                           api.log((index + ' | ' + (_rawtxJSON.length - 1)), 'spv.listtransactions');
                           // api.log(_rawtxJSON, 'spv.listtransactions');
@@ -187,6 +234,23 @@ module.exports = (api) => {
                                     formattedTx.vinLen = decodedTx.inputs.length;
                                     formattedTx.vinMaxLen = api.appConfig.spv.maxVinParseLimit;
                                     formattedTx.opreturn = opreturn;
+
+                                    if (api.electrumCache[network] &&
+                                        api.electrumCache[network].verboseTx &&
+                                        api.electrumCache[network].verboseTx[transaction.tx_hash]) {
+                                      formattedTx.dpowSecured = false;
+
+                                      if (api.electrumCache[network].verboseTx[transaction.tx_hash].hasOwnProperty('confirmations')) {
+                                        if (api.electrumCache[network].verboseTx[transaction.tx_hash].confirmations >= 2) {
+                                          formattedTx.dpowSecured = true;
+                                          formattedTx.rawconfirmations = formattedTx.confirmations;
+                                        } else {
+                                          formattedTx.confirmations = api.electrumCache[network].verboseTx[transaction.tx_hash].confirmations;
+                                          formattedTx.rawconfirmations = api.electrumCache[network].verboseTx[transaction.tx_hash].rawconfirmations;
+                                        }             
+                                      }
+                                    }
+
                                     _rawtx.push(formattedTx);
                                   } else {
                                     formattedTx[0].height = transaction.height;
@@ -209,6 +273,28 @@ module.exports = (api) => {
                                     formattedTx[1].vinLen = decodedTx.inputs.length;
                                     formattedTx[1].vinMaxLen = api.appConfig.spv.maxVinParseLimit;
                                     formattedTx[1].opreturn = opreturn[1];
+
+                                    if (api.electrumCache[network] &&
+                                        api.electrumCache[network].verboseTx &&
+                                        api.electrumCache[network].verboseTx[transaction.tx_hash]) {
+                                      formattedTx[0].dpowSecured = false;
+                                      formattedTx[1].dpowSecured = false;
+
+                                      if (api.electrumCache[network].verboseTx[transaction.tx_hash].hasOwnProperty('confirmations')) {
+                                        if (api.electrumCache[network].verboseTx[transaction.tx_hash].confirmations >= 2) {
+                                          formattedTx[0].dpowSecured = true;
+                                          formattedTx[1].dpowSecured = true;
+                                          formattedTx[0].rawconfirmations = formattedTx[0].confirmations;
+                                          formattedTx[1].rawconfirmations = formattedTx[1].confirmations;
+                                        } else {
+                                          formattedTx[0].confirmations = api.electrumCache[network].verboseTx[transaction.tx_hash].confirmations;
+                                          formattedTx[1].confirmations = api.electrumCache[network].verboseTx[transaction.tx_hash].confirmations;
+                                          formattedTx[0].rawconfirmations = api.electrumCache[network].verboseTx[transaction.tx_hash].rawconfirmations;
+                                          formattedTx[1].rawconfirmations = api.electrumCache[network].verboseTx[transaction.tx_hash].rawconfirmations;
+                                        }
+                                      }
+                                    }
+
                                     _rawtx.push(formattedTx[0]);
                                     _rawtx.push(formattedTx[1]);
                                   }

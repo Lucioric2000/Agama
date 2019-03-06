@@ -118,14 +118,14 @@ let __defaultAppSettings = require('./routes/appConfig.js').config;
 __defaultAppSettings['daemonOutput'] = false; // shadow setting
 const _defaultAppSettings = __defaultAppSettings;
 
-api.log(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`, 'init');
-api.writeLog(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`);
+api.log(`app started in ${(appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'dev mode' : ' user mode')}`, 'init');
+api.writeLog(`app started in ${(appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'dev mode' : ' user mode')}`);
 
 api.setConfKMD();
 // api.setConfKMD('CHIPS');
 
 guiapp.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', appConfig.dev ? '*' : 'http://127.0.0.1:3000');
+	res.header('Access-Control-Allow-Origin', appConfig.dev || process.argv.indexOf('devmode') > -1 ? '*' : 'http://127.0.0.1:3000');
 	res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 	res.header('Access-Control-Allow-Credentials', 'true');
 	res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
@@ -154,7 +154,8 @@ process.once('loaded', () => {
 });
 
 // silent errors
-if (!appConfig.dev) {
+if (!appConfig.dev &&
+		!process.argv.indexOf('devmode') > -1) {
 	process.on('uncaughtException', (err) => {
 	  api.log(`${(new Date).toUTCString()} uncaughtException: ${err.message}`, 'exception');
 	  api.log(err.stack, 'exception');
@@ -246,7 +247,7 @@ if (!_argv.nogui ||
 		api.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 		api.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 		// start sockets.io
-		io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
+		io.set('origins', appConfig.dev  || process.argv.indexOf('devmode') > -1 ? 'http://127.0.0.1:3000' : null); // set origin
 	});
 	api.setIO(io); // pass sockets object to api router
 	api.setVar('appBasicInfo', appBasicInfo);
@@ -265,7 +266,7 @@ function createAppCloseWindow() {
 
 	appCloseWindow.setResizable(false);
 
-	appCloseWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort}/gui/startup/app-closing.html` : `file://${__dirname}/gui/startup/app-closing.html`);
+	appCloseWindow.loadURL(appConfig.dev || process.argv.indexOf('devmode') > -1 ? `http://${appConfig.host}:${appConfig.agamaPort}/gui/startup/app-closing.html` : `file://${__dirname}/gui/startup/app-closing.html`);
 
   appCloseWindow.webContents.on('did-finish-load', () => {
     setTimeout(() => {
@@ -318,7 +319,7 @@ function createAppCloseWindow() {
 					api.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 					api.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
 					// start sockets.io
-					io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
+					io.set('origins', appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'http://127.0.0.1:3000' : null); // set origin
 				});
 
 				// initialise window
@@ -329,7 +330,7 @@ function createAppCloseWindow() {
 					show: false,
 				});
 
-				mainWindow.loadURL(appConfig.dev ? 'http://127.0.0.1:3000' : `file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
+				mainWindow.loadURL(appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'http://127.0.0.1:3000' : `file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
 
 				api.setIO(io); // pass sockets object to api router
 				api.setVar('appBasicInfo', appBasicInfo);
@@ -364,13 +365,12 @@ function createAppCloseWindow() {
 					appExit,
 					getMaxconKMDConf: api.getMaxconKMDConf,
 					setMaxconKMDConf: api.setMaxconKMDConf,
-					getMMCacheData: api.getMMCacheData,
+					// getMMCacheData: api.getMMCacheData,
 					activeSection: 'wallets', // temp deprecated
 					argv: process.argv,
 					getAssetChainPorts: api.getAssetChainPorts,
 					startSPV: api.startSPV,
 					startKMDNative: api.startKMDNative,
-					addressVersionCheck: api.addressVersionCheck,
 					getCoinByPub: api.getCoinByPub,
 					resetSettings: () => { api.saveLocalAppConf(__defaultAppSettings) },
 					createSeed: {
@@ -381,11 +381,6 @@ function createAppCloseWindow() {
 					checkStringEntropy: api.checkStringEntropy,
 					pinAccess: false,
 					isWatchOnly: api.isWatchOnly,
-					setPubkey: api.setPubkey,
-					getPubkeys: api.getPubkeys,
-					kvEncode: api.kvEncode,
-					kvDecode: api.kvDecode,
-					getAddressVersion: api.getAddressVersion,
 					sha256: (data) => {
 						const crypto = require('crypto');
 						return crypto.createHash('sha256').update(data).digest();
@@ -418,7 +413,7 @@ function createAppCloseWindow() {
 					api.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`, 'init');
 					api.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`);
 				});
-				mainWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html` : `file://${__dirname}/gui/startup/agama-instance-error.html`);
+				mainWindow.loadURL(appConfig.dev || process.argv.indexOf('devmode') > -1 ? `http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html` : `file://${__dirname}/gui/startup/agama-instance-error.html`);
 				api.log('another agama app is already running', 'init');
 			}
 
@@ -455,13 +450,14 @@ function createAppCloseWindow() {
 				}
 			});
 
-			if (appConfig.dev) {
+			if (appConfig.dev ||
+					process.argv.indexOf('devmode') > -1) {
 				mainWindow.webContents.openDevTools();
 			}
 
 			function appExit() {
-				if (api.appConfig.spv &&
-						api.appConfig.spv.cache) {
+				if (((api.appConfig.dev || process.argv.indexOf('devmode') > -1) && api.appConfig.spv.cache) ||
+						(!api.appConfig.dev && process.argv.indexOf('devmode') === -1)) {
 					api.saveLocalSPVCache();
 				}
 

@@ -208,6 +208,29 @@ const chainParams = {
                 addnode: '149.202.84.141',
                 genproclimit: true,
         },
+	KSB: {
+		ac_supply: 1000000000,
+		ac_end: 1,
+		ac_public: 1,
+		addnode: [
+			'37.187.225.231',
+			'217.182.129.38',
+		],
+	},
+	OUR: {
+		ac_reward: 1478310502,
+		ac_halving: 525600,
+		ac_cc: 42,
+		ac_supply: 100000000,
+		ac_perc: 7700,
+		ac_staked: 93,
+		ac_pubkey: '02652a3f3e00b3a1875a918314f0bac838d6dd189a346fa623f5efe9541ac0b98c',
+		ac_public: 1,
+		addnode: [
+			'37.187.225.231',
+			'217.182.129.38',
+		],
+	},
 };
 
 module.exports = chainParams;

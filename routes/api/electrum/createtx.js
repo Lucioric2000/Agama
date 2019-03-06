@@ -96,12 +96,13 @@ module.exports = (api) => {
             let totalInterestUTXOCount = 0;
             let interestClaimThreshold = 200;
             let utxoVerified = true;
+            let dpowSecured = 'n/a';
 
             for (let i = 0; i < utxoList.length; i++) {
               if (network === 'komodo' ||
                   network.toLowerCase() === 'kmd') {
                 if (utxoList[i].confirmations > 0) {
-                  utxoListFormatted.push({
+                  let _formattedUtxo = {
                     txid: utxoList[i].txid,
                     vout: utxoList[i].vout,
                     value: Number(utxoList[i].amountSats),
@@ -109,18 +110,32 @@ module.exports = (api) => {
                     verified: utxoList[i].verified ? utxoList[i].verified : false,
                     height: utxoList[i].height,
                     currentHeight: utxoList[i].currentHeight,
-                  });
+                  };
+
+                  if (utxoList[i].hasOwnProperty('dpowSecured')) {
+                    _formattedUtxo.dpowSecured = utxoList[i].dpowSecured;
+                    dpowSecured = true;
+                  }
+
+                  utxoListFormatted.push(_formattedUtxo);
                 }
               } else {
                 if (utxoList[i].confirmations > 0) {
-                  utxoListFormatted.push({
+                  let _formattedUtxo = {
                     txid: utxoList[i].txid,
                     vout: utxoList[i].vout,
                     value: Number(utxoList[i].amountSats),
                     verified: utxoList[i].verified ? utxoList[i].verified : false,
                     height: utxoList[i].height,
                     currentHeight: utxoList[i].currentHeight,
-                  });
+                  };
+
+                  if (utxoList[i].hasOwnProperty('dpowSecured')) {
+                    _formattedUtxo.dpowSecured = utxoList[i].dpowSecured;
+                    dpowSecured = true;
+                  }
+
+                  utxoListFormatted.push(_formattedUtxo);
                 }
               }
             }
@@ -221,6 +236,14 @@ module.exports = (api) => {
               for (let i = 0; i < inputs.length; i++) {
                 if (!inputs[i].verified) {
                   utxoVerified = false;
+                  break;
+                }
+              }
+
+              for (let i = 0; i < inputs.length; i++) {
+                if (inputs[i].hasOwnProperty('dpowSecured') &&
+                    !inputs[i].dpowSecured) {
+                  dpowSecured = false;
                   break;
                 }
               }
@@ -352,6 +375,7 @@ module.exports = (api) => {
                     changeAddress,
                     network,
                     utxoVerified,
+                    dpowSecured,
                   };
 
                   const retObj = {
@@ -403,6 +427,7 @@ module.exports = (api) => {
                         network,
                         rawtx: _rawtx,
                         utxoVerified,
+                        dpowSecured,
                       },
                     };
 
@@ -428,6 +453,7 @@ module.exports = (api) => {
                           rawtx: _rawtx,
                           txid,
                           utxoVerified,
+                          dpowSecured,
                         };
 
                         if (txid &&
@@ -465,6 +491,15 @@ module.exports = (api) => {
 
                             res.end(JSON.stringify(retObj));
                           } else {
+                            api.updatePendingTxCache(
+                              network,
+                              txid,
+                              {
+                                pub: changeAddress,
+                                rawtx: _rawtx,
+                              },
+                            );
+
                             const retObj = {
                               msg: 'success',
                               result: _rawObj,
@@ -573,6 +608,17 @@ module.exports = (api) => {
 
               res.end(JSON.stringify(retObj));
             } else {
+              if (req.query.pub) {
+                api.updatePendingTxCache(
+                  network,
+                  txid,
+                  {
+                    pub: req.query.pub,
+                    rawtx: _rawtx,
+                  },
+                );
+              }
+
               const retObj = {
                 msg: 'success',
                 result: json,

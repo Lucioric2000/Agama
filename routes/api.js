@@ -18,8 +18,6 @@ api.appRuntimeLog = [];
 api.lockDownAddCoin = false;
 api._isWatchOnly = false;
 
-api.staking = {};
-
 // dex cache
 api.mmupass = null;
 api.mmRatesInterval = null;
@@ -164,6 +162,15 @@ api = require('./api/eth/utils.js')(api);
 // Allow the API to get some extra wallet functions
 api = require('./api/walletlib.js')(api);
 
+// exchanges
+api.exchangesCache = {
+  coinswitch: {},
+};
+api = require('./api/exchange/exchange')(api);
+api = require('./api/exchange/coinswitch/coinswitch')(api);
+api = require('./api/exchange/changelly/changelly')(api);
+api.loadLocalExchangesCache();
+
 api.printDirs();
 
 // default route
@@ -181,8 +188,8 @@ api.setVar = (_name, _body) => {
 };
 
 // spv
-if (api.appConfig.spv &&
-    api.appConfig.spv.cache) {
+if (((api.appConfig.dev || process.argv.indexOf('devmode') > -1) && api.appConfig.spv.cache) ||
+    (!api.appConfig.dev && process.argv.indexOf('devmode') === -1)) {
   api.loadLocalSPVCache();
 }
 

@@ -44,6 +44,9 @@ const appConfig = {
       zshieldcoinbase: false,
     },
     pubkey: '',
+    exchanges: {
+      coinswitchKey: '',
+    },
     // coinControl: false,
     // darkmode: false,
   },
@@ -265,6 +268,16 @@ const appConfig = {
       displayName: 'Pubkey',
       info: 'Append pubkey (-pubkey) to daemon launch params list',
       type: 'string',
+    },
+    exchanges: {
+      display: false,
+      displayName: 'Exchanges',
+      coinswitchKey: {
+        display: true,
+        displayName: 'Coinswitch API key',
+        info: 'Your personal Coinswitch API key',
+        type: 'string',
+      },
     },
     /*coinControl: {
       display: true,

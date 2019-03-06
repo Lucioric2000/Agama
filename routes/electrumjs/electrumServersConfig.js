@@ -15,6 +15,7 @@ const disableCoins = [
   'btcp', // sort out kv
   'blk',
   // untested coins
+  'smart',
   'usc',
   'bca',
   'mnx',
@@ -66,6 +67,12 @@ const disableCoins = [
   'edrc',
   'ccn',
   'cmp',
+  // temp disable
+  'mue',
+  'xbc',
+  'pac',
+  'lcc',
+  'axe',
 ];
 
 module.exports = disableCoins;
