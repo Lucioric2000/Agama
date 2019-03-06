@@ -11,7 +11,12 @@ git checkout fullapidev
 git pull upstream dev
 git merge dev
 #echo estamos en $(pwd)
+rm -rf node_modules
+rm -rf gui/EasyDEX-GUI/react/node_modules
+rm -rf build/*
 npm install
+npm update
+npm install webpack
 #npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
 #npm start
@@ -32,6 +37,7 @@ git checkout dev
 git pull upstream dev
 #npm install electron-packager electron-prebuilt
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
+npm update
 npm install electron
 npm install
 #pwd
