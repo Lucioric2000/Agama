@@ -1,5 +1,3 @@
-const ethers = require('ethers');
-
 module.exports = (api) => {  
   api.get('/eth/coins', (req, res, next) => {
     if (api.eth.wallet &&
@@ -35,6 +33,10 @@ module.exports = (api) => {
         const mnemonicWallet = api.eth._keys(api.seed);
 
         api.eth.wallet = mnemonicWallet;
+      }
+
+      if (!api.eth.coins) {
+        api.eth.coins = {};
       }
 
       if (_coin &&

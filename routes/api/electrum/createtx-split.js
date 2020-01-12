@@ -1,7 +1,4 @@
-const bitcoinJS = require('bitcoinjs-lib');
-const bitcoinJSForks = require('bitcoinforksjs-lib');
-const bitcoinZcash = require('bitgo-utxo-lib');
-const bitcoinPos = require('bitcoinjs-lib-pos');
+const bitcoin = require('bitgo-utxo-lib');
 
 // merge into agama-wallet-lib
 
@@ -17,19 +14,8 @@ module.exports = (api) => {
       const outputAddress = req.body.payload.outputAddress;
       const changeAddress = req.body.payload.changeAddress;
 
-      let key = api.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, api.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, api.getNetworkData(network));
-      let tx;
-
-      console.log(key.toWIF());
-
-      if (api.isZcash(network) &&
-          api.getNetworkData(network).overwinter) {
-        tx = new bitcoinZcash.TransactionBuilder(api.getNetworkData(network));
-      } else if (api.isPos(network)) {
-        tx = new bitcoinPos.TransactionBuilder(api.getNetworkData(network));
-      } else {
-        tx = new bitcoinJS.TransactionBuilder(api.getNetworkData(network));
-      }
+      let key = bitcoin.ECPair.fromWIF(wif, api.getNetworkData(network));
+      let tx = new bitcoin.TransactionBuilder(api.getNetworkData(network));
 
       api.log('buildSignedTx', 'spv.createrawtx');
       api.log(`buildSignedTx pub key ${key.getAddress().toString()}`, 'spv.createrawtx');
@@ -49,7 +35,7 @@ module.exports = (api) => {
           tx.addOutput(outputAddress, Number(targets[i]));
         }
       }
-      
+
       if (Number(change) > 0) {
         if (api.isPos(network)) {
           tx.addOutput(
@@ -62,7 +48,7 @@ module.exports = (api) => {
           tx.addOutput(changeAddress, Number(change));
         }
       }
-      
+
       if (network === 'komodo' ||
           network === 'KMD') {
         const _locktime = Math.floor(Date.now() / 1000) - 777;
@@ -71,8 +57,9 @@ module.exports = (api) => {
       }
 
       let versionNum;
-      if ((utxo[0].currentHeight >= 419200 && network === 'zec') || 
-          (utxo[0].currentHeight >= 227520 && network === 'vrsc')){
+      if ((utxo[0].currentHeight >= 419200 && network === 'zec') ||
+          (utxo[0].currentHeight >= 227520 && network === 'vrsc') ||
+          network === 'vrsctest'){
         versionNum = 4;
       } else {
         if (network === 'zec') {
@@ -81,12 +68,12 @@ module.exports = (api) => {
           versionNum = 1;
         }
       }
-  
+
       if (versionNum) {
         tx.setVersion(versionNum);
       }
       api.log('version set');
-      
+
       for (let i = 0; i < utxo.length; i++) {
         if (api.isPos(network)) {
           tx.sign(
@@ -96,7 +83,8 @@ module.exports = (api) => {
           );
         } else {
           if (network === 'zec' ||
-              network === 'vrsc') {
+              network === 'vrsc' ||
+              network === 'vrsctest') {
             tx.sign(i, key, '', null, utxo[i].value || utxo[i].amountSats);
           } else {
             tx.sign(i, key);

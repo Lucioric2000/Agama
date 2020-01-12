@@ -30,11 +30,11 @@ module.exports = (api) => {
           break;
       }
 
-      if (_herd === 'komodo') {
+      if (_ac && api.appConfig.reservedChains.indexOf(_ac) === -1) {
+        _location = `${api.appConfig.verus.pbaasTestmode ? api.verusTestDir : api.verusDir}/PBAAS/${_ac}`
+      } else if (_herd === 'komodo') {
         _location = api.komodoDir;
-      }
-
-      if (_ac) {
+      } else if (_ac) {
         _location = `${api.komodoDir}/${_ac}`;
 
         if (_ac === 'CHIPS') {

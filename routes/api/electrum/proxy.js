@@ -1,26 +1,15 @@
 const request = require('request');
 const Promise = require('bluebird');
 const { getRandomIntInclusive } = require('agama-wallet-lib/src/utils');
+const { proxyServersHttps } = require('agama-wallet-lib/src/electrum-servers');
 
 // TODO: reduce code
 // abstraction layer to communicate with electrum proxies
 
-const proxyServers = [{
-  ip: '94.130.225.86',
-  port: 80,
-}, {
-  ip: '94.130.98.74',
-  port: 80,
-}];
-
 // pick a random proxy server
-const _randomServer = proxyServers[getRandomIntInclusive(0, proxyServers.length - 1)];
-const proxyServer = {
-  ip: _randomServer.ip,
-  port: _randomServer.port,
-};
+const proxyServer = proxyServersHttps[getRandomIntInclusive(0, proxyServersHttps.length - 1)];
 
-console.log(`proxy server ${proxyServer.ip}:${proxyServer.port}`);
+console.log(`proxy server ${proxyServer}`);
 
 module.exports = (api) => {
   /*api.httpReq = (url, type) => {
@@ -68,7 +57,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/getbalance?${makeUrl({ address })}`,
+            url: `https://${proxyServer}/api/getbalance?${makeUrl({ address })}`,
             method: 'GET',
           };
 
@@ -99,7 +88,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/listunspent?${makeUrl({ address })}`,
+            url: `https://${proxyServer}/api/listunspent?${makeUrl({ address })}`,
             method: 'GET',
           };
 
@@ -130,7 +119,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/listtransactions?${makeUrl({ address })}`,
+            url: `https://${proxyServer}/api/listtransactions?${makeUrl({ address })}`,
             method: 'GET',
           };
 
@@ -161,7 +150,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/estimatefee?${makeUrl({ blocks })}`,
+            url: `https://${proxyServer}/api/estimatefee?${makeUrl({ blocks })}`,
             method: 'GET',
           };
 
@@ -192,7 +181,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/getblockinfo?${makeUrl({ height })}`,
+            url: `https://${proxyServer}/api/getblockinfo?${makeUrl({ height })}`,
             method: 'GET',
           };
 
@@ -223,7 +212,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/getcurrentblock?${makeUrl()}`,
+            url: `https://${proxyServer}/api/getcurrentblock?${makeUrl()}`,
             method: 'GET',
           };
 
@@ -254,7 +243,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?${makeUrl({ txid })}`,
+            url: `https://${proxyServer}/api/gettransaction?${makeUrl({ txid })}`,
             method: 'GET',
           };
 
@@ -285,7 +274,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/getmerkle?${makeUrl({ txid, height })}`,
+            url: `https://${proxyServer}/api/getmerkle?${makeUrl({ txid, height })}`,
             method: 'GET',
           };
 
@@ -316,7 +305,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/gettransaction?${makeUrl()}`,
+            url: `https://${proxyServer}/api/gettransaction?${makeUrl()}`,
             method: 'GET',
           };
 
@@ -347,7 +336,7 @@ module.exports = (api) => {
 
         return new Promise((resolve, reject) => {
           const options = {
-            url: `http://${proxyServer.ip}:${proxyServer.port}/api/pushtx`,
+            url: `https://${proxyServer}/api/pushtx`,
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

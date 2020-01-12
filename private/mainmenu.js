@@ -1,7 +1,11 @@
-const {Menu} = require('electron');
+const { Menu } = require('electron');
 const electron = require('electron');
 const app = electron.app;
-const {shell} = require('electron');
+const { shell } = require('electron');
+const {
+  pathsAgama,
+  pathsDaemons,
+} = require('../routes/api/pathsUtil');
 
 const template = [
   {
@@ -96,9 +100,40 @@ const template = [
           focusedWindow.resetSettings();
         }
       },
+      {
+        label: 'Join our Discord',
+        click (item, focusedWindow) {
+          shell.openExternal('https://discord.gg/VRKMP2S');
+        }
+      },
+      // ref: https://github.com/sindresorhus/new-github-issue-url
+      {
+        label: 'Add Github issue',
+        click (item, focusedWindow) {
+          shell.openExternal('https://github.com/VerusCoin/agama/issues/new?body=Please+describe+your+issue+in+details.+Attach+screenshots+if+you+can,+they+help+a+lot.');
+        }
+      },
+      {
+        label: 'Show Agama data folder',
+        click (item, focusedWindow) {
+          shell.openItem(pathsAgama().agamaDir);
+        }
+      },
+      {
+        label: 'Show Verus data folder (default)',
+        click (item, focusedWindow) {
+          shell.openItem(pathsDaemons().vrscDir);
+        }
+      },
+      {
+        label: 'Show komodo-cli folder',
+        click (item, focusedWindow) {
+          shell.openItem(pathsDaemons().komodocliDir);
+        }
+      },
     ]
   }
-]
+];
 
 if (process.platform === 'darwin') {
   const name = app.getName();
@@ -179,7 +214,7 @@ if (process.platform === 'darwin') {
       role: 'front'
     }
   ]
-};
+}
 
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);

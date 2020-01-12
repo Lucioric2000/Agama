@@ -10,6 +10,13 @@ module.exports = (api) => {
     if (fs.existsSync(`${api.agamaDir}/config.json`)) {
       let localAppConfig = fs.readFileSync(`${api.agamaDir}/config.json`, 'utf8');
 
+      try {
+        JSON.parse(localAppConfig);
+      } catch (e) {
+        api.log('unable to parse local config.json', 'settings');
+        localAppConfig = JSON.stringify(defaultConf);
+      }
+
       api.log('app config set from local file', 'settings');
       api.writeLog('app config set from local file');
 
@@ -45,9 +52,9 @@ module.exports = (api) => {
       };
 
       if (localAppConfig) {
+        let _localAppConfig = JSON.parse(localAppConfig);
         // update config to v2.42 compatible
-        if (!JSON.parse(localAppConfig).native) {
-          let _localAppConfig = JSON.parse(localAppConfig);
+        if (!_localAppConfig.native) {
           const _confProps = [
             'dataDir',
             'cliStopTimeout',
@@ -75,6 +82,16 @@ module.exports = (api) => {
           localAppConfig = JSON.stringify(_localAppConfig);
           api.saveLocalAppConf(_localAppConfig);
         }
+
+        //This block of code forces the enabling or disabling of verustest.
+        //Use for releases that do not support either normal verus or verustest
+        /*if (_localAppConfig.verus.hasOwnProperty('enableVrsctest') && 
+          _localAppConfig.verus.enableVrsctest !== defaultConf.verus.enableVrsctest) {
+          _localAppConfig.verus.enableVrsctest = defaultConf.verus.enableVrsctest
+          api.log('Changed PBaaS enableVrsctest to ' + defaultConf.verus.enableVrsctest, 'settings');
+          localAppConfig = JSON.stringify(_localAppConfig);
+          api.saveLocalAppConf(_localAppConfig);
+        }*/
 
         const compareConfigs = compareJSON(defaultConf, JSON.parse(localAppConfig));
 

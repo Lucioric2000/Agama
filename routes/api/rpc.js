@@ -9,6 +9,8 @@ module.exports = (api) => {
     let _confLocation = chain === 'komodod' ? `${api.komodoDir}/komodo.conf` : `${api.komodoDir}/${chain}/${chain}.conf`;
     _confLocation = chain === 'CHIPS' ? `${api.chipsDir}/chips.conf` : _confLocation;
 
+   
+
     // any coind
     if (chain) {
       if (api.nativeCoindList[chain.toLowerCase()]) {
@@ -16,7 +18,15 @@ module.exports = (api) => {
         let coindDebugLogLocation = `${_osHome}/.${api.nativeCoindList[chain.toLowerCase()].bin.toLowerCase()}/debug.log`;
 
         _confLocation = `${_osHome}/.${api.nativeCoindList[chain.toLowerCase()].bin.toLowerCase()}/${api.nativeCoindList[chain.toLowerCase()].bin.toLowerCase()}.conf`;
+      } else if (api.appConfig.reservedChains.indexOf(chain) === -1) {
+        _confLocation = `${api.appConfig.verus.pbaasTestmode ? api.verusTestDir : api.verusDir}/PBAAS/${chain}/${chain}.conf`;
+      } else if (chain === 'chips') {
+        _confLocation = `${api.chipsDir}/chips.conf`;
+      } else {
+        _confLocation = chain === 'komodod' ? `${api.komodoDir}/komodo.conf` : `${api.komodoDir}/${chain}/${chain}.conf`;
       }
+
+      api.log(`Checking conf location: ${_confLocation}`, 'native.confd');
 
       if (fs.existsSync(_confLocation)) {
         const _rpcConf = fs.readFileSync(_confLocation, 'utf8');
@@ -73,13 +83,13 @@ module.exports = (api) => {
         };
 
         res.end(JSON.stringify(retObj));
-      } else if (!payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
+      /*} else if (!payload.cmd.match(/^[0-9a-zA-Z _\,\.\[\]"'/\\]+$/g)) {
         const retObj = {
           msg: 'error',
           result: 'wrong cli string format',
         };
 
-        res.end(JSON.stringify(retObj));
+        res.end(JSON.stringify(retObj));*/
       } else {
         const _mode = payload.mode === 'passthru' ? 'passthru' : 'default';
         const _chain = payload.chain === 'KMD' ? null : payload.chain;
@@ -91,8 +101,10 @@ module.exports = (api) => {
         }
 
         if (_mode === 'default') {
-          if (payload.rpc2cli) {
-            let _coindCliBin = api.komodocliBin;
+          if (payload.rpc2cli === true) {
+            let _coindCliBin = api.appConfig.reservedChains.indexOf(_chain) === -1 ? api.veruscliBin : api.komodocliBin;
+
+            api.log(`${payload.chain} ${payload.cmd} ${payload.rpc2cli}`, 'native.rpc2cli');
 
             if (api.nativeCoindList &&
                 _chain &&
@@ -116,7 +128,9 @@ module.exports = (api) => {
               _arg = `${_arg} -datadir=${api.appConfig.native.dataDir  + (_chain ? '/' + key : '')}`;
             }
 
-            exec(`"${_coindCliBin}" ${_arg}`, (error, stdout, stderr) => {
+            exec(`"${_coindCliBin}" ${_arg}`, {
+              maxBuffer: 1024 * 1000000 // 1000 mb
+            }, (error, stdout, stderr) => {
               // api.log(`stdout: ${stdout}`, 'native.debug');
               // api.log(`stderr: ${stderr}`, 'native.debug');
 
@@ -139,7 +153,14 @@ module.exports = (api) => {
 
                 if ((stderr.indexOf('{') > -1 && stderr.indexOf('}') > -1) ||
                     (stderr.indexOf('[') > -1 && stderr.indexOf(']') > -1)) {
-                  _res = JSON.parse(stderr);
+                  try {
+                    _res = JSON.parse(stderr);
+                  } catch (e) {
+                    _error = {
+                      code: -777,
+                      message: 'can\'t parse json, max buffer size is exceeded?',
+                    };
+                  }
                 } else {
                   _res = stderr.trim();
                 }
@@ -173,7 +194,14 @@ module.exports = (api) => {
 
                 if ((stdout.indexOf('{') > -1 && stdout.indexOf('}') > -1) ||
                     (stdout.indexOf('[') > -1 && stdout.indexOf(']') > -1)) {
-                  _res = JSON.parse(stdout);
+                  try {
+                    _res = JSON.parse(stdout);
+                  } catch (e) {
+                    _error = {
+                      code: -777,
+                      message: 'can\'t parse json, max buffer size is exceeded?',
+                    };
+                  }
                 } else {
                   _res = stdout.trim();
                 }
@@ -206,7 +234,9 @@ module.exports = (api) => {
                 const _osHome = os.platform === 'win32' ? process.env.APPDATA : process.env.HOME;
                 let coindDebugLogLocation;
 
-                if (_chain === 'CHIPS') {
+                if (api.appConfig.reservedChains.indexOf(_chain) === -1) {
+                  coindDebugLogLocation = `${api.appConfig.verus.pbaasTestmode ? api.verusTestDir : api.verusDir}/PBAAS/${_chain}/debug.log`;
+                } else if (_chain === 'CHIPS') {
                   coindDebugLogLocation = `${api.chipsDir}/debug.log`;
                 } else {
                   coindDebugLogLocation = `${_osHome}/.${api.nativeCoindList[_chain.toLowerCase()].bin.toLowerCase()}/debug.log`;
@@ -291,7 +321,7 @@ module.exports = (api) => {
             }
           }
         } else {
-          let _coindCliBin = api.komodocliBin;
+          let _coindCliBin = _chain && (_chain === 'VRSC' || _chain === 'VRSCTEST' || api.appConfig.reservedChains.indexOf(_chain) === -1) ? api.veruscliBin : api.komodocliBin;
 
           if (api.nativeCoindList &&
               _chain &&
@@ -306,7 +336,9 @@ module.exports = (api) => {
           }
 
           _arg = _arg.trim().split(' ');
-          execFile(_coindCliBin, _arg, (error, stdout, stderr) => {
+          execFile(_coindCliBin, _arg, {
+            maxBuffer: 1024 * 1000000 // 1000 mb
+          }, (error, stdout, stderr) => {
             api.log(`stdout: ${stdout}`, 'native.debug');
             api.log(`stderr: ${stderr}`, 'native.debug');
 
@@ -329,7 +361,7 @@ module.exports = (api) => {
             }
 
             res.end(JSON.stringify(retObj));
-            api.killRogueProcess('komodo-cli');
+            api.killRogueProcess(_chain && (_chain === 'VRSC' || _chain === 'VRSCTEST' || api.appConfig.reservedChains.indexOf(_chain) === -1) ? 'verus' : 'komodo-cli');
           });
         }
       }

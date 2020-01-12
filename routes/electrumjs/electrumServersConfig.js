@@ -3,7 +3,6 @@ const disableCoins = [
   'vot',
   'mac',
   'bdl',
-  'axe', // no servers
   'mzc', // no servers
   'zet', // no servers
   'jbs', // no servers
@@ -12,11 +11,11 @@ const disableCoins = [
   'xwc', // needs kv edit
   'put', // needs kv edit
   'ecn', // needs kv edit
-  'smart', // wrong address
   'ac',
   'btcp', // sort out kv
   'blk',
   // untested coins
+  'smart',
   'usc',
   'bca',
   'mnx',
@@ -67,8 +66,13 @@ const disableCoins = [
   'insn',
   'edrc',
   'ccn',
-  'xbc',
   'cmp',
+  // temp disable
+  'mue',
+  'xbc',
+  'pac',
+  'lcc',
+  'axe',
 ];
 
 module.exports = disableCoins;

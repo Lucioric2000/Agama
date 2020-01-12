@@ -22,11 +22,13 @@ module.exports = (api) => {
           getbalance: {},
           listunspent: {},
           addresses: {},
+          getwalletinfo: {},
         };
         _promiseStack = [
           'getinfo',
           'listtransactions',
-          'getbalance'
+          'getbalance',
+          'getwalletinfo'
         ];
       } else {
         _returnObj = {
@@ -36,12 +38,14 @@ module.exports = (api) => {
           z_getoperationstatus: {},
           listunspent: {},
           addresses: {},
+          getwalletinfo: {}
         };
         _promiseStack = [
           'getinfo',
           'listtransactions',
           'z_gettotalbalance',
           'z_getoperationstatus',
+          'getwalletinfo'
         ];
       }
 
@@ -132,17 +136,26 @@ module.exports = (api) => {
                 if (result[a]) {
                   for (let b = 0; b < result[a].length; b++) {
                     const filteredArraySpends = json.filter(res => res.address === result[a][b]);
-                    const filteredArray = json.filter(res => res.address === result[a][b]).map(res => res.amount);
+                    const filteredArray = json.filter(res => res.address === result[a][b]).map(res => {
+                      return {
+                        amount: res.amount,
+                        reserveAmount: res.reserveAmount
+                      }
+                    });
 
-                    let sum = 0;
-                    let spendableSum = 0;
+                    let nativeSum = 0;
+                    let reserveSum = 0
+                    let spendableNativeSum = 0;
+                    let spendableReserveSum = 0;
                     let canspend = true;
 
                     for (let i = 0; i < filteredArray.length; i++) {
-                      sum += filteredArray[i];
+                      nativeSum += filteredArray[i].amount;
+                      reserveSum += filteredArray[i].reserveAmount ? filteredArray[i].reserveAmount : 0;
 
                       if (filteredArraySpends[i].spendable) {
-                        spendableSum += filteredArray[i];
+                        spendableNativeSum += filteredArray[i].amount;
+                        spendableReserveSum += filteredArray[i].reserveAmount ? filteredArray[i].reserveAmount : 0;
                       } else {
                         canspend = false;
                       }
@@ -150,8 +163,10 @@ module.exports = (api) => {
 
                     newAddressArray[a][b] = {
                       address: result[a][b],
-                      amount: sum,
-                      spendable: spendableSum,
+                      amount: nativeSum,
+                      reserveAmount: reserveSum,
+                      spendable: spendableNativeSum,
+                      spendableReserve: spendableReserveSum,
                       canspend,
                       type: a === 0 ? 'public' : 'private',
                     };
@@ -185,6 +200,7 @@ module.exports = (api) => {
                           address: _address,
                           amount: __json.result,
                           type: 'private',
+                          txs: []
                         };
                       }
                     });
@@ -194,6 +210,7 @@ module.exports = (api) => {
                   // get z_listreceivedbyaddress history
                   if (api.appConfig.native.zlistreceivedbyaddress ||
                       (chainParams[coin] && chainParams[coin].ac_private)) {
+
                     Promise.all(result[1].map((_address, index) => {
                       return new Promise((resolve, reject) => {
                         _bitcoinRPC(
@@ -210,18 +227,43 @@ module.exports = (api) => {
     
                           if (__json &&
                               __json.error) {
-                            resolve(0);
+                            throw new Error("JSON ERROR");
                           } else {
-                            resolve(__json.result);
-                            newAddressArray[1][index].txs = __json.result
+                            //newAddressArray[1][index].txs = __json.result
+                            return (__json.result);
                           }
-                        });
+                        })
+                        .then((receivedByAddressList) => {
+                          return getZTransactionGroups(coin, receivedByAddressList, [receivedByAddressList])
+                        })
+                        .then((gottenTransactionsArray) => {
+                          let receivedByAddressList = gottenTransactionsArray.shift();
+
+                          for (let i = 0; i < gottenTransactionsArray.length; i++) {
+                            let tx = gottenTransactionsArray[i];
+                            let pvtx = receivedByAddressList[i];
+                            tx.amount = pvtx.amount;
+                            tx.memo = pvtx.memo;
+                            tx.address = _address;
+                            tx.category = 'receive';
+                            tx.ztx = true;
+                          }
+
+                          resolve(gottenTransactionsArray)
+                        })
                       });
                     }))
                     .then(zresultHistory => {
+
+                      let newPvAddressArray = newAddressArray[1]
+
+                      for (let i = 0; i < zresultHistory.length; i++) {
+                        newPvAddressArray[i].txs = zresultHistory[i]
+                      }
+
                       _returnObj.addresses = {
                         public: newAddressArray[0],
-                        private: newAddressArray[1],
+                        private: newPvAddressArray,
                       };
     
                       const retObj = {
@@ -334,6 +376,58 @@ module.exports = (api) => {
         });
       }
 
+      const getZTransactionGroups = (coin, array, results) => {
+
+        let txInputGroups = [{ coin: coin, group: array.slice(0, 100)}];
+        let numCounted = txInputGroups[0].group.length;
+      
+        while (numCounted < array.length) {
+          txInputGroups.push({coin: coin, group: array.slice(numCounted, numCounted + 100)});
+          numCounted += txInputGroups[txInputGroups.length - 1].group.length;
+        }
+      
+        return txInputGroups.reduce((p, a) => {
+          return p.then(chainResults => {
+            return getZTransactions(a.coin, a.group).then( txGroup => {
+              return chainResults.concat(txGroup);
+            })
+          })},
+          Promise.resolve(results)
+        )
+      }
+      
+      const getZTransactions = (coin, array) => {
+        let promiseArray = [];
+        for (let i = 0; i < array.length; i++)
+        {
+          
+            promiseArray.push(
+              new Promise((resolve, reject) => {
+                _bitcoinRPC(
+                  coin,
+                  'gettransaction',
+                  [array[i].txid]
+                )
+                .then((__json) => {
+                  try {
+                    __json = JSON.parse(__json);
+                  } catch (e) {
+                    __json = { error: 'can\'t parse json' };
+                  }
+
+                  if (__json &&
+                      __json.error) {
+                    throw new Error("JSON ERROR");
+                  } else {
+                    resolve(__json.result);
+                  }
+                })
+              }
+            ));
+        }
+        return Promise.all(promiseArray);
+      }
+
       Promise.all(_promiseStack.map((_call, index) => {
         let _params;
 
@@ -356,30 +450,46 @@ module.exports = (api) => {
                 !json) {
               _returnObj[_call] = { error: 'daemon is busy' };
             } else {
-              const _jsonParsed = JSON.parse(json);
+              let _jsonParsed = JSON.parse(json);
 
-              if (api.appConfig.native.zgetoperationresult &&
-                  _call === 'z_getoperationstatus' &&
-                  _jsonParsed &&
+              if (_jsonParsed &&
                   _jsonParsed.result &&
                   _jsonParsed.result.length) {
-                api.log('found runtime z data, purge all', 'native');
+                if (api.appConfig.native.zgetoperationresult &&
+                  _call === 'z_getoperationstatus') {
+                  api.log('found runtime z data, purge all', 'native');
 
-                _bitcoinRPC(
-                  _coin,
-                  'z_getoperationresult',
-                  []
-                )
-                .then((_json) => {
-                  const __jsonParsed = JSON.parse(_json);
-                  
-                  if (__jsonParsed &&
-                      __jsonParsed.result) {
-                    api.log('found runtime z data, purge success', 'native');
-                  } else {
-                    api.log('found runtime z data, purge error' + JSON.stringify(__jsonParsed.error), 'native');
-                  }
-                });
+                  _bitcoinRPC(
+                    _coin,
+                    'z_getoperationresult',
+                    []
+                  )
+                  .then((_json) => {
+                    const __jsonParsed = JSON.parse(_json);
+                    
+                    if (__jsonParsed &&
+                        __jsonParsed.result) {
+                      api.log('found runtime z data, purge success', 'native');
+                    } else {
+                      api.log('found runtime z data, purge error' + JSON.stringify(__jsonParsed.error), 'native');
+                    }
+                  });
+                } else if (_call === 'listtransactions') {
+                  _jsonParsed.result = _jsonParsed.result.filter(
+                    (tx) => {
+                      if (tx.category === 'stake') {
+                        if (tx.amount > 0) {
+                          return true;
+                        }
+                        else {
+                          return false;
+                        }
+                      }
+                      else {
+                        return true
+                      }
+                  });
+                }
               }
               _returnObj[_call] = _jsonParsed;
             }

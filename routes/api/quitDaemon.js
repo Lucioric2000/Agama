@@ -2,7 +2,7 @@ const portscanner = require('portscanner');
 const execFile = require('child_process').execFile;
 
 module.exports = (api) => {
-  api.quitKomodod = (timeout = 100) => {
+  api.quitKomodod = (timeout = 30000) => {
     // if komodod is under heavy load it may not respond to cli stop the first time
     // exit komodod gracefully
     let coindExitInterval = {};
@@ -11,7 +11,7 @@ module.exports = (api) => {
     for (let key in api.coindInstanceRegistry) {
       if (api.appConfig.native.stopNativeDaemonsOnQuit) {
         const chain = key !== 'komodod' ? key : null;
-        let _coindQuitCmd = api.komodocliBin;
+        let _coindQuitCmd = api.appConfig.reservedChains.indexOf(key) === -1 ? api.veruscliBin : api.komodocliBin;
 
          // any coind
         if (api.nativeCoindList[key.toLowerCase()]) {
@@ -27,8 +27,6 @@ module.exports = (api) => {
           if (chain &&
               !api.nativeCoindList[key.toLowerCase()] &&
               key !== 'CHIPS') {
-            api.removePubkey(chain.toLowerCase());
-
             _arg.push(`-ac_name=${chain}`);
 
             if (api.appConfig.native.dataDir.length) {
@@ -47,45 +45,39 @@ module.exports = (api) => {
             api.log(`stderr: ${stderr}`, 'native.debug');
             api.log(`send stop sig to ${key}`, 'native.process');
 
-            if (stdout.indexOf('EOF reached') > -1 ||
-                stderr.indexOf('EOF reached') > -1 ||
-                (error && error.toString().indexOf('Command failed') > -1 && !stderr) || // windows
-                stdout.indexOf('connect to server: unknown (code -1)') > -1 ||
-                stderr.indexOf('connect to server: unknown (code -1)') > -1) {
-              delete api.coindInstanceRegistry[key];
-              delete api.native.startParams[key];
-              clearInterval(coindExitInterval[key]);
-            }
-
-            // workaround for AGT-65
-            const _port = api.assetChainPorts[key];
-            setTimeout(() => {
-              portscanner.checkPortStatus(_port, '127.0.0.1', (error, status) => {
-                // Status is 'open' if currently in use or 'closed' if available
-                if (status === 'closed') {
-                  delete api.coindInstanceRegistry[key];
-                  delete api.native.startParams[key];
-                  clearInterval(coindExitInterval[key]);
-                }
-              });
-            }, 100);
-
             if (error !== null) {
               api.log(`exec error: ${error}`, 'native.process');
             }
-
-            setTimeout(() => {
-              api.killRogueProcess(key === 'CHIPS' ? 'chips-cli' : 'komodo-cli');
-            }, 100);
           });
         }
 
+        const didDaemonQuit = () => {
+          // workaround for AGT-65
+          const _port = api.assetChainPorts[key];
+            portscanner.checkPortStatus(_port, '127.0.0.1', (error, status) => {
+              // Status is 'open' if currently in use or 'closed' if available
+              if (status === 'closed') {
+                api.log(`${key} shut down succesfully, cleaning up...`, 'native.process');
+                delete api.coindInstanceRegistry[key];
+                delete api.native.startParams[key];
+                clearInterval(coindExitInterval[key]);
+              } else {
+                api.log(`${key} is still running...`, 'native.process');
+              }
+            });
+        }
+
+        api.log(`trying to safely quit ${key}`, 'native.process');
         execCliStop();
-        coindExitInterval[key] = setInterval(() => {
+        setInterval(() => {
           execCliStop();
-        }, timeout);
+        }, timeout)
+        coindExitInterval[key] = setInterval(() => {
+          api.log(`Checking if ${key} has quit...`, 'native.process');
+          didDaemonQuit();
+        }, 1000);
       } else {
-        delete api.coindInstanceRegistry[key];
+        delete api.coindExitInterval[key];
       }
     }
   }
@@ -93,13 +85,11 @@ module.exports = (api) => {
   api.post('/coind/stop', (req, res) => {
     if (api.checkToken(req.body.token)) {
       const _chain = req.body.chain;
-      let _coindQuitCmd = api.komodocliBin;
+      let _coindQuitCmd = _chain && api.appConfig.reservedChains.indexOf(_chain) === -1 ? api.veruscliBin : api.komodocliBin;
       let _arg = [];
 
 
       if (_chain) {
-        api.removePubkey(_chain.toLowerCase());
-
         _arg.push(`-ac_name=${_chain}`);
 
         if (api.appConfig.native.dataDir.length) {
@@ -170,10 +160,6 @@ module.exports = (api) => {
       if (req.body.mode === 'native') {
         delete api.coindInstanceRegistry[_chain ? _chain : 'komodod'];
         delete api.native.startParams[_chain ? _chain : 'komodod'];
-        
-        if (_chain) {
-          api.removePubkey(_chain.toLowerCase());
-        }
 
         const retObj = {
           msg: 'success',

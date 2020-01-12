@@ -57,7 +57,7 @@ module.exports = (api) => {
           try {
             const _json = JSON.parse(body);
 
-            if (_json.message === 'OK' &&
+            if ((_json.message === 'OK' || _json.message === 'No transactions found') &&
                 _json.result) {
               const _txs = ethTransactionsToBtc(_json.result, address);
               resolve(_txs);
@@ -101,7 +101,7 @@ module.exports = (api) => {
           try {
             const _json = JSON.parse(body);
 
-            if (_json.message === 'OK' &&
+            if ((_json.message === 'OK' || _json.message === 'No transactions found') &&
                 _json.result) {
               const _decimals = decimals[symbol.toUpperCase()];
               const _txs = ethTransactionsToBtc(_json.result, address, true, _decimals < 18 && _decimals >= 0 ? 18 - _decimals : 0);

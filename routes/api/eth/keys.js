@@ -1,6 +1,3 @@
-const ethers = require('ethers');
-const sha256 = require('js-sha256');
-const ethUtil = require('ethereumjs-util');
 const {
   etherKeys,
   seedToPriv,
