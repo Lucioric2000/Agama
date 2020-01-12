@@ -14,13 +14,15 @@ npm install webpack@3.0.0 webpack-cli@3.0.0
 ./binary_artifacts.sh
 
 cd gui
+rm -rf EasyDEX-GUI
 if [[ -d EasyDEX-GUI ]]
 then
 	echo The EasyDEX-GUI dir already existed
 	cd EasyDEX-GUI/react
   git pull origin dev
 else
-	git clone https://github.com/komodoplatform/EasyDEX-GUI
+  #git clone https://github.com/Lucioric2000/EasyDEX-GUI
+  git clone https://github.com/VerusCoin/EasyDEX-GUI
 	cd EasyDEX-GUI/react
 fi
 echo edex en:
