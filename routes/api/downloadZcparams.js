@@ -147,7 +147,8 @@ module.exports = (api) => {
           _keysProgress.output,
           _keysProgress.spend,
           _keysProgress.groth16
-        ].reduce((a, b) => a + b, 0);
+        ]
+        .reduce((a, b) => a + b, 0);
       };
 
       for (let key in api.zcashParamsDownloadLinks[dlOption]) {

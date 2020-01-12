@@ -24,7 +24,8 @@ module.exports = (api) => {
         }
       });
 
-      if (!fs.existsSync(api.agamaDir)) {
+      //COPY OVER STUF FROM "COPY THIS OVER" MARKER
+      /*if (!fs.existsSync(api.agamaDir)) {
         fs.mkdirSync(api.agamaDir);
 
         if (fs.existsSync(api.agamaDir)) {
@@ -33,6 +34,24 @@ module.exports = (api) => {
         }
       } else {
         api.log('agama folder already exists', 'init');
+      }*/
+
+      //COPY THIS OVER
+      if (!fs.existsSync(api.agamaDir)) {
+        fs.mkdirSync(api.agamaDir);
+
+        if (fs.existsSync(api.agamaDir)) {
+          api.log(`created verus agama folder at ${api.agamaDir}`, 'init');
+          api.writeLog(`created verus agama folder at ${api.agamaDir}`);
+        }
+
+        if (fs.existsSync(api.agamaDirKMD) && fs.existsSync(`${api.agamaDirKMD}/config.json`)) {
+          fs.copyFileSync(`${api.agamaDirKMD}/config.json`, `${api.agamaDir}/config.json`);
+          api.log(`located config.json in KMD folder and copied over to ${api.agamaDir}`, 'init');
+          api.writeLog(`located config.json in KMD folder and copied over to ${api.agamaDir}`);
+        } 
+      } else {
+        api.log('verus agama folder already exists', 'init');
       }
 
       if (!fs.existsSync(`${api.agamaDir}/shepherd`)) {

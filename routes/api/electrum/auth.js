@@ -1,6 +1,5 @@
 const bs58check = require('bs58check');
-const bitcoinZcash = require('bitcoinjs-lib-zcash');
-const bitcoin = require('bitcoinjs-lib');
+const bitcoin = require('bitgo-utxo-lib');
 const { seedToPriv } = require('agama-wallet-lib/src/keys');
 
 // TODO: merge spv and eth login/logout into a single func
@@ -56,7 +55,7 @@ module.exports = (api) => {
           api._isWatchOnly = true;
         } else {
           api._isWatchOnly = false;
-          
+
           try {
             bs58check.decode(_seed);
             isWif = true;
@@ -65,12 +64,12 @@ module.exports = (api) => {
           if (isWif) {
             try {
               const _network = api.getNetworkData(key.toLowerCase());
-              const _key = api.isZcash(key.toLowerCase()) ? bitcoinZcash.ECPair.fromWIF(_seed, _network, true) : bitcoin.ECPair.fromWIF(_seed, _network, true);
+              const _key = bitcoin.ECPair.fromWIF(_seed, _network, true);
               keys = {
                 priv: _key.toWIF(),
                 pub: _key.getAddress(),
                 pubHex: _key.getPublicKeyBuffer().toString('hex'),
-              };              
+              };
             } catch (e) {
               api.log(e, 'api.auth');
               _wifError = true;
@@ -104,7 +103,7 @@ module.exports = (api) => {
       api.electrumKeys = {};
       api.seed = null;
       api.eth.wallet = {};
-      
+
       const retObj = {
         msg: 'success',
         result: 'true',
@@ -123,7 +122,7 @@ module.exports = (api) => {
 
   api.post('/electrum/logout', (req, res, next) => {
     if (api.checkToken(req.body.token)) {
-      api.seed = null;      
+      api.seed = null;
       api.electrumCoins = {
         auth: false,
       };

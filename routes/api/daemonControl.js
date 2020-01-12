@@ -13,7 +13,7 @@ module.exports = (api) => {
   const getConf = (flock, coind) => {
     const _platform = os.platform();
     let DaemonConfPath = '';
-    let nativeCoindDir;
+    let pbaasCoinDir;
 
     if (flock === 'CHIPS') {
       flock = 'chipsd';
@@ -23,7 +23,7 @@ module.exports = (api) => {
     api.log(`getconf coind ${coind}`, 'native.confd');
     api.writeLog(`getconf flock: ${flock}`, 'native.confd');
 
-    if (coind) {
+    /*if (coind) {
       switch (_platform) {
         case 'darwin':
           nativeCoindDir = `${process.env.HOME}/Library/Application Support/${api.nativeCoindList[coind.toLowerCase()].bin}`;
@@ -35,6 +35,20 @@ module.exports = (api) => {
           nativeCoindDir = coind ? `${process.env.APPDATA}/${api.nativeCoindList[coind.toLowerCase()].bin}` : null;
           break;
       }
+    }*/
+
+    //If the coin uses verusd as it's daemon and isn't Verus, we assume it's
+    //directory will lie in PBaaS territory, outside of the komodoDir
+    if (api.appConfig.reservedChains.indexOf(flock) === -1) {
+      if (api.appConfig.verus.pbaasTestmode) {
+        pbaasCoinDir = path.normalize(path.join(api.verusTestDir, `/PBAAS/${flock}`));
+        api.log(`Assuming PBAAS chain in test mode, using conf path as ${pbaasCoinDir}`, 'native.confd');
+      } else {
+        pbaasCoinDir = path.normalize(path.join(api.verusDir, `/PBAAS/${flock}`));
+        api.log(`Assuming PBAAS chain, using conf path as ${pbaasCoinDir}`, 'native.confd');
+      }
+
+      return pbaasCoinDir;
     }
 
     switch (flock) {
@@ -76,9 +90,15 @@ module.exports = (api) => {
   // TODO: json.stringify wrapper
 
   const herder = (flock, data, coind) => {
+    let acDaemon = false
+
     if (data === undefined) {
       data = 'none';
       api.log('it is undefined', 'native.confd');
+    } else if (data.ac_daemon != undefined) {
+      flock = data.ac_daemon;
+      acDaemon = true;
+      api.customPathsDaemons(flock);
     }
 
     api.log(`herder flock: ${flock} coind: ${coind}`, 'native.confd');
@@ -86,12 +106,22 @@ module.exports = (api) => {
 
     // TODO: notify gui that reindex/rescan param is used to reflect on the screen
     //       asset chain debug.log unlink
-    if (flock === 'komodod') {
-      let kmdDebugLogLocation = (data.ac_name !== 'komodod' ? `${api.komodoDir}/${data.ac_name}` : api.komodoDir) + '/debug.log';
+    if (flock === 'komodod' || acDaemon) {
+      let kmdDebugLogLocation
+      let _coindConf
+      
+      //If these conditions pass, we can assume PBaaS chain
+      if (acDaemon && data.ac_daemon === 'verusd' && (api.appConfig.reservedChains.indexOf(data.ac_name) === -1)) {
+        kmdDebugLogLocation = `${api.appConfig.verus.pbaasTestmode ? api.verusTestDir : api.verusDir}/PBAAS/${data.ac_name}/debug.log`;
+        _coindConf = `${api.appConfig.verus.pbaasTestmode ? api.verusTestDir : api.verusDir}/PBAAS/${data.ac_name}/${data.ac_name}.conf`;
+        api.log(`Assuming PBAAS chain, using ${kmdDebugLogLocation}`, 'native.confd');
+      } else {
+        kmdDebugLogLocation = (data.ac_name !== 'komodod' ? `${api.komodoDir}/${data.ac_name}` : api.komodoDir) + '/debug.log';
+        _coindConf = data.ac_name !== 'komodod' ? `${api.komodoDir}/${data.ac_name}/${data.ac_name}.conf` : `${api.komodoDir}/komodo.conf`;
+      }
 
       // get custom coind port
-      const _coindConf = data.ac_name !== 'komodod' ? `${api.komodoDir}/${data.ac_name}/${data.ac_name}.conf` : `${api.komodoDir}/komodo.conf`;
-
+      
       try {
         const _coindConfContents = fs.readFileSync(_coindConf, 'utf8');
 
@@ -116,7 +146,13 @@ module.exports = (api) => {
         if (api.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name]) {
           api.rpcConf[data.ac_name === 'komodod' ? 'KMD' : data.ac_name].port = api.assetChainPortsDefault[data.ac_name];
         }
-        api.assetChainPorts[data.ac_name] = api.assetChainPortsDefault[data.ac_name];
+
+        if (data.ac_init_rpc_port) {
+          api.assetChainPorts[data.ac_name] = data.ac_init_rpc_port;
+        } else {
+          api.assetChainPorts[data.ac_name] = api.assetChainPortsDefault[data.ac_name];
+        }
+
         api.log(`${data.ac_name} port ${api.assetChainPorts[data.ac_name]}`, 'native.confd');
       }
 
@@ -207,13 +243,19 @@ module.exports = (api) => {
               _customParam = _customParam + ' -datadir=' + api.appConfig.native.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
             }
 
-            const isChain = data.ac_name.match(/^[A-Z]*$/);
+            const isChain = data.ac_name !== 'komodod' && data.ac_name !== 'chipsd';
             const coindACParam = isChain ? ` -ac_name=${data.ac_name} ` : '';
 
-            api.log(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
-            api.writeLog(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`);
-            api.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
-
+            if (acDaemon) {
+              api.log(`exec ${api[flock + 'Bin']} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
+              api.writeLog(`exec ${api[flock + 'Bin']} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`);
+              api.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
+            } else {
+              api.log(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`, 'native.process');
+              api.writeLog(`exec ${api.komododBin} ${coindACParam} ${data.ac_options.join(' ')}${_customParam}`);
+              api.log(`daemon param ${data.ac_custom_param}`, 'native.confd');
+            }
+            
             api.coindInstanceRegistry[data.ac_name] = true;
             if (!api.kmdMainPassiveMode) {
               let _arg = `${coindACParam}${data.ac_options.join(' ')}${_customParam}`;
@@ -235,42 +277,79 @@ module.exports = (api) => {
                 let spawnOut = fs.openSync(_daemonLogName, 'a');
                 let spawnErr = fs.openSync(_daemonLogName, 'a');
 
-                spawn(api.komododBin, _arg, {
-                  stdio: [
-                    'ignore',
-                    spawnOut,
-                    spawnErr
-                  ],
-                  detached: true,
-                })
-                .unref();
+                if (acDaemon) {
+                  spawn(api[flock + 'Bin'], _arg, {
+                    stdio: [
+                      'ignore',
+                      spawnOut,
+                      spawnErr
+                    ],
+                    detached: true,
+                  }).unref();
+                } 
+                else {
+                  spawn(api.komododBin, _arg, {
+                    stdio: [
+                      'ignore',
+                      spawnOut,
+                      spawnErr
+                    ],
+                    detached: true,
+                  }).unref();
+                }
+
               } else {
                 let logStream = fs.createWriteStream(
                   _daemonLogName,
                   { flags: 'a' }
                 );
 
-                let _daemonChildProc = execFile(`${api.komododBin}`, _arg, {
-                  maxBuffer: 1024 * 1000000, // 1000 mb
-                }, (error, stdout, stderr) => {
-                  api.writeLog(`stdout: ${stdout}`, 'native.debug');
-                  api.writeLog(`stderr: ${stderr}`, 'native.debug');
+                let _daemonChildProc;
 
-                  if (error !== null) {
-                    api.log(`exec error: ${error}`, 'native.debug');
-                    api.writeLog(`exec error: ${error}`, 'native.debug');
-
-                    // TODO: check other edge cases
-                    if (error.toString().indexOf('using -reindex') > -1) {
-                      api.io.emit('service', {
-                        komodod: {
-                          error: 'run -reindex',
-                        },
-                      });
+                if (acDaemon) {
+                  _daemonChildProc = execFile(`${api[flock + 'Bin']}`, _arg, {
+                    maxBuffer: 1024 * 1000000, // 1000 mb
+                  }, (error, stdout, stderr) => {
+                    api.writeLog(`stdout: ${stdout}`, 'native.debug');
+                    api.writeLog(`stderr: ${stderr}`, 'native.debug');
+  
+                    if (error !== null) {
+                      api.log(`exec error: ${error}`, 'native.debug');
+                      api.writeLog(`exec error: ${error}`, 'native.debug');
+  
+                      // TODO: check other edge cases
+                      if (error.toString().indexOf('using -reindex') > -1) {
+                        api.io.emit('service', {
+                          komodod: {
+                            error: 'run -reindex',
+                          },
+                        });
+                      }
                     }
-                  }
-                });
-
+                  });
+                } else {
+                  _daemonChildProc = execFile(`${api.komododBin}`, _arg, {
+                    maxBuffer: 1024 * 1000000, // 1000 mb
+                  }, (error, stdout, stderr) => {
+                    api.writeLog(`stdout: ${stdout}`, 'native.debug');
+                    api.writeLog(`stderr: ${stderr}`, 'native.debug');
+  
+                    if (error !== null) {
+                      api.log(`exec error: ${error}`, 'native.debug');
+                      api.writeLog(`exec error: ${error}`, 'native.debug');
+  
+                      // TODO: check other edge cases
+                      if (error.toString().indexOf('using -reindex') > -1) {
+                        api.io.emit('service', {
+                          komodod: {
+                            error: 'run -reindex',
+                          },
+                        });
+                      }
+                    }
+                  });
+                }
+                
                 // TODO: logger add verbose native output
                 _daemonChildProc.stdout.on('data', (data) => {
                   // api.log(`${_daemonName} stdout: \n${data}`);
@@ -469,7 +548,10 @@ module.exports = (api) => {
 
       // get komodod instance port
       const _port = api.nativeCoindList[coind.toLowerCase()].port;
-      const coindBin = `${api.coindRootDir}/${coind.toLowerCase()}/${api.nativeCoindList[coind.toLowerCase()].bin.toLowerCase()}d`;
+      const coindBin = acDaemon ? 
+        `${api[flock + 'Bin']}/${coind.toLowerCase()}/${api.nativeCoindList[coind.toLowerCase()].bin.toLowerCase()}d`
+        :
+        `${api.coindRootDir}/${coind.toLowerCase()}/${api.nativeCoindList[coind.toLowerCase()].bin.toLowerCase()}d`;
 
       try {
         // check if coind instance is already running
@@ -526,6 +608,18 @@ module.exports = (api) => {
     }
 
     switch (flock) {
+      case 'verusd':
+        if (coind && api.appConfig.reservedChains.indexOf(coind) === -1) {
+          DaemonConfPath = `${api.verusDir}/PBAAS/${coind}.conf`;
+        } else {
+          DaemonConfPath = `${api.vrscDir}/VRSC.conf`;
+        }
+        
+
+        if (_platform === 'win32') {
+          DaemonConfPath = path.normalize(DaemonConfPath);
+        }
+        break;
       case 'komodod':
         DaemonConfPath = `${api.komodoDir}/komodo.conf`;
 
@@ -846,8 +940,8 @@ module.exports = (api) => {
                   res.status(500);
                   res.end(JSON.stringify(retObj));
                 } else {
-                  api.log(`komodod service start success at port ${_port}`, 'native.process');
-                  api.writeLog(`komodod service start success at port ${_port}`);
+                  api.log(`daemon service start success at port ${_port}`, 'native.process');
+                  api.writeLog(`daemon service start success at port ${_port}`);
                 }
               } else {
                 if (!skipError) {

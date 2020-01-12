@@ -10,6 +10,7 @@ module.exports = (api) => {
     const _bins = [
       api.komododBin,
       api.komodocliBin,
+      api.veruscliBin
     ];
 
     if (osPlatform === 'darwin' ||

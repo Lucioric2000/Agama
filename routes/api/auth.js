@@ -48,28 +48,5 @@ module.exports = (api) => {
     return api.argv && api.argv.watchonly === 'override' ? false : api._isWatchOnly;
   };
 
-  api.setPubkey = (seed, coin) => {
-    const {
-      pub,
-      pubHex,
-    } = api.seedToWif(seed, 'komodo', true);
-
-    api.staking[coin] = {
-      pub,
-      pubHex,
-    };
-
-    api.log(`pub key for ${coin} is set`, 'pubkey');
-    api.log(api.staking[coin], 'pubkey');
-  };
-
-  api.getPubkeys = () => {
-    return api.staking;
-  };
-
-  api.removePubkey = (coin) => {
-    delete api.staking[coin];
-  };
-
   return api;
 };

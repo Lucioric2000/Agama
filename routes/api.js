@@ -18,8 +18,6 @@ api.appRuntimeLog = [];
 api.lockDownAddCoin = false;
 api._isWatchOnly = false;
 
-api.staking = {};
-
 // dex cache
 api.mmupass = null;
 api.mmRatesInterval = null;
@@ -52,6 +50,7 @@ const {
 } = require('./electrumjs/electrumServers.js');
 api.electrumServers = electrumServers;
 api.electrumServersFlag = electrumServersFlag;
+api.electrumServersV1_4 = {};
 
 api.CONNECTION_ERROR_OR_INCOMPLETE_DATA = 'connection error or incomplete data';
 
@@ -160,6 +159,15 @@ api = require('./api/eth/gasPrice.js')(api);
 api = require('./api/eth/createtx.js')(api);
 api = require('./api/eth/utils.js')(api);
 
+// exchanges
+api.exchangesCache = {
+  coinswitch: {},
+};
+api = require('./api/exchange/exchange')(api);
+api = require('./api/exchange/coinswitch/coinswitch')(api);
+api = require('./api/exchange/changelly/changelly')(api);
+api.loadLocalExchangesCache();
+
 api.printDirs();
 
 // default route
@@ -177,8 +185,8 @@ api.setVar = (_name, _body) => {
 };
 
 // spv
-if (api.appConfig.spv &&
-    api.appConfig.spv.cache) {
+if (((api.appConfig.dev || process.argv.indexOf('devmode') > -1) && api.appConfig.spv.cache) ||
+    (!api.appConfig.dev && process.argv.indexOf('devmode') === -1)) {
   api.loadLocalSPVCache();
 }
 

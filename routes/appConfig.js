@@ -1,9 +1,10 @@
 const fiatList = require('./fiatList');
+const coins = require('../gui/EasyDEX-GUI/react/src/translate/coins.js')
 
 const appConfig = {
   config: { // default config
     host: '127.0.0.1',
-    agamaPort: 17777,
+    agamaPort: 17776,
     maxDescriptors: {
       darwin: 90000,
       linux: 1000000,
@@ -16,7 +17,7 @@ const appConfig = {
       walletUnlockTimeout: 3600,
     },
     lang: 'EN',
-    fiatRates: false,
+    fiatRates: true,
     defaultFiatCurrency: 'usd',
     loadCoinsFromStorage: false,
     requirePinToConfirmTx: false,
@@ -33,17 +34,28 @@ const appConfig = {
     },
     native: {
       rpc2cli: false,
-      cliStopTimeout: 1000,
+      cliStopTimeout: 30000,
       failedRPCAttemptsThreshold: 10,
       stopNativeDaemonsOnQuit: true,
       dataDir: '',
       listtransactionsMaxLength: 300,
       csvListtransactionsMaxLength: 1000,
-      zlistreceivedbyaddress: false,
+      zlistreceivedbyaddress: true,
       zgetoperationresult: false,
-      zshieldcoinbase: false,
+      zshieldcoinbase: true,
     },
+    verus: {
+      stakeGuard: '',
+      autoStakeVRSC: false,
+      // pbaasTestmode: false,
+      //enableVrsctest: false,
+    },
+    pbaasChains: [],
+    reservedChains: Object.keys(coins.CRYPTO).concat(Object.keys(coins.ASSETCHAINS)).concat(["KOMODO", "zcashd", "komodod", "chipsd"]),
     pubkey: '',
+    exchanges: {
+      coinswitchKey: '',
+    },
     // coinControl: false,
     // darkmode: false,
   },
@@ -243,7 +255,7 @@ const appConfig = {
       },
       zlistreceivedbyaddress: {
         display: true,
-        displayName: 'Fetch received z transactions (z_listreceivedbyaddress)',
+        displayName: 'Fetch received Z transactions (z_listreceivedbyaddress)',
         info: 'Warning: turning on this option may have an impact on weak systems.<br>If you don\'t use private addresses or don\'t need to see all private transactions to your addresses keep this option disabled.',
         type: 'boolean',
       },
@@ -260,11 +272,55 @@ const appConfig = {
         type: 'boolean',
       },
     },
+    verus: {
+      display: true,
+      displayName: 'Verus Specific Settings',
+      autoStakeVRSC: {
+        display: true,
+        initDisplay: true,
+        displayName: 'Automatically start staking VerusCoin when it is launched in native mode',
+        type: 'boolean',
+      },
+      stakeGuard: {
+        display: true,
+        info: 'You can enter a Verus sapling address in this field, and receive awards for finding double-stakers',
+        displayName: 'Your VRSC sapling address for StakeGuard',
+        type: 'string',
+      },
+      pbaasTestmode: {
+        display: true,
+        info: 'Select this and the option below if you would like to test PBaaS features on VRSCTEST',
+        displayName: 'PBaaS Test Mode',
+        type: 'boolean',
+      },
+      enableVrsctest: {
+        display: true,
+        info: 'Enables VRSCTEST as an option in the Add Coin menu',
+        displayName: 'Enable Verus Testnet',
+        type: 'boolean',
+      },
+    },
+    pbaasChains: {
+      display: false,
+    },
+    reservedChains: {
+      display: false,
+    },
     pubkey: {
       display: true,
       displayName: 'Pubkey',
-      info: 'Append pubkey (-pubkey) to daemon launch params list',
+      info: 'Public Key you would like to mine to',
       type: 'string',
+    },
+    exchanges: {
+      display: false,
+      displayName: 'Exchanges',
+      coinswitchKey: {
+        display: true,
+        displayName: 'Coinswitch API key',
+        info: 'Your personal Coinswitch API key',
+        type: 'string',
+      },
     },
     /*coinControl: {
       display: true,

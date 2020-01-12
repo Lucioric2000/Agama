@@ -1,6 +1,10 @@
 // main proc for Agama
 
 const electron = require('electron');
+const {
+	Menu,
+	ipcMain,
+} = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
@@ -9,7 +13,6 @@ const os = require('os');
 const { randomBytes } = require('crypto');
 const md5 = require('agama-wallet-lib/src/crypto/md5');
 const exec = require('child_process').exec;
-const { Menu } = require('electron');
 const portscanner = require('portscanner');
 const osPlatform = os.platform();
 const fixPath = require('fix-path');
@@ -19,9 +22,14 @@ const fsnode = require('fs');
 const fs = require('fs-extra');
 const Promise = require('bluebird');
 const arch = require('arch');
-const bip39 = require('bip39');
 const chainParams = require('./routes/chainParams');
 const { formatBytes } = require('agama-wallet-lib/src/utils');
+
+let staticVar = {}; // static shared main -> renderer vars
+
+ipcMain.on('staticVar', (event, arg) => {
+	event.sender.send('staticVar', !arg ? staticVar : staticVar[arg]);
+});
 
 if (osPlatform === 'linux') {
 	process.env.ELECTRON_RUN_AS_NODE = true;
@@ -40,12 +48,7 @@ api.setVar('nativeCoindList', nativeCoindList);*/
 
 let localVersion;
 let localVersionFile = api.readVersionFile();
-
-if (localVersionFile.indexOf('\r\n') > -1) {
-  localVersion = localVersionFile.split('\r\n');
-} else {
-  localVersion = localVersionFile.split('\n');
-}
+localVersion = localVersionFile.split(localVersionFile.indexOf('\r\n') > -1 ? '\r\n' : '\n');
 
 const appBasicInfo = {
 	name: 'Agama',
@@ -74,10 +77,10 @@ for (let i = 0; i < process.argv.length; i++) {
   if (!_argv.nogui) {
   	_argv = {};
   } else {
-  	api.argv = _argv;
   	api.log('arguments', 'init');
-  	api.log(_argv, 'init');
-  }
+		api.log(_argv, 'init');
+		api.argv = _argv;
+	}
 }
 
 const appSessionHash = _argv.token ? _argv.token : randomBytes(32).toString('hex');
@@ -115,14 +118,14 @@ let __defaultAppSettings = require('./routes/appConfig.js').config;
 __defaultAppSettings['daemonOutput'] = false; // shadow setting
 const _defaultAppSettings = __defaultAppSettings;
 
-api.log(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`, 'init');
-api.writeLog(`app started in ${(appConfig.dev ? 'dev mode' : ' user mode')}`);
+api.log(`app started in ${(appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'dev mode' : ' user mode')}`, 'init');
+api.writeLog(`app started in ${(appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'dev mode' : ' user mode')}`);
 
 api.setConfKMD();
 // api.setConfKMD('CHIPS');
 
 guiapp.use((req, res, next) => {
-	res.header('Access-Control-Allow-Origin', appConfig.dev ? '*' : 'http://127.0.0.1:3000');
+	res.header('Access-Control-Allow-Origin', appConfig.dev || process.argv.indexOf('devmode') > -1 ? '*' : 'http://127.0.0.1:3000');
 	res.header('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 	res.header('Access-Control-Allow-Credentials', 'true');
 	res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
@@ -141,7 +144,7 @@ process.once('loaded', () => {
 		process.setFdLimit(appConfig.maxDescriptors.darwin);
 		app.setAboutPanelOptions({
 			applicationName: app.getName(),
-			applicationVersion: `${app.getVersion().replace('version=', '')}-beta`,
+			applicationVersion: `${app.getVersion().replace('version=', '')}-Tech-Preview-02`,
 			copyright: 'Released under the MIT license',
 			credits: 'SuperNET Team',
 		});
@@ -151,7 +154,8 @@ process.once('loaded', () => {
 });
 
 // silent errors
-if (!appConfig.dev) {
+if (!appConfig.dev &&
+		!process.argv.indexOf('devmode') > -1) {
 	process.on('uncaughtException', (err) => {
 	  api.log(`${(new Date).toUTCString()} uncaughtException: ${err.message}`, 'exception');
 	  api.log(err.stack, 'exception');
@@ -183,6 +187,22 @@ let forceQuitApp = false;
 
 // apply parsed argv
 if (api.argv) {
+	if (api.argv.servers) {
+		api.log('set electrum servers from argv', 'argv');
+
+		try {
+			const _servers = JSON.parse(api.argv.servers);
+
+			for (let key in _servers) {
+				if (api.electrumServers[key]) {
+					api.electrumServers[key].serverList = _servers[key];
+				}
+			}
+		} catch (e) {
+			api.log('error: malformatted servers argv', 'argv');
+		}
+	}
+
 	if (api.argv.coins) {
 		const _coins = api.argv.coins.split(',');
 
@@ -227,7 +247,7 @@ if (!_argv.nogui ||
 		api.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 		api.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 		// start sockets.io
-		io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
+		io.set('origins', appConfig.dev  || process.argv.indexOf('devmode') > -1 ? 'http://127.0.0.1:3000' : null); // set origin
 	});
 	api.setIO(io); // pass sockets object to api router
 	api.setVar('appBasicInfo', appBasicInfo);
@@ -246,7 +266,7 @@ function createAppCloseWindow() {
 
 	appCloseWindow.setResizable(false);
 
-	appCloseWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort}/gui/startup/app-closing.html` : `file://${__dirname}/gui/startup/app-closing.html`);
+	appCloseWindow.loadURL(appConfig.dev || process.argv.indexOf('devmode') > -1 ? `http://${appConfig.host}:${appConfig.agamaPort}/gui/startup/app-closing.html` : `file://${__dirname}/gui/startup/app-closing.html`);
 
   appCloseWindow.webContents.on('did-finish-load', () => {
     setTimeout(() => {
@@ -299,7 +319,7 @@ function createAppCloseWindow() {
 					api.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`, 'init');
 					api.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort}`);
 					// start sockets.io
-					io.set('origins', appConfig.dev ? 'http://127.0.0.1:3000' : null); // set origin
+					io.set('origins', appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'http://127.0.0.1:3000' : null); // set origin
 				});
 
 				// initialise window
@@ -310,7 +330,7 @@ function createAppCloseWindow() {
 					show: false,
 				});
 
-				mainWindow.loadURL(appConfig.dev ? 'http://127.0.0.1:3000' : `file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
+				mainWindow.loadURL(appConfig.dev || process.argv.indexOf('devmode') > -1 ? 'http://127.0.0.1:3000' : `file://${__dirname}/gui/EasyDEX-GUI/react/build/index.html`);
 
 				api.setIO(io); // pass sockets object to api router
 				api.setVar('appBasicInfo', appBasicInfo);
@@ -318,35 +338,39 @@ function createAppCloseWindow() {
 
 				// load our index.html (i.e. Agama GUI)
 				api.writeLog('show agama gui');
-
 				const _assetChainPorts = require('./routes/ports.js');
+				
+				staticVar.arch = localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch();
+				staticVar.appBasicInfo = appBasicInfo;
+				staticVar.assetChainPorts = _assetChainPorts;
+				staticVar.appConfigSchema = api.appConfigSchema;
+				staticVar.zcashParamsDownloadLinks = api.zcashParamsDownloadLinks;
+				staticVar.argv = process.argv;
+				staticVar.isWindows = os.platform() === 'win32' ? true : false;
+				staticVar.spvFees = _spvFees;
+				staticVar.electrumServers = api.electrumServersFlag;
+				staticVar.chainParams = chainParams;
+
 				let _global = {
 					appConfig,
-					appConfigSchema: api.appConfigSchema,
 					arch: localVersion[1].indexOf('-spv-only') > -1 ? 'spv-only' : arch(),
 					appBasicInfo,
 					appSessionHash,
-					assetChainPorts: _assetChainPorts,
-					agamaIcon,
 					testLocation: api.testLocation,
 					kmdMainPassiveMode: api.kmdMainPassiveMode,
 					getAppRuntimeLog: api.getAppRuntimeLog,
 					// nativeCoindList,
 					zcashParamsExist: _zcashParamsExist,
 					zcashParamsExistPromise: api.zcashParamsExistPromise,
-					zcashParamsDownloadLinks: api.zcashParamsDownloadLinks,
-					isWindows: os.platform() === 'win32' ? true : false, // obsolete(?)
 					appExit,
 					getMaxconKMDConf: api.getMaxconKMDConf,
 					setMaxconKMDConf: api.setMaxconKMDConf,
-					getMMCacheData: api.getMMCacheData,
+					// getMMCacheData: api.getMMCacheData,
 					activeSection: 'wallets', // temp deprecated
 					argv: process.argv,
 					getAssetChainPorts: api.getAssetChainPorts,
-					spvFees: _spvFees,
 					startSPV: api.startSPV,
 					startKMDNative: api.startKMDNative,
-					addressVersionCheck: api.addressVersionCheck,
 					getCoinByPub: api.getCoinByPub,
 					resetSettings: () => { api.saveLocalAppConf(__defaultAppSettings) },
 					createSeed: {
@@ -356,15 +380,14 @@ function createAppCloseWindow() {
 					},
 					checkStringEntropy: api.checkStringEntropy,
 					pinAccess: false,
-					bip39,
 					isWatchOnly: api.isWatchOnly,
-					setPubkey: api.setPubkey,
-					getPubkeys: api.getPubkeys,
-					kvEncode: api.kvEncode,
-					kvDecode: api.kvDecode,
-					electrumServers: api.electrumServersFlag,
-					getAddressVersion: api.getAddressVersion,
-					chainParams,
+					sha256: (data) => {
+						const crypto = require('crypto');
+						return crypto.createHash('sha256').update(data).digest();
+					},
+					randomBytes: (size) => {
+						return randomBytes(size || 32).toString('hex');
+					},
 				};
 				global.app = _global;
 				/*for (let i = 0; i < process.argv.length; i++) {
@@ -390,7 +413,7 @@ function createAppCloseWindow() {
 					api.log(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`, 'init');
 					api.writeLog(`guiapp and sockets.io are listening on port ${appConfig.agamaPort + 1}`);
 				});
-				mainWindow.loadURL(appConfig.dev ? `http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html` : `file://${__dirname}/gui/startup/agama-instance-error.html`);
+				mainWindow.loadURL(appConfig.dev || process.argv.indexOf('devmode') > -1 ? `http://${appConfig.host}:${appConfig.agamaPort + 1}/gui/startup/agama-instance-error.html` : `file://${__dirname}/gui/startup/agama-instance-error.html`);
 				api.log('another agama app is already running', 'init');
 			}
 
@@ -427,13 +450,14 @@ function createAppCloseWindow() {
 				}
 			});
 
-			if (appConfig.dev) {
+			if (appConfig.dev ||
+					process.argv.indexOf('devmode') > -1) {
 				mainWindow.webContents.openDevTools();
 			}
 
 			function appExit() {
-				if (api.appConfig.spv &&
-						api.appConfig.spv.cache) {
+				if (((api.appConfig.dev || process.argv.indexOf('devmode') > -1) && api.appConfig.spv.cache) ||
+						(!api.appConfig.dev && process.argv.indexOf('devmode') === -1)) {
 					api.saveLocalSPVCache();
 				}
 

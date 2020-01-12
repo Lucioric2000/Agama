@@ -1,5 +1,6 @@
 const disableCoins = require('./electrumServersConfig');
-const _electrumServers = require('agama-wallet-lib/src/electrum-servers');
+const _electrumServers = require('agama-wallet-lib/src/electrum-servers').electrumServers;
+//const fs = require('fs');
 
 const _electrumServersExtend = {
   vpn: {
@@ -53,9 +54,6 @@ const _electrumServersExtend = {
   uno: {
     txfee: 10000,
   },
-  smart: {
-    txfee: 10000,
-  },
   rdd: {
     txfee: 10000,
   },
@@ -76,9 +74,6 @@ const _electrumServersExtend = {
   },
   mnx: {
     txfee: 10000,
-  },
-  lcc: {
-    txfee: 1000000,
   },
   nlg: {
     txfee: 1000000,
@@ -215,9 +210,6 @@ const _electrumServersExtend = {
   brit: {
     txfee: 10000,
   },
-  xbc: {
-    txfee: 10000,
-  },
   bela: {
     txfee: 10000,
   },
@@ -237,9 +229,6 @@ const _electrumServersExtend = {
     txfee: 10000,
   },
   slm: {
-    txfee: 10000,
-  },
-  axe: {
     txfee: 10000,
   },
   ppc: {

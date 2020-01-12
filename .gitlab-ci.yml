@@ -1,0 +1,205 @@
+stages:
+  - build
+  - test
+  - deploy
+########################################################################################################################
+####START####                                     PROJECT LEVEL VARIABLES                                  ####START####
+########################################################################################################################
+variables:
+  DOCKER_DRIVER: overlay2
+  DEFAULT_VERUSCOIN_BRANCH: master
+  AGAMA_VERSION: 0.6.1
+  VERUSCOIN_VERSION: 0.6.1
+  KOMODO_VERSION: 0.5.0
+  BINARY_SOURCE: VerusCoin
+  EASYDEX_GUI_BUILD: build.tar.gz
+  AGAMA_APPIMAGE: Agama-Linux-v${AGAMA_VERSION}.AppImage
+  AGAMA_LINUX_TAR: Agama-Linux-v${AGAMA_VERSION}.tar.gz
+  AGAMA_WINDOWS_ZIP: Agama-Windows-v${AGAMA_VERSION}.zip
+  AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}.dmg
+  GIT_SUBMODULE_STRATEGY: recursive
+  POST_COMMENT: "Pipeline Trigger: ${CI_PIPELINE_SOURCE}\n
+      Branch: ${CI_COMMIT_REF_NAME}\n
+      Commit: https://github.com/VerusCoin/Agama/commit/${CI_COMMIT_SHA}\n
+      ${CI_COMMIT_MESSAGE}\n"
+########################################################################################################################
+####END####                                        PROJECT LEVEL VARIABLES                                   ####END####
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+####START####          Build Stage: compile and package komodo binaries for Verus CLI                     ####START#####
+########################################################################################################################
+########################################################################################################################
+####START####                                            LINUX                                             ####START####
+########################################################################################################################
+build:linux:
+  image: asherd/agama-builder
+  stage: build
+  before_script:
+    - echo "$AUTH_KEY" > AUTH_KEY.json &&
+      gcloud auth activate-service-account
+      --key-file AUTH_KEY.json &&
+      rm AUTH_KEY.json
+    - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export
+      VERUS_CLI_LINUX="${BINARY_SOURCE}/${DEFAULT_VERUSCOIN_BRANCH}/Linux/Verus-CLI-Linux-v${VERUSCOIN_VERSION}-amd64.tar.gz"
+      POST_COMMENT="${POST_COMMENT}Using ${BINARY_SOURCE}/${DEFAULT_VERUSCOIN_BRANCH} binaries.";
+      else
+      export POST_COMMENT="${POST_COMMENT}Using ${UPSTREAM_TRIGGER}/${UPSTREAM_CLI_BRANCH} binaries."; fi
+    - cd gui/EasyDEX-GUI/react
+    - yarn install
+    - yarn run build
+    - cd ../../..
+    - mkdir -p assets/bin/linux64/verusd
+    - gsutil cp $STAGING/$VERUS_CLI_LINUX .
+    - tar -xzvf Verus-CLI-Linux-v${VERUSCOIN_VERSION}-amd64.tar.gz --strip=1 --directory assets/bin/linux64/verusd
+    - rm Verus-CLI-Linux-v${VERUSCOIN_VERSION}-amd64.tar.gz
+    - wget https://github.com/KomodoPlatform/komodo/releases/download/0.5.0/komodo_0.5.0_linux.tar.gz
+    - tar -xzvf komodo_${KOMODO_VERSION}_linux.tar.gz --strip=1 --directory assets/bin/linux64
+    - rm komodo_${KOMODO_VERSION}_linux.tar.gz
+    - strip --strip-unneeded  assets/bin/linux64/komodod && strip --strip-unneeded  assets/bin/linux64/komodo-cli
+    - yarn install
+  script:
+    - yarn run dist
+    - cd dist
+    - chmod 755 ${AGAMA_APPIMAGE}
+    - tar -czvf ${AGAMA_LINUX_TAR} ${AGAMA_APPIMAGE}
+    - sha256sum ${AGAMA_LINUX_TAR} > ${AGAMA_LINUX_TAR}.sha256
+    - mv ${AGAMA_LINUX_TAR} ${AGAMA_LINUX_TAR}.sha256 ..
+  after_script:
+    - curl -F file=@"$AGAMA_LINUX_TAR"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT}"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
+  artifacts:
+    paths:
+      - ${AGAMA_LINUX_TAR}
+      - ${AGAMA_LINUX_TAR}.sha256
+      - ${AGAMA_APPIMAGE}
+      - ${AGAMA_APPIMAGE}.sha256 ..
+      - dist
+    expire_in: 1 week
+########################################################################################################################
+####END####                                              LINUX                                               ####END####
+########################################################################################################################
+####START####                                           WINDOWS                                            ####START####
+########################################################################################################################
+build:windows:
+  stage: build
+  image: asherd/agama-builder:windows
+  before_script:
+    - echo "$AUTH_KEY" > AUTH_KEY.json &&
+      gcloud auth activate-service-account
+      --key-file AUTH_KEY.json &&
+      rm AUTH_KEY.json
+    - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export
+      VERUS_CLI_WINDOWS="${BINARY_SOURCE}/${DEFAULT_VERUSCOIN_BRANCH}/Windows/Verus-CLI-Windows-v${VERUSCOIN_VERSION}.zip"
+      POST_COMMENT="${POST_COMMENT}Using ${BINARY_SOURCE}/${DEFAULT_VERUSCOIN_BRANCH} binaries.";
+      else
+      export POST_COMMENT="${POST_COMMENT}Using ${UPSTREAM_TRIGGER}/${UPSTREAM_CLI_BRANCH} binaries."; fi
+    - cd gui/EasyDEX-GUI/react
+    - yarn install
+    - yarn run build
+    - cd ../../..
+    - mkdir -p assets/bin/
+    - gsutil cp $STAGING/$VERUS_CLI_WINDOWS .
+    - unzip -qq Verus-CLI-Windows-v${VERUSCOIN_VERSION}.zip -d assets/bin/win64
+    - mv assets/bin/win64/verus-cli assets/bin/win64/verusd
+    - wget https://github.com/KomodoPlatform/komodo/releases/download/0.5.0/komodo_0.5.0_windows.zip
+    - unzip komodo_${KOMODO_VERSION}_windows.zip -d assets/bin
+    - rm komodo_${KOMODO_VERSION}_windows.zip
+    - strip --strip-unneeded  assets/bin/win64/komodod.exe && strip --strip-unneeded  assets/bin/win64/komodo-cli.exe && strip --strip-unneeded  assets/bin/win64/komodo-tx.exe
+    - rm Verus-CLI-Windows-v${VERUSCOIN_VERSION}.zip
+    - yarn install
+  script:
+    - yarn run dist-win
+    - cd dist
+    - unzip ${AGAMA_WINDOWS_ZIP} -d Agama-Windows-v${AGAMA_VERSION}
+    - rm ${AGAMA_WINDOWS_ZIP}
+    - zip -r ${AGAMA_WINDOWS_ZIP} Agama-Windows-v${AGAMA_VERSION}
+    - sha256sum ${AGAMA_WINDOWS_ZIP} > ${AGAMA_WINDOWS_ZIP}.sha256
+    - mv ${AGAMA_WINDOWS_ZIP} ${AGAMA_WINDOWS_ZIP}.sha256 ..
+  after_script:
+    - curl -F file=@"$AGAMA_WINDOWS_ZIP"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT}"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
+  artifacts:
+    paths:
+      - ${AGAMA_WINDOWS_ZIP}
+      - ${AGAMA_WINDOWS_ZIP}.sha256
+      - dist
+    expire_in: 1 week
+########################################################################################################################
+####END####                                             WINDOWS                                              ####END####
+########################################################################################################################
+####START####                                            MACOS                                             ####START####
+########################################################################################################################
+build:mac:
+  stage: build
+  tags: ["Mojave"]
+  before_script:
+    - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export
+      VERUS_CLI_MACOS="${BINARY_SOURCE}/${DEFAULT_VERUSCOIN_BRANCH}/MacOS/Verus-CLI-MacOS-v${VERUSCOIN_VERSION}.tar.gz";
+      POST_COMMENT="${POST_COMMENT}Using ${BINARY_SOURCE}/${DEFAULT_VERUSCOIN_BRANCH} binaries.";
+      else
+      export POST_COMMENT="${POST_COMMENT}Using ${UPSTREAM_TRIGGER}/${UPSTREAM_CLI_BRANCH} binaries."; fi
+    - cd gui/EasyDEX-GUI/react
+    - yarn install
+    - yarn run build
+    - cd ../../..
+    - gsutil cp $STAGING/$VERUS_CLI_MACOS .
+    - wget https://github.com/KomodoPlatform/komodo/releases/download/0.5.0/komodo_0.5.0_macOS.gz
+    - mkdir -p assets/bin/osx/verusd
+    - tar -xzf Verus-CLI-MacOS-v${VERUSCOIN_VERSION}.tar.gz --strip=1 --directory assets/bin/osx/verusd
+    - tar -xzvf komodo_${KOMODO_VERSION}_macOS.gz  --strip=1 --directory assets/bin/osx
+    - rm komodo_${KOMODO_VERSION}_macOS.gz
+    - rm Verus-CLI-MacOS-v${VERUSCOIN_VERSION}.tar.gz
+    - yarn install
+  script:
+    - export USE_HARD_LINKS=false
+    - yarn run dist
+    - cd dist
+    - shasum -a 256 ${AGAMA_MACOS} > ${AGAMA_MACOS}.sha256
+    - mv ${AGAMA_MACOS} ${AGAMA_MACOS}.sha256 ..
+  after_script:
+    - curl -F file=@"${AGAMA_MACOS}"
+      -F channels="${AGAMA_POST_CHANNEL}"
+      -F initial_comment="${POST_COMMENT}"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
+  artifacts:
+    paths:
+      - ${AGAMA_MACOS}
+      - ${AGAMA_MACOS}.sha256
+      - dist
+    expire_in: 1 week
+
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  dependencies:
+    - build:linux
+    - build:windows
+    - build:mac
+  script:
+    - mkdir -p $CI_COMMIT_REF_NAME/Windows
+    - mkdir -p $CI_COMMIT_REF_NAME/Linux
+    - mkdir -p $CI_COMMIT_REF_NAME/MacOS
+    - cp ${AGAMA_LINUX_TAR} ${CI_COMMIT_REF_NAME}/Linux
+    - cp ${AGAMA_WINDOWS_ZIP} ${CI_COMMIT_REF_NAME}/Windows
+    - cp ${AGAMA_MACOS} ${CI_COMMIT_REF_NAME}/MacOS
+    - echo ${AUTH_KEY} > AUTH_KEY.json
+    - gcloud auth activate-service-account --key-file AUTH_KEY.json
+    - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
+  artifacts:
+    paths:
+      - ${AGAMA_LINUX_TAR}
+      - ${AGAMA_LINUX_TAR}.sha256
+      - ${AGAMA_WINDOWS_ZIP}
+      - ${AGAMA_WINDOWS_ZIP}.sha256
+      - ${AGAMA_MACOS}
+      - ${AGAMA_MACOS}.sha256
+    expire_in: 1 week

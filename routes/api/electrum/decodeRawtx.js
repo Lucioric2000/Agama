@@ -25,31 +25,34 @@ module.exports = (api) => {
 
         res.end(JSON.stringify(retObj));
       } else {
-        const ecl = api.ecl(req.query.network);
+        async function _decodeRawTx() {
+          const ecl = await api.ecl(req.query.network);
 
-        api.log(decodedTx.inputs[0], 'spv.decoderawtx');
-        api.log(decodedTx.inputs[0].txid, 'spv.decoderawtx');
+          api.log(decodedTx.inputs[0], 'spv.decoderawtx');
+          api.log(decodedTx.inputs[0].txid, 'spv.decoderawtx');
 
-        ecl.connect();
-        ecl.blockchainTransactionGet(decodedTx.inputs[0].txid)
-        .then((json) => {
-          ecl.close();
-          api.log(json, 'spv.decoderawtx');
+          ecl.connect();
+          ecl.blockchainTransactionGet(decodedTx.inputs[0].txid)
+          .then((json) => {
+            ecl.close();
+            api.log(json, 'spv.decoderawtx');
 
-          const decodedVin = api.electrumJSTxDecoder(json, req.query.network, _network);
+            const decodedVin = api.electrumJSTxDecoder(json, req.query.network, _network);
 
-          const retObj = {
-            msg: 'success',
-            result: {
-              network: decodedTx.network,
-              format: decodedTx.format,
-              inputs: decodedVin.outputs[decodedTx.inputs[0].n],
-              outputs: decodedTx.outputs,
-            },
-          };
+            const retObj = {
+              msg: 'success',
+              result: {
+                network: decodedTx.network,
+                format: decodedTx.format,
+                inputs: decodedVin.outputs[decodedTx.inputs[0].n],
+                outputs: decodedTx.outputs,
+              },
+            };
 
-          res.end(JSON.stringify(retObj));
-        });
+            res.end(JSON.stringify(retObj));
+          });
+        };
+        _decodeRawTx();
       }
     } else {
       const retObj = {

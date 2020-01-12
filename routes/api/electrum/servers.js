@@ -91,7 +91,7 @@ module.exports = (api) => {
       list = api.electrumServers;
     }
 
-    _fs.access(api.agamaDir, api.fs.constants.R_OK, (err) => {
+    _fs.access(api.agamaDir, fs.constants.R_OK, (err) => {
       if (!err) {
         const FixFilePermissions = () => {
           return new Promise((resolve, reject) => {
