@@ -7,7 +7,7 @@ then
     cd Agama
 fi
 git checkout dev
-git pull upstream dev
+git pull origin dev
 
 npm install
 npm install webpack@3.0.0 webpack-cli@3.0.0
@@ -18,14 +18,14 @@ if [[ -d EasyDEX-GUI ]]
 then
 	echo The EasyDEX-GUI dir already existed
 	cd EasyDEX-GUI/react
-  git pull upstream dev
+  git pull origin dev
 else
 	git clone https://github.com/komodoplatform/EasyDEX-GUI
 	cd EasyDEX-GUI/react
 fi
 echo edex en:
 git checkout dev
-git pull upstream dev
+git pull origin dev
 sudo /usr/local/bin/node /usr/local/bin/npm install -g electron-packager
 npm install electron
 npm install

@@ -14,10 +14,12 @@ echo =========================================
 echo Step: Downloading latest LINUX komodo binaries from github
 curl -s https://api.github.com/repos/KomodoPlatform/komodo/releases \
   | grep browser_download_url \
-  | grep linux_master \
+  | grep _linux \
   | cut -d '"' -f 4 \
   | wget -qi -
-tar xvfz komodo_linux_master.tar.gz
+# before was  | grep linux_master \
+#tar xvfz komodo_linux_master.tar.gz
+tar -xvzf komodo_0.5.0_linux.tar.gz
 mv -Tf src bins_linux/
 echo =========================================
 echo Step: Downloading latest WIN komodo binaries from github
